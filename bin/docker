@@ -1,0 +1,135 @@
+#!/bin/bash
+
+cd "$(dirname "$(which "$0")")/.."
+
+. lib/conflib
+
+docker_compose () {
+    export WWW_DATA_UID="`id -u`"
+    export WWW_DATA_GID="`id -g`"
+    test -f ".config.env" && . .config.env
+    docker-compose "$@"
+}
+
+docker_configure() {
+    . scripts/configure
+}
+
+docker_initialize() {
+    docker_compose exec --user www-data webserver bash scripts/initialize
+}
+
+docker_up() {
+    docker_compose up --build -d
+}
+
+docker_down() {
+    docker_compose down
+}
+
+docker_kill() {
+    docker_compose kill
+}
+
+docker_restart() {
+    docker_down
+    docker_up
+}
+
+real_docker_exec() {
+    docker_compose exec "$@"
+}
+
+parse_container_name() {
+    echo "$1" | sed 's/:.*$//;s/^-.*//'
+}
+
+parse_user_name() {
+    if echo "$1" | grep -q ':'; then
+        echo "$1" | sed 's/^[^:]*://'
+    else
+        echo "www-data"
+    fi
+}
+
+docker_exec() {
+    if [ "$#" = 0 ]; then
+        arg_error "container name expected"
+        exit 1
+    fi
+    container="`parse_container_name "$1"`"
+    user="`parse_user_name "$1"`"
+    shift
+
+    if [ "$container" = "" ]; then
+        arg_error "container name expected"
+        exit 1
+    fi
+
+    if [ "$#" = 0 ]; then
+        real_docker_exec --user "$user" "$container" bash
+    else
+        real_docker_exec --user "$user" "$container" "$@"
+    fi
+}
+
+arg_error() {
+    echo "$1" 1>&2
+    echo "use: "$0 help" for more help" 1>&2
+}
+
+show_help() {
+    echo "usage: $0 command [arguments]" 1>&2
+    echo "possible commands:" 1>&2
+    echo "    configure" 1>&2
+    echo "        configure the runtime environment" 1>&2
+    echo "    up" 1>&2
+    echo "        start all docker containers" 1>&2
+    echo "    down" 1>&2
+    echo "        stop all docker containers" 1>&2
+    echo "    initialize" 1>&2
+    echo "        initialize the application" 1>&2
+    echo "    kill" 1>&2
+    echo "        kill all docker containers" 1>&2
+    echo "    restart" 1>&2
+    echo "        restart all docker containers" 1>&2
+    echo "    compose [docker-compose-arguments]" 1>&2
+    echo "        manually run docker-compose with all environment variables properly set" 1>&2
+    echo "    exec container [command [arg1 [arg2 ...]]" 1>&2
+    echo "        run a command in a given docker container" 1>&2
+    echo "    help" 1>&2
+    echo "        show this help" 1>&2
+}
+
+if [ "$#" = 0 ]; then
+    show_help
+    exit 1
+fi
+
+cmd="$1"
+shift
+
+case "$cmd" in
+config|configure)
+    docker_configure "$@";;
+up|start)
+    docker_up "$@";;
+down|stop)
+    docker_down "$@";;
+init|initialize)
+    docker_initialize "$@";;
+kill)
+    docker_kill "$@";;
+restart)
+    docker_restart "$@";;
+compose|dc)
+    docker_compose "$@";;
+exec)
+    docker_exec "$@";;
+help)
+    show_help "$@";;
+*)
+    echo "unknown command: $cmd" 1>&2
+    echo "use: "$0 help" for more help" 1>&2
+    exit 1;;
+esac

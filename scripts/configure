@@ -1,0 +1,9 @@
+#!/bin/bash
+
+print_heading "=" "Configuring the evangnet runtime environment"
+create_config
+question "q_int 1 65535" APP_PORT 80 "On which port the web service should listen?"
+commit_config
+print_line
+print_line "Environment successfully configured."
+

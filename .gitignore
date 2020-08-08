@@ -1,0 +1,10 @@
+#configuration
+/.config.env
+/.config.env.new
+
+#vendor
+
+/vendor
+
+#ides (put your favorite IDE tmp file masks here)
+.*.swp

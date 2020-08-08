@@ -1,0 +1,190 @@
+#!/bin/bash
+
+CONF_FILE=".config.env"
+TMP_CONF_FILE=".config.env.new"
+
+create_config() {
+    echo -n > "$TMP_CONF_FILE"
+}
+
+commit_config() {
+    test -f "$TMP_CONF_FILE" && mv "$TMP_CONF_FILE" "$CONF_FILE"
+}
+
+append_config() {
+    cat >> "$TMP_CONF_FILE"
+}
+
+append_config_line() {
+    echo "$1" | append_config
+}
+
+append_config_value() {
+    local var="$1"
+    local val="$2"
+    local line="export $var='`echo -n "$val" | sed "s/'/'\\\\\\''/g"`'"
+    append_config_line "$line"
+}
+
+read_config_value() {
+    bash -c "test -f '$TMP_CONF_FILE' && source '$TMP_CONF_FILE'; echo \"\$$1\""
+}
+
+read_final_config_value() {
+    bash -c "test -f '$CONF_FILE' && source '$CONF_FILE'; echo \"\$$1\""
+}
+
+print_line() {
+    echo "$@" 1>&2
+}
+
+print_heading() {
+    local char="$1"
+    local message="$2"
+    local msglen="${#message}"
+    test "$char" = "" && char="="
+    while [ "${#char}" -lt "$msglen" ]; do
+        char="$char$char"
+    done
+    char="${char:0:$msglen}"
+    print_line
+    print_line "$message"
+    print_line "$char"
+
+}
+
+#this function is allowed to be used only in the form scripts
+module_enabled() {
+    local m
+    for m in `read_config_value MODS_ENABLED`; do
+        if [ "$m" = "$1" ]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+
+question() {
+    local check="$1"
+    local var="$2"
+    local default="$3"
+    local question="$4"
+    local val="`read_final_config_value "$var"`"
+    if [ "$val" != "" ]; then
+        val="`$check "$val" 2> /dev/null`"
+        if [ "$?" = 0 ]; then
+            default="$val"
+        fi
+    fi
+    local dflt
+	if [ "$default" = "" ]; then
+		dflt=""
+	else
+		dflt="[$default] "
+	fi
+	local run=1
+    local first=1
+	while [ -n "$run" ]; do
+
+        print_line
+        if [ "$first" = "1" -a "$CONFIGURE_BATCH_MODE" = "y" -a "$default" != "" ]; then
+            echo "$question $dflt $default"
+            data="$default"
+        else
+		    read -p "$question $dflt" data
+        fi
+        first=0
+        if [ "$data" = "" ]; then
+            data="$default"
+        fi
+        data="`$check "$data"`"
+        if [ "$?" = 0 ]; then
+            run=""
+        fi
+	done
+    append_config_value "$var" "$data"
+}
+
+get_last_arg() {
+    while [ "$#" -gt 1 ]; do
+        shift
+    done
+    echo -n "$1"
+}
+
+q_bool() {
+    local data="`get_last_arg "$@" | awk '{print tolower($0)}'`"
+    case "$data" in
+			y|yes)
+				data="y" ;;
+			n|no)
+				data="n" ;;
+			*)
+				echo "Error: Please type 'y' or 'n'" 1>&2
+                return 1
+				;;
+    esac
+    echo -n "$data"
+    return 0
+}
+
+q_symfony_env() {
+    local data="`get_last_arg "$@" | awk '{print tolower($0)}'`"
+    case "$data" in
+    dev|test|prod) echo -n "$data"; return 0;;
+    *) echo "Error: invalid symfony environment. Use one of dev, test, prod." 1>&2; return 1;;
+    esac
+    return 1;
+}
+
+q_int() {
+    local data="`get_last_arg "$@"`"
+    if echo "$data" | grep -q '^[0-9]\+$'; then
+        if [ "$#" -gt 2 ]; then
+            if [ "$data" -lt "$1" -o "$data" -gt "$2" ]; then
+                echo "Error: integer out of range. Please enter an integer in the range [$1,$2]" 1>&2
+                return 1
+            fi
+        elif [ "$#" -gt 1 ]; then
+            if [ "$data" -gt "$1"]; then
+                echo "Error: integer out of range. Please enter an integer of maximal value $1" 1>&2
+                return 1
+            fi
+        fi
+        echo "$data"
+        return 0
+    else
+        echo "Error: Invalid integer. Please enter an integer." 1>&2
+        return 1
+    fi
+    
+}
+
+q_hostname() {
+    local data="`get_last_arg "$@"`"
+    if echo "$data" | grep -Eq '^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$'; then
+        echo "$data"
+        return 0
+    else
+        echo "Help: Set IP alias which will be provided i.e. 'sudo ifconfig en0 alias 10.254.254.254 255.255.255.0' and use 10.254.254.254 as valid IP"
+        echo "Error: Invalid hostname." 1>&2
+        return 1
+    fi
+}
+
+q_ip() {
+    local data="`get_last_arg "$@"`"
+    if echo "$data." | grep -Eq '^(0*[1-9][0-9]{0,2}\.){4}$'; then
+        echo "$data"
+        return 0
+    else
+        echo "Error: Invalid ip." 1>&2
+        return 1
+    fi
+}
+
+q_string() {
+    get_last_arg "$@"
+    return 0
+}

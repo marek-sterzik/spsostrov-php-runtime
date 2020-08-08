@@ -1,0 +1,16 @@
+{
+    "name": "sterzik/php-runtime-env",
+    "description": "PHP Docker Runtime Environment",
+    "authors": [
+        {
+            "name": "Marek Sterzik",
+            "email": "marek@milimetr.org"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "App\\": "src"
+        }
+    },
+    "require": {}
+}
