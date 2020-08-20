@@ -253,13 +253,15 @@ function enableBird(element)
 $(window).on("load", function() {
     enableBird($('object.ptacek'));
     $('#prepinac').css("opacity", 0).css("visibility", "visible");
-    $('#prepinac a').bind("click", function() {
+    $('#prepinac a').bind("click", function(ev) {
         $(".ptacek").hide();
         $(".sloupek").show();
         $("#prepinac").hide();
         setTimeout(function(){
             $("video.sloupek")[0].play();
         }, 5000);
+        ev.preventDefault();
+        return false;
     });
     $('video.sloupek').bind("click", function() {
         $(this)[0].play();
