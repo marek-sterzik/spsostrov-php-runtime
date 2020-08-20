@@ -105,22 +105,6 @@ function animateBirdStep(val, hoopLength, pauseLength, bird)
 
 carouselPausedLevel = 0;
 
-function pauseCarousel()
-{
-    if (carouselPausedLevel == 0) {
-        $('#carousel').carousel('pause');
-    }
-    carouselPausedLevel++;
-}
-
-function unpauseCarousel()
-{
-    carouselPausedLevel--;
-    if (carouselPausedLevel == 0) {
-        $('#carousel').carousel('cycle');
-    }
-}
-
 function animateBird(hoopLength, pauseLength, hoops, bird)
 {
     if (bird.tweeting || bird.hooping) {
@@ -142,6 +126,8 @@ function animateBird(hoopLength, pauseLength, hoops, bird)
         }
     });
 }
+
+numberOfTweets = 0;
 
 function tweetBird(bird)
 {
@@ -168,7 +154,10 @@ function tweetBird(bird)
         easing: "linear",
         done: function() {
             bird.tweeting = false;
-            unpauseCarousel();
+            numberOfTweets++;
+            if (numberOfTweets == 3) {
+                $('#prepinac').animate({"opacity": 1});
+            }
         }
     });
     $('#sound')[0].play();
@@ -230,7 +219,6 @@ function startBirdAction(bird)
 {
     //tweetBird(bird);
     animateBird(200, 200, 3, bird);
-    pauseCarousel();
 }
 
 function birdBlinkEye(bird)
@@ -264,13 +252,16 @@ function enableBird(element)
 
 $(window).on("load", function() {
     enableBird($('object.ptacek'));
-    $('#startstop').on("click", function() {
-        if ($(this).hasClass("running")) {
-            pauseCarousel();
-            $(this).removeClass("running").addClass("paused");
-        } else {
-            unpauseCarousel();
-            $(this).removeClass("paused").addClass("running");
-        }
+    $('#prepinac').css("opacity", 0).css("visibility", "visible");
+    $('#prepinac a').bind("click", function() {
+        $(".ptacek").hide();
+        $(".sloupek").show();
+        $("#prepinac").hide();
+        setTimeout(function(){
+            $("video.sloupek")[0].play();
+        }, 5000);
+    });
+    $('video.sloupek').bind("click", function() {
+        $(this)[0].play();
     });
 });
