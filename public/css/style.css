@@ -2,7 +2,7 @@ div.telo {margin: auto; box-shadow: 3px 3px 3px #e0e0e0; border: 1px solid #f0f0
 h1 {color: #800000; text-align: center; text-shadow: 2px 2px #e0e0e0;}
 p {text-indent: 1em; text-align: justify;}
 object.ptacek {width: 20em; height: 12em; margin: auto; display: block;}
-div#prepinac {text-align: center; visibility: hidden;}
-div#prepinac a {color: inherit; text-decoration: underline;}
-video.sloupek {display: none; margin: auto; cursor: pointer;}
-.sloupek-kontejner {text-align: center;}
+div#prepinac, div#prepinac-zpet {text-align: center; visibility: hidden;}
+div#prepinac a, div#prepinac-zpet a {color: inherit; text-decoration: underline;}
+video.sloupek {margin: auto; cursor: pointer;}
+.sloupek-kontejner {display: none; text-align: center;}

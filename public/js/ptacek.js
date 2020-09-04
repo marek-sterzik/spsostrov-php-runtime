@@ -253,13 +253,25 @@ function enableBird(element)
 $(window).on("load", function() {
     enableBird($('object.ptacek'));
     $('#prepinac').css("opacity", 0).css("visibility", "visible");
+    $('#prepinac-zpet').css("opacity", 0).css("visibility", "visible");
     $('#prepinac a').bind("click", function(ev) {
-        $(".ptacek").hide();
-        $(".sloupek").show();
-        $("#prepinac").hide();
+        $(".sloupek-kontejner").show();
+        $(".ptacek-kontejner").hide();
         setTimeout(function(){
             $("video.sloupek")[0].play();
+            setTimeout(function(){
+                $('#prepinac-zpet').animate({"opacity": 1});
+            }, 5000);
         }, 5000);
+        ev.preventDefault();
+        return false;
+    });
+    $('#prepinac-zpet a').bind("click", function(ev) {
+        $(".sloupek-kontejner").hide();
+        $(".ptacek-kontejner").show();
+        var video = $('video.sloupek')[0];
+        video.pause();
+        video.currentTime = 0;
         ev.preventDefault();
         return false;
     });
