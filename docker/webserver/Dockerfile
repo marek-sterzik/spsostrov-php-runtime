@@ -18,4 +18,5 @@ RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer
 
 RUN docker-php-ext-install zip
+RUN docker-php-ext-install bcmath
 RUN a2enmod rewrite
