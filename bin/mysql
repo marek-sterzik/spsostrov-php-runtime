@@ -1,0 +1,14 @@
+#!/bin/bash
+
+cd "$(dirname "$(which "$0")")/.."
+tflag=""
+test -t 0 || tflag="-T"
+
+echo "Starting main database"
+
+host=db
+user=root
+password=rootpass
+database=thedatabase
+
+bin/docker exec $tflag db mysql -h $host -u $user -p$password $database

@@ -1,0 +1,13 @@
+#!/bin/bash
+
+cd "$(dirname "$(which "$0")")/.."
+tflag=""
+test -t 0 || tflag="-T"
+
+echo "Starting main database"
+host=db
+user=root
+password=heslo
+database=mikeportal
+
+bin/docker exec $tflag db mysqldump -h $host -u $user -p$password $database --no-create-info

@@ -15,3 +15,12 @@ services:
             - .:/var/www/html
         environment:
             APACHE_DOCUMENT_ROOT: /var/www/html/public
+    db:
+        image: mysql:5.7.22
+        expose:
+            - 3306
+        environment:
+            MYSQL_ROOT_PASSWORD: rootpass
+            MYSQL_DATABASE: thedatabase
+            MYSQL_USER: user
+            MYSQL_PASSWORD: userpass
