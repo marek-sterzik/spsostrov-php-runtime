@@ -1,3 +1,8 @@
 #!/bin/bash
 
 composer install
+
+if [ -n "$(find migrations/ -iname '*.php')" ]; then
+    lib/console doctrine:migrations:migrate --no-interaction
+fi
+
