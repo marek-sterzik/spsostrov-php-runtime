@@ -4,10 +4,11 @@ cd "$(dirname "$(which "$0")")/.."
 tflag=""
 test -t 0 || tflag="-T"
 
-echo "Starting main database"
 host=db
 user=root
-password=heslo
-database=mikeportal
+password=rootpass
+database=thedatabase
 
-bin/docker exec $tflag db mysqldump -h $host -u $user -p$password $database --no-create-info
+bin/docker compose exec $tflag db bash -c "
+    mysqldump -h $host -u $user -p$password $database --complete-insert --no-create-info --ignore-table=\"$database.doctrine_migration_versions\" 2> /dev/null
+"

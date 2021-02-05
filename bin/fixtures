@@ -1,0 +1,43 @@
+#!/bin/bash
+
+cd "$(dirname "$(which "$0")")/.."
+
+error=""
+if [ "$#" != 1 ]; then
+    error=1
+fi
+
+if [ "$1" != 'load' -a "$1" != 'save' -a "$1" != 'store' -a "$1" != 'migrate' -a "$1" != 'empty' -a "$1" != 'vanish' ]; then
+    error=1
+fi
+
+if [ "$error" = "1" ]; then
+    echo "usage: $0 load|save|migrate|empty|vanish"
+    exit
+fi
+
+if [ "$1" = "migrate" ]; then
+    bin/console make:migration
+    if [ -n "$(find migrations/ -iname '*.php')" ]; then
+        bin/console doctrine:migrations:migrate --no-interaction
+    fi
+    bin/fixtures save
+
+elif [ "$1" = "vanish" ]; then
+    echo "drop database thedatabase; create database thedatabase;" | bin/mysql
+elif [ "$1" = "empty" ]; then
+    echo "drop database thedatabase; create database thedatabase;" | bin/mysql
+    if [ -n "$(find migrations/ -iname '*.php')" ]; then
+        bin/console doctrine:migrations:migrate --no-interaction
+    fi
+elif [ "$1" = "load" ]; then
+    echo "drop database thedatabase; create database thedatabase;" | bin/mysql
+    if [ -n "$(find migrations/ -iname '*.php')" ]; then
+        bin/console doctrine:migrations:migrate --no-interaction
+    fi
+    bin/mysql < fixtures/data.sql
+else
+    mkdir -p fixtures
+    bin/mysqldump > fixtures/data.sql
+fi
+

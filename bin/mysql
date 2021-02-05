@@ -11,4 +11,4 @@ user=root
 password=rootpass
 database=thedatabase
 
-bin/docker exec $tflag db mysql -h $host -u $user -p$password $database
+bin/docker compose exec $tflag db mysql -h $host -u $user -p$password $database

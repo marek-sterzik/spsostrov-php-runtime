@@ -1,0 +1,11 @@
+#!/bin/bash
+
+cd "$(dirname "$(which "$0")")/.."
+
+rm -f migrations/*.php
+bin/fixtures vanish
+bin/console make:migration
+if [ -n "$(find migrations/ -iname '*.php')" ]; then
+    bin/console doctrine:migrations:migrate --no-interaction
+fi
+bin/fixtures load

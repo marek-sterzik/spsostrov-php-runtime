@@ -1,0 +1,5 @@
+#!/bin/bash
+
+cd "$(dirname "$(which "$0")")/.."
+
+bin/docker exec webserver composer "$@"
