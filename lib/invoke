@@ -1,10 +1,15 @@
 #!/bin/bash
 
+export RUNTIME_ENV_TYPE="$1"
+shift
+
 if [ -x "./invoke" ]; then
     ./invoke "$@"
 else
-    host="webserver"
-    test "$1" = "mysql" -o "$1" = "lib/mysqldump" && host=db
-
+    if [ "$RUNTIME_ENV_TYPE" = "mysql" ]; then
+        host="db"
+    else
+        host="webserver"
+    fi
     bin/docker exec "$host" "$@"
 fi

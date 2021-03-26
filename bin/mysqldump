@@ -2,6 +2,6 @@
 
 cd "$(dirname "$(which "$0")")/.."
 
-eval "`lib/invoke lib/readenv mysqlvars | sed 's/\r$//'`"
+eval "`lib/invoke runtime lib/readenv mysqlvars | sed 's/\r$//'`"
 
-lib/invoke lib/mysqldump -h "$mysqlhost" -P "$mysqlport" -u "$mysqluser" -p"$mysqlpass" "$mysqldb" --complete-insert --no-create-info --ignore-table=\"$mysqldb.doctrine_migration_versions\"
+lib/invoke mysql lib/mysqldump -h "$mysqlhost" -P "$mysqlport" -u "$mysqluser" -p"$mysqlpass" "$mysqldb" --complete-insert --no-create-info --ignore-table="$mysqldb.doctrine_migration_versions"

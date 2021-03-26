@@ -2,4 +2,4 @@
 
 cd "$(dirname "$(which "$0")")/.."
 
-lib/invoke lib/console "$@"
+lib/invoke runtime lib/console "$@"

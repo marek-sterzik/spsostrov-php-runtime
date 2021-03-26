@@ -2,6 +2,6 @@
 
 cd "$(dirname "$(which "$0")")/.."
 
-eval "`lib/invoke lib/readenv mysqlvars | sed 's/\r$//'`"
+eval "`lib/invoke runtime lib/readenv mysqlvars | sed 's/\r$//'`"
 
-lib/invoke mysql -h "$mysqlhost" -P "$mysqlport" -u "$mysqluser" -p"$mysqlpass" "$mysqldb"
+lib/invoke mysql mysql -h "$mysqlhost" -P "$mysqlport" -u "$mysqluser" -p"$mysqlpass" "$mysqldb"
