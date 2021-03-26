@@ -2,4 +2,4 @@
 
 cd "$(dirname "$(which "$0")")/.."
 
-bin/docker exec webserver lib/console "$@"
+lib/invoke lib/console "$@"

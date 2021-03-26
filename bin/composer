@@ -2,4 +2,4 @@
 
 cd "$(dirname "$(which "$0")")/.."
 
-bin/docker exec webserver composer "$@"
+lib/invoke composer "$@"

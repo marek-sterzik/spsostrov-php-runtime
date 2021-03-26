@@ -1,14 +1,7 @@
 #!/bin/bash
 
 cd "$(dirname "$(which "$0")")/.."
-tflag=""
-test -t 0 || tflag="-T"
 
-echo "Starting main database"
+eval "`lib/invoke lib/readenv mysqlvars | sed 's/\r$//'`"
 
-host=db
-user=root
-password=rootpass
-database=thedatabase
-
-bin/docker compose exec $tflag db mysql -h $host -u $user -p$password $database
+lib/invoke mysql -h "$mysqlhost" -P "$mysqlport" -u "$mysqluser" -p"$mysqlpass" "$mysqldb"

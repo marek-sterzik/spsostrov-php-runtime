@@ -66,10 +66,13 @@ docker_exec() {
         exit 1
     fi
 
+    tflag=""
+    test -t 0 || tflag="-T"
+
     if [ "$#" = 0 ]; then
-        real_docker_exec --user "$user" "$container" bash
+        real_docker_exec $tflag --user "$user" "$container" bash
     else
-        real_docker_exec --user "$user" "$container" "$@"
+        real_docker_exec $tflag --user "$user" "$container" "$@"
     fi
 }
 

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if [ -x "./invoke" ]; then
+    ./invoke "$@"
+else
+    host="webserver"
+    test "$1" = "mysql" -o "$1" = "lib/mysqldump" && host=db
+
+    bin/docker exec "$host" "$@"
+fi

@@ -1,0 +1,58 @@
+#!/usr/bin/env php
+<?php
+
+use App\Kernel;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Dotenv\Dotenv;
+use Symfony\Component\ErrorHandler\Debug;
+
+if (!in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
+    echo 'Warning: The console should be invoked via the CLI version of PHP, not the '.PHP_SAPI.' SAPI'.PHP_EOL;
+}
+
+set_time_limit(0);
+
+require dirname(__DIR__).'/vendor/autoload.php';
+
+(new Dotenv())->bootEnv(dirname(__DIR__).'/.env');
+
+$url = $_ENV['DATABASE_URL'] ?? null;
+
+if ($url === null) {
+    exit(1);
+}
+
+$urlParsed = parse_url($url);
+
+if (!is_array($urlParsed)) {
+    exit(1);
+}
+
+$scheme = $urlParsed['scheme'] ?? null;
+$host = $urlParsed['host'] ?? null;
+$port = $urlParsed['port'] ?? null;
+$user = $urlParsed['user'] ?? null;
+$password = $urlParsed['pass'] ?? null;
+$path = $urlParsed['path'] ?? null;
+
+if ($scheme === null || $host === null || $port === null || $user === null || $password === null || $path === null) {
+    exit(1);
+}
+
+if ($scheme !== 'mysql') {
+    exit(1);
+}
+
+if (substr($path, 0, 1) !== '/') {
+    exit(1);
+}
+
+$database = substr($path, 1);
+
+echo "mysqlhost=".escapeshellarg($host)."\n";
+echo "mysqlport=".escapeshellarg($port)."\n";
+echo "mysqluser=".escapeshellarg($user)."\n";
+echo "mysqlpass=".escapeshellarg($password)."\n";
+echo "mysqldb=".escapeshellarg($database)."\n";
+exit(0);
