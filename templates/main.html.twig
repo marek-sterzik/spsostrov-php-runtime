@@ -1,11 +1,5 @@
-<!doctype html>
-<html>
-    <head>
-        <title>Vývojové prostředí pro PVA</title>
-        <link rel="stylesheet" href="/css/style.css">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script src="/js/ptacek.js"></script>
-    </head>
+{% extends "base.html.twig" %}
+{% block body %}
     <body>
         <div  class="telo">
             <h1>Milý studente!</h1>
@@ -19,19 +13,19 @@
                 okamžitý efekt.
             </p>
             <div class="ptacek-kontejner">
-                <object class="ptacek" type="image/svg+xml" data="/svg/ptacek.svg"></object>
+                <object class="ptacek" type="image/svg+xml" data="{{ asset('svg/ptacek.svg') }}"></object>
                 <div id="prepinac">
                     <a href="#">Myslím, že ten pták je infantilní!</a>
                 </div>
             </div>
             <div class="sloupek-kontejner">
-                <video class="sloupek"><source src="/media/sloupek.mp4" type="video/mp4" /></video>
+                <video class="sloupek"><source src="{{ asset('media/sloupek.mp4') }}" type="video/mp4" /></video>
                 <div id="prepinac-zpet">
                     <a href="#">Tvl, to raději toho ptáka!</a>
                 </div>
             </div>
 
         </div>
-        <audio id="sound"><source src="/media/tweet.mp3" type="audio/mpeg"></audio>
+        <audio id="sound"><source src="{{ asset('media/tweet.mp3') }}" type="audio/mpeg"></audio>
     </body>
-</html>
+{% endblock %}
