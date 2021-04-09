@@ -3,6 +3,9 @@
 /.config.env.new
 /invoke
 
+#assets
+/public/assets-v*
+
 #ides (put your favorite IDE tmp file masks here)
 .*.swp
 

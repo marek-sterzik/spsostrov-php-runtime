@@ -1,0 +1,11 @@
+#!/bin/bash
+
+cd "$(dirname "$(which "$0")")/../public"
+
+asset_version="`(echo 0; ls -d assets-v* 2> /dev/null) | sed 's/^assets-v//' | grep '^[0-9]\+$' | sed 's/^0\+//;s/^$/0/' | sort -rn | head -n 1`"
+
+rm -f assets-v*
+
+asset_version="`expr "$asset_version" + 1`"
+
+ln -s . "assets-v$asset_version"

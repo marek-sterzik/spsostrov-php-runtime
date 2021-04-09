@@ -1,0 +1,5 @@
+#!/bin/bash
+
+cd "$(dirname "$(which "$0")")/.."
+
+lib/invoke install lib/asset-update
