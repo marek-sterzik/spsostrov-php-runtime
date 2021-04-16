@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<ruleset name="Mikenopa ruleset"
+         xmlns="http://pmd.sf.net/ruleset/1.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sf.net/ruleset/1.0.0
+                     http://pmd.sf.net/ruleset_xml_schema.xsd"
+         xsi:noNamespaceSchemaLocation="
+                     http://pmd.sf.net/ruleset_xml_schema.xsd">
+    <description>
+        Mikenopa code style rules.
+    </description>
+    <!--Import whole default rulesets -->
+    <rule ref="rulesets/cleancode.xml">
+        <exclude name="ElseExpression"/>
+        <exclude name="StaticAccess" />
+        <exclude name="BooleanArgumentFlag" />
+        <exclude name="ErrorControlOperator" />
+    </rule>
+    <rule ref="rulesets/codesize.xml">
+        <exclude name="ExcessiveMethodLength"/>
+        <exclude name="ExcessiveParameterList"/>
+        <exclude name="CyclomaticComplexity" />
+        <exclude name="NPathComplexity" />
+        <exclude name="TooManyPublicMethods"/>
+        <exclude name="TooManyFields"/>
+        <exclude name="ExcessiveClassComplexity"/>
+    </rule>
+    <rule ref="rulesets/controversial.xml" />
+    <rule ref="rulesets/design.xml">
+        <exclude name="CouplingBetweenObjects"/>
+        <exclude name="NumberOfChildren"/>
+    </rule>
+    <rule ref="rulesets/naming.xml">
+        <exclude name="ShortVariable"/>
+        <exclude name="LongVariable"/>
+    </rule>
+    <rule ref="rulesets/unusedcode.xml">
+        <exclude name="UnusedFormalParameter" />
+        <exclude name="UnusedLocalVariable" />
+    </rule>
+
+    <!-- Custom settings for specific rules -->
+    <rule ref="rulesets/naming.xml/ShortVariable">
+        <properties>
+            <property name="exceptions" value="id,ip,i,j,n,io,qb,os"/>
+        </properties>
+    </rule>
+    <rule ref="rulesets/design.xml/CouplingBetweenObjects">
+        <properties>
+            <property name="maximum" value="15"/>
+        </properties>
+    </rule>
+    <rule ref="rulesets/codesize.xml/ExcessiveParameterList">
+        <properties>
+            <property name="minimum" value="20"/>
+        </properties>
+    </rule>
+    <rule ref="rulesets/codesize.xml/CyclomaticComplexity">
+        <properties>
+            <property name="reportLevel" value="30"/>
+        </properties>
+    </rule>
+    <rule ref="rulesets/codesize.xml/TooManyPublicMethods">
+        <properties>
+            <property name="maxmethods" value="20"/>
+        </properties>
+    </rule>
+    <rule ref="rulesets/codesize.xml/TooManyFields">
+        <properties>
+            <property name="maxfields" value="20"/>
+        </properties>
+    </rule>
+    <rule ref="rulesets/codesize.xml/ExcessiveClassComplexity">
+        <properties>
+            <property name="maximum" value="60"/>
+        </properties>
+    </rule>
+</ruleset>

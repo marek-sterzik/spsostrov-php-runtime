@@ -1,0 +1,46 @@
+#!/bin/bash
+
+set -e
+
+is_module() {
+    if [ "$module" = "all" -o "$module" = "$1" ]; then
+        true
+    else
+        false
+    fi
+}
+
+if [ "$#" = 0 ]; then
+    module=all
+else
+    module="$1"
+fi
+
+if is_module phpcs; then
+    echo 1>&2
+    echo "phpcs" 1>&2
+    echo "=====" 1>&2
+    echo 1>&2
+
+    vendor/bin/phpcs --standard=standards/phpcs.xml src
+    echo "Ok" 1>&2
+fi
+
+if is_module phpmd; then
+    echo 1>&2
+    echo "phpmd" 1>&2
+    echo "=====" 1>&2
+    echo 1>&2
+
+    vendor/bin/phpmd src text standards/phpmd.xml
+    echo "Ok" 1>&2
+fi
+
+if is_module phpstan; then
+    echo 1>&2
+    echo "phpstan" 1>&2
+    echo "=======" 1>&2
+    echo 1>&2
+
+    vendor/bin/phpstan analyse --level 6 src
+fi

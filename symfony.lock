@@ -1,9 +1,42 @@
 {
+    "composer/xdebug-handler": {
+        "version": "1.4.6"
+    },
+    "dealerdirect/phpcodesniffer-composer-installer": {
+        "version": "v0.7.1"
+    },
     "nikic/php-parser": {
         "version": "v4.10.2"
     },
+    "pdepend/pdepend": {
+        "version": "2.9.1"
+    },
     "php": {
         "version": "7.4"
+    },
+    "phpmd/phpmd": {
+        "version": "2.9.1"
+    },
+    "phpstan/phpdoc-parser": {
+        "version": "0.5.4"
+    },
+    "phpstan/phpstan": {
+        "version": "0.12.83"
+    },
+    "slevomat/coding-standard": {
+        "version": "7.0.2"
+    },
+    "squizlabs/php_codesniffer": {
+        "version": "3.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "master",
+            "version": "3.0",
+            "ref": "0dc9cceda799fd3a08b96987e176a261028a3709"
+        },
+        "files": [
+            "phpcs.xml.dist"
+        ]
     },
     "symfony/browser-kit": {
         "version": "v5.1.6"
