@@ -2,4 +2,4 @@
 
 cd "$(dirname "$(which "$0")")/.."
 
-bin/docker exec webserver bash lib/codecheck "$@"
+lib/invoke runtime bash lib/codecheck "$@"
