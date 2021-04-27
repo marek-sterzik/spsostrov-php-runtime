@@ -2,6 +2,11 @@
 
 cd "$(dirname "$(which "$0")")/.."
 
+do_vanish() {
+    eval "`echo -n | lib/invoke runtime lib/readenv mysqlvars | sed 's/\r$//'`"
+    echo "drop database $mysqldb; create database $mysqldb;" | bin/mysql
+}
+
 error=""
 if [ "$#" != 1 ]; then
     error=1
@@ -24,14 +29,14 @@ if [ "$1" = "migrate" ]; then
     bin/fixtures save
 
 elif [ "$1" = "vanish" ]; then
-    echo "drop database thedatabase; create database thedatabase;" | bin/mysql
+    do_vanish
 elif [ "$1" = "empty" ]; then
-    echo "drop database thedatabase; create database thedatabase;" | bin/mysql
+    do_vanish
     if [ -n "$(find migrations/ -iname '*.php')" ]; then
         bin/console doctrine:migrations:migrate --no-interaction
     fi
 elif [ "$1" = "load" ]; then
-    echo "drop database thedatabase; create database thedatabase;" | bin/mysql
+    do_vanish
     if [ -n "$(find migrations/ -iname '*.php')" ]; then
         bin/console doctrine:migrations:migrate --no-interaction
     fi
