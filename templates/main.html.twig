@@ -1,31 +1,29 @@
 {% extends "base.html.twig" %}
 {% block body %}
-    <body>
-        <div  class="telo">
-            <h1>Milý studente!</h1>
-            <p>
-                Toto je vývojové prostředí pro předmět PVA. Právě se Ti jej podařilo kompletně rozběhnout. Gratuluji. ☺
-            </p>
-            <p>
-                S tímto prostředím se budeme potkávat po celý rok a proto je dobré, aby ses s ním trochu seznámil.
-                Rozhlédni se po aplikaci a zkus si s ní trochu pohrát. Prozkoumej útroby. Zjisti co slouží k čemu.
-                Klidně si zkus aplikaci modifikovat a upravit ke svému obrazu. Většina provedených změn by měla mít
-                okamžitý efekt.
-            </p>
-            <div class="ptacek-kontejner">
-                <object class="ptacek" type="image/svg+xml" data="{{ asset('svg/ptacek.svg') }}"></object>
-                <div id="prepinac">
-                    <a href="#">Myslím, že ten pták je infantilní!</a>
-                </div>
+    <div  class="telo">
+        <h1>Milý studente!</h1>
+        <p>
+            Toto je vývojové prostředí pro předmět PVA. Právě se Ti jej podařilo kompletně rozběhnout. Gratuluji. ☺
+        </p>
+        <p>
+            S tímto prostředím se budeme potkávat po celý rok a proto je dobré, aby ses s ním trochu seznámil.
+            Rozhlédni se po aplikaci a zkus si s ní trochu pohrát. Prozkoumej útroby. Zjisti co slouží k čemu.
+            Klidně si zkus aplikaci modifikovat a upravit ke svému obrazu. Většina provedených změn by měla mít
+            okamžitý efekt.
+        </p>
+        <div class="ptacek-kontejner">
+            <object class="ptacek" type="image/svg+xml" data="{{ asset('svg/ptacek.svg') }}"></object>
+            <div id="prepinac">
+                <a href="#">Myslím, že ten pták je infantilní!</a>
             </div>
-            <div class="sloupek-kontejner">
-                <video class="sloupek"><source src="{{ asset('media/sloupek.mp4') }}" type="video/mp4" /></video>
-                <div id="prepinac-zpet">
-                    <a href="#">Tvl, to raději toho ptáka!</a>
-                </div>
-            </div>
-
         </div>
-        <audio id="sound"><source src="{{ asset('media/tweet.mp3') }}" type="audio/mpeg"></audio>
-    </body>
+        <div class="sloupek-kontejner">
+            <video class="sloupek"><source src="{{ asset('media/sloupek.mp4') }}" type="video/mp4" /></video>
+            <div id="prepinac-zpet">
+                <a href="#">Tvl, to raději toho ptáka!</a>
+            </div>
+        </div>
+
+    </div>
+    <audio id="sound"><source src="{{ asset('media/tweet.mp3') }}" type="audio/mpeg"></audio>
 {% endblock %}
