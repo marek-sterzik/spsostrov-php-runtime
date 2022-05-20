@@ -3,7 +3,15 @@
 set -e
 
 is_module() {
-    if [ "$module" = "all" -o "$module" = "$1" ]; then
+    if [ "$module" = "all" ]; then
+        if [ "$1" = "phpcbf" ]; then
+            false
+        else
+            true
+        fi
+    elif [ "$module" = "$1" ]; then
+        true
+    elif [ "$module" = "phpcbf" -a "$1" = "phpcs" ]; then
         true
     else
         false
@@ -14,6 +22,18 @@ if [ "$#" = 0 ]; then
     module=all
 else
     module="$1"
+fi
+
+if [ "$module" = "fix" -o "$module" = "--fix" -o "$module" = "-fix" -o "$module" = "phpcbf" ]; then
+    module="phpcbf"
+fi
+
+if is_module phpcbf; then
+    echo 1>&2
+    echo "phpcbf" 1>&2
+    echo "======" 1>&2
+    echo 1>&2
+    vendor/bin/phpcbf --standard=standards/phpcs.xml src || true
 fi
 
 if is_module phpcs; then
