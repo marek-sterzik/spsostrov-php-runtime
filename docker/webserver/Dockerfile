@@ -5,7 +5,7 @@ ARG WWW_DATA_GID
 
 # fix www-data uid and gid
 ADD fix-www-data-user /usr/local/sbin/fix-www-data-user
-RUN fix-www-data-user "${WWW_DATA_UID}" "${WWW_DATA_GID}"
+RUN perl /usr/local/sbin/fix-www-data-user "${WWW_DATA_UID}" "${WWW_DATA_GID}"
 RUN chown -R www-data:www-data /var/www
 
 RUN apt-get update && apt-get -y install git libzip-dev zip

@@ -4,11 +4,27 @@ cd "$(dirname "$(which "$0")")/.."
 
 . lib/conflib
 
+get_platform() {
+    if [ "$(expr substr $(uname -s) 1 10)" == "MINGW32_NT" -o "$(expr substr $(uname -s) 1 10)" == "MINGW64_NT" ]; then
+        echo "windows"
+    else
+        echo "other"
+    fi
+}
+
+if test -z "$RUNTIME_PLATFORM"; then
+    export RUNTIME_PLATFORM="`get_platform`"
+fi
+
 docker_compose () {
     export WWW_DATA_UID="`id -u`"
     export WWW_DATA_GID="`id -g`"
     test -f ".config.env" && . .config.env
-    docker-compose "$@"
+    if [ "$RUNTIME_PLATFORM" == "windows" ]; then
+        winpty docker-compose "$@"
+    else
+        docker-compose "$@"
+    fi
 }
 
 docker_configure() {

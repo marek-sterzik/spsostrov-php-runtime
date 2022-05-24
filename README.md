@@ -9,6 +9,16 @@ Pro běh vývojového prostředí je potřeba operační systém založený na l
 * docker
 * docker-compose
 
+## Windows
+
+Před stažením je potřeba nastavit parametr autocrlf u gitu z true na false:
+
+* git config --global core.autocrlf false
+
+Po stažení se nastavení může změnit zpět.
+
+* git config --global core.autocrlf true
+
 ## Rychlý start
 
 Pro rychlý start systému, spusťte tuto sekvenci příkazů:
