@@ -1,0 +1,145 @@
+#!/usr/bin/perl
+
+sub printError
+{
+	my $message = shift;
+	&_printMessage($message,"Error: ");
+}
+
+sub printMessage
+{
+	my $message = shift;
+	&_printMessage($message);
+}
+
+sub printOKMessage
+{
+	my $message = shift;
+	&_printMessage($message);
+}
+
+sub _printMessage
+{
+	my $message = shift;
+	my $prefix = shift;
+	print STDERR $prefix.$message."\n";
+}
+
+sub fixUid
+{
+	my $new_uid = shift;
+	my $new_gid = shift;
+	my $found = 0;
+	if(!open FD,"+<", "/etc/passwd"){
+		printError("Cannot open /etc/passwd to fix permissions");
+		return 0;
+	}
+	my $result = "";
+	while(my $line = <FD>){
+		my ($user,$pass,$uid,$gid,$rest) = split(/:/,$line,5);
+		if(defined $rest){
+			if($user eq 'node'){
+				if($found){
+					printError("multiple node users are in /etc/passwd, don't know what to do");
+					return 0;
+				}
+				$found = 1;
+				my $g;
+				$g = defined($new_gid)?$new_gid:$gid;
+				$result .= "$user:$pass:$new_uid:$g:$rest";
+			}else{
+				if($uid == $new_uid){
+					printError("User with UID $new_uid already exists!");
+					return 0;
+				}else{
+					$result .= $line;
+				}
+			}
+		}else{
+			$result .= $line;
+		}
+	}
+	if(!$found){
+		printError("user node was not found in /etc/passwd");
+		return 0;
+	}
+	seek(FD, 0, SEEK_SET);
+	truncate(FD,0);
+	print FD $result;
+	close(FD);
+
+	return 1;
+
+}
+
+sub fixGid
+{
+	my $new_gid = shift;
+	my $found = 0;
+	if(!open FD,"+<", "/etc/group"){
+		printError("Cannot open /etc/group to fix permissions");
+		return 0;
+	}
+	my $result = "";
+	while(my $line = <FD>){
+		my ($group,$pass,$gid,$rest) = split(/:/,$line,4);
+		if(defined $rest){
+			if($group eq 'node'){
+				if($found){
+					printError("multiple node groups are in /etc/group, don't know what to do");
+					return 0;
+				}
+				$found = 1;
+				my $g;
+				$result .= "$group:$pass:$new_gid:$rest";
+			}else{
+				if($gid == $new_gid){
+					printError("Group with GID $new_gid already exists!");
+					return 0;
+				}else{
+					$result .= $line;
+				}
+			}
+		}else{
+			$result .= $line;
+		}
+	}
+	if(!$found){
+		printError("group node was not found in /etc/group");
+		return 0;
+	}
+	seek(FD, 0, SEEK_SET);
+	truncate(FD,0);
+	print FD $result;
+	close(FD);
+
+	return 1;
+
+}
+
+$uid = lc($ARGV[0]);
+$gid = lc($ARGV[1]);
+$uid = undef if($uid eq '' || $uid eq 'orig');
+$gid = undef if($gid eq '' || $uid eq 'orig');
+
+$error = 0;
+$want_fix = 0;
+
+if(defined $uid){
+	$want_fix = 1;
+	$error = 1 if(!&fixUid($uid,$gid));
+}
+
+if(defined $gid){
+	$want_fix = 1;
+	$error = 1 if(!&fixGid($gid));
+}
+
+
+if($want_fix){
+	if(!$error){
+		&printOKMessage("node UID set to $uid and node GID set to $gid successfully");
+	}
+}else{
+	&printMessage("UID and GID was not changed");
+}

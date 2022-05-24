@@ -1,0 +1,19 @@
+#!/bin/bash
+
+cd "$(dirname "$(which "$0")")/.."
+
+usage() {
+    echo "usage: $0 [--watch]" 2>&1
+}
+
+watch=""
+if [ "$#" -ne 0 ]; then
+    if [ "$#" -eq 1 -a \( "$1" = "-w" -o "$1" = "--watch" -o "$1" = "watch" \) ]; then
+        watch="-w"
+    else
+        usage
+        exit
+    fi
+fi
+
+node_modules/.bin/webpack $watch

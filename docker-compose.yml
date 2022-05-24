@@ -27,3 +27,11 @@ services:
             MYSQL_DATABASE: thedatabase
             MYSQL_USER: user
             MYSQL_PASSWORD: userpass
+    node:
+        build:
+            context: docker/node
+            args:
+                - WWW_DATA_UID=${WWW_DATA_UID:-orig}
+                - WWW_DATA_GID=${WWW_DATA_GID:-orig}
+        volumes:
+            - .:/workspace
