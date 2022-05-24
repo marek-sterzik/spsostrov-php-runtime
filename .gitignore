@@ -6,6 +6,11 @@
 #assets
 /public/assets-v*
 
+#node
+/node_modules/
+/public/js/*
+!/public/js/.gitkeep
+
 #ides (put your favorite IDE tmp file masks here)
 .*.swp
 

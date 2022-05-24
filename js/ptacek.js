@@ -1,3 +1,5 @@
+import $ from "jquery"
+
 function composeTransform(t1, t2)
 {
     var t = "translate("+ t1.x +" "+ t1.y +")";
@@ -103,7 +105,7 @@ function animateBirdStep(val, hoopLength, pauseLength, bird)
     animateBirdHoop(val, max, bird);
 }
 
-carouselPausedLevel = 0;
+var carouselPausedLevel = 0;
 
 function animateBird(hoopLength, pauseLength, hoops, bird)
 {
@@ -127,7 +129,7 @@ function animateBird(hoopLength, pauseLength, hoops, bird)
     });
 }
 
-numberOfTweets = 0;
+var numberOfTweets = 0;
 
 function tweetBird(bird)
 {

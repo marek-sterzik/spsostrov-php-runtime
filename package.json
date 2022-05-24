@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "@babel/core": "^7.15.5",
+    "@babel/preset-env": "^7.15.6",
+    "babel-loader": "^8.2.2",
+    "jquery": "^3.6.0",
+    "webpack": "^5.57.1",
+    "webpack-cli": "^4.8.0"
+  }
+}
