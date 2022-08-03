@@ -29,6 +29,7 @@
     <rule ref="rulesets/design.xml">
         <exclude name="CouplingBetweenObjects"/>
         <exclude name="NumberOfChildren"/>
+        <exclude name="CountInLoopExpression"/>
     </rule>
     <rule ref="rulesets/naming.xml">
         <exclude name="ShortVariable"/>
