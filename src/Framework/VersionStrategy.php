@@ -14,12 +14,12 @@ class VersionStrategy implements VersionStrategyInterface
         $this->version = $this->detectVersion($assetBaseDir, $versionLinkWildCard);
     }
 
-    public function getVersion(string $path)
+    public function getVersion(string $path): string
     {
         return $this->version;
     }
 
-    public function applyVersion(string $path)
+    public function applyVersion(string $path): string
     {
         if ($this->version !== null) {
             return sprintf("%s/%s", $this->version, $path);
