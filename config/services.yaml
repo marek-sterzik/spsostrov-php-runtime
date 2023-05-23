@@ -4,6 +4,7 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
+    defaultAdminerEnabled: false
 
 services:
     # default configuration for services in *this* file
@@ -33,3 +34,8 @@ services:
         arguments:
             $assetBaseDir: '%kernel.project_dir%/public'
             $versionLinkWildCard: 'assets-v*'
+    App\Controller\AdminerController:
+        arguments:
+            $databaseUrl: '%env(resolve:DATABASE_URL)%'
+            $adminerBootFile: '%kernel.project_dir%/adminer/boot.php'
+            $adminerEnabled: '%env(default:defaultAdminerEnabled:bool:ADMINER_ENABLED)%'
