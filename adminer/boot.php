@@ -37,6 +37,47 @@ class AdminerLoginPasswordLess
     {
         return ltrim(static::$dbConf['path'], '/');
     }
+
+    public function loginForm()
+    {
+        $drivers = [
+            "mysql" => "server",
+            "mysqli" => "server",
+            "pdo_mysql" => "server",
+            "sqlite3" => "sqlite",
+            "pdo_sqlite" => "sqlite",
+            "sqlite2" => "sqlite2",
+            "pgsql" => "pgsq",
+            "pdo_pgsql" => "pgsq",
+            "oci8" => "oracle",
+            "pdo_oci" => "oracle",
+            "mssql" => "mssql",
+            "pdo_sqlsrv" => "mssql",
+            "mongo" => "mongo",
+            "elastic" => "elastic",
+        ];
+
+        if (!isset($drivers[self::$dbConf['scheme']])) {
+            return null;
+        }
+
+        $data = [
+            "driver" => $drivers[self::$dbConf['scheme']],
+            "server" => "",
+            "username" => "",
+            "password" => "",
+            "db" => ""
+        ];
+        foreach ($data as $var => $value) {
+            echo sprintf("<input type=\"hidden\" name=\"auth[%s]\" value=\"%s\">\n", htmlspecialchars($var), htmlspecialchars($value));
+        }
+        $nonce = get_nonce();
+        echo "<input type=\"submit\" value=\"Login\">\n";
+        echo "<script type=\"text/javascript\" nonce=\"$nonce\">\n";
+        echo "window.onload = () => {qs('form').submit()}\n";
+        echo "</script>\n";
+        return true;
+    }
 }
 
 
