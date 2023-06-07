@@ -160,7 +160,7 @@ down|stop)
     docker_down "$@";;
 init|initialize)
     docker_initialize "$@";;
-prod-update|production-update)
+prod-update|production-update|update-prod|update-production)
     docker_prod_update "$@";;
 kill)
     docker_kill "$@";;
