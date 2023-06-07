@@ -2,4 +2,4 @@
 
 cd "$(dirname "$(which "$0")")/.."
 
-lib/invoke install composer "$@"
+lib/invoke deploy composer "$@"

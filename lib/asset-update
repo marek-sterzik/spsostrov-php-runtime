@@ -6,6 +6,7 @@ asset_version="`(echo 0; ls -d assets-v* 2> /dev/null) | sed 's/^assets-v//' | g
 
 rm -f assets-v*
 
-asset_version="`expr "$asset_version" + 1`"
-
-ln -s . "assets-v$asset_version"
+if [ "$1" != "remove" ]; then
+    asset_version="`expr "$asset_version" + 1`"
+    ln -s . "assets-v$asset_version"
+fi
