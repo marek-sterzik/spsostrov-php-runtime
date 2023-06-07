@@ -1,8 +1,11 @@
 #!/bin/bash
-flags=""
+
 if [ "$1" == "prod" ]; then
     flags="--no-interaction --no-dev"
     composer dump-env prod
+else
+    flags=""
+    test -f .env.local.php && rm -f .env.local.php
 fi
 
 composer install $flags
