@@ -3,13 +3,15 @@
 export RUNTIME_ENV_TYPE="$1"
 shift
 
+# supported environments: mysql, node, deploy, runtime
+
 if [ -x "./invoke" ]; then
     ./invoke "$@"
 else
     if [ "$RUNTIME_ENV_TYPE" = "mysql" ]; then
         host="db"
     elif [ "$RUNTIME_ENV_TYPE" = "node" ]; then
-	host="node:node:run"
+        host="node:node:run"
     else
         host="webserver"
     fi

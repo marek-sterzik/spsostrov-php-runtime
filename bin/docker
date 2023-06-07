@@ -31,9 +31,18 @@ docker_configure() {
     . scripts/configure
 }
 
+do_initialize() {
+    lib/invoke node bash scripts/initialize-node "$@"
+    lib/invoke deploy bash scripts/initialize-deploy "$@"
+    lib/invoke runtime bash scripts/initialize-runtime "$@"
+}
+
 docker_initialize() {
-    docker_compose exec --user www-data webserver bash scripts/initialize
-    docker_compose run --user node node bash scripts/initialize-node
+    do_initialize debug
+}
+
+docker_prod_update() {
+    do_initialize prod
 }
 
 docker_up() {
@@ -120,6 +129,8 @@ show_help() {
     echo "        stop all docker containers" 1>&2
     echo "    initialize" 1>&2
     echo "        initialize the application" 1>&2
+    echo "    prod-update" 1>&2
+    echo "        make production update of the application" 1>&2
     echo "    kill" 1>&2
     echo "        kill all docker containers" 1>&2
     echo "    restart" 1>&2
@@ -149,6 +160,8 @@ down|stop)
     docker_down "$@";;
 init|initialize)
     docker_initialize "$@";;
+prod-update|production-update)
+    docker_prod_update "$@";;
 kill)
     docker_kill "$@";;
 restart)

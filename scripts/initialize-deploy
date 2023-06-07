@@ -1,0 +1,9 @@
+#!/bin/bash
+flags=""
+if [ "$1" == "prod" ]; then
+    flags="--no-interaction --no-dev"
+    composer dump-env prod
+fi
+
+composer install $flags
+
