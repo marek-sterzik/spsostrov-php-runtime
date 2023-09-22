@@ -2,22 +2,27 @@
 
 Toto je vývojové prostředí pro vývoj PHP aplikací v předmětu PVA.
 
-## Závislosti
+## Závislosti a instalace
 
-Pro běh vývojového prostředí je potřeba operační systém založený na linuxu. Prostředí je založeno na systému docker, proto musí být nainstalovány ještě tyto zvláštní balíky:
+### Linux
 
-* docker
-* docker-compose
+Pro provozování operačního systému založeném na Linuxu je potřeba udělat dvě věci:
 
-## Windows
+1. Nainstalovat balíček `docker` (u starších instalací také balíček `docker-compose` který je u novějších instalací už součástí balíčku `docker`).
+2. Přidat uživatele, který bude docker používat do skupiny `docker`.
 
-Před stažením je potřeba nastavit parametr autocrlf u gitu z true na false:
+Na nejnovějších systémech Ubuntu by mělo být například možné nakonfigurovat nutné závislosti pomocí těchto dvou příkazu:
+```
+sudo apt install docker
+sudo usermod -a -G docker <uživatelské-jméno>
+```
 
-* git config --global core.autocrlf false
+Přidání do skupiny se nicméně může projevit až po restartu (nejméně terminálu, někdy ale snad i celého systému, což je na Linux dost ostudné).
+Zda už se přidání do skupiny projevilo, lze zkontrolovat zavoláním příkazu `groups`.
 
-Po stažení se nastavení může změnit zpět.
+### Windows
 
-* git config --global core.autocrlf true
+Instalaci ve Windows je věnována [samostatná stránka](README.windows.md).
 
 ## Rychlý start
 
@@ -28,6 +33,8 @@ bin/docker configure
 bin/docker up
 bin/docker initialize
 ```
+
+**Aplikaci přitom vždy ze zásady spouštíme jako obyčejný uživatel, nikdy jako root!**
 
 Aplikace se potom rozběhne na portu, který jste zadali v konfigurační části. Pokud jste ponechali základní port 80, budete mít aplikaci
 k dispozici na adrese:
