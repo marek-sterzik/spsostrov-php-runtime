@@ -63,6 +63,7 @@ docker_runtime_update() {
 
 docker_up() {
     docker_compose up --build -d
+    echo "Running at port: ${APP_PORT:-80}"
 }
 
 docker_down() {
