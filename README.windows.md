@@ -6,7 +6,7 @@ Toto je nejnovější optimalizovaný návod, jak správně nainstalovat všechn
 
 ## Postup instalace
 
-G1. Instalace Docker Desktop
+1. Instalace Docker Desktop
 2. Aktualizace WSL subsystému na nejnovější verzi
 3. Instalace Ubuntu
 4. Integrace Ubuntu s Dockerem
