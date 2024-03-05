@@ -28,6 +28,7 @@ class AdminerController extends AbstractController
 
         return new StreamedResponse(
             function () {
+                $httpAuth = null;
                 $dbConf = $this->databaseUrl;
                 include $this->adminerBootFile;
             }
