@@ -80,8 +80,60 @@ class AdminerLoginPasswordLess
     }
 }
 
-function http_authorize(?callable $httpAuthorize)
+function parse_users(string $usersPass): ?array
 {
+    $users = [];
+    if ($usersPass !== '') {
+        foreach (preg_split('/\s+/', $usersPass) as $userPass) {
+            if ($userPass === '') {
+                continue;
+            }
+            $parsed = explode(":", $userPass);
+            if (count($parsed) !== 2) {
+                return null;
+            }
+            list($username, $password) = $parsed;
+            $username = urldecode($username);
+            $password = urldecode($password);
+            if (!isset($users[$username])) {
+                $users[$username] = [];
+            }
+            $users[$username][] = $password;
+        }
+    }
+    return $users;
+}
+
+function build_auth_callback($httpAuthorize): ?callable
+{
+    if ($httpAuthorize === null) {
+        return null;
+    }
+    if (is_callable($httpAuthorize)) {
+        return $httpAuthorize;
+    }
+    if (is_string($httpAuthorize)) {
+        $users = parse_users($httpAuthorize);
+        if ($users !== null) {
+            return function ($user, $pass) use ($users) {
+                foreach ($users[$user] ?? [] as $password) {
+                    if ($password === $pass) {
+                        return true;
+                    }
+                }
+                return false;
+            };
+        }
+    }
+
+    return function($username, $password) {
+        return false;
+    };
+}
+
+function http_authorize($httpAuthorize)
+{
+    $httpAuthorize = build_auth_callback($httpAuthorize);
     if ($httpAuthorize !== null) {
         $username = $_SERVER['PHP_AUTH_USER'] ?? null;
         $password = $_SERVER['PHP_AUTH_PW'] ?? null;
