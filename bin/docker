@@ -21,9 +21,9 @@ docker_compose () {
     export WWW_DATA_GID="`id -g`"
     test -f ".config.env" && . .config.env
     if [ "$RUNTIME_PLATFORM" == "windows" ]; then
-        winpty docker-compose "$@"
+        winpty docker compose "$@"
     else
-        docker-compose "$@"
+        docker compose "$@"
     fi
 }
 
