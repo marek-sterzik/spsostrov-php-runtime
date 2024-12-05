@@ -17,9 +17,7 @@ class AdminerController extends AbstractController
     ) {
     }
 
-    /**
-     * @Route("/adminer", name="app.adminer")
-     */
+    #[Route("/adminer", name: "app.adminer")]
     public function pageAdminer(): Response
     {
         if (!$this->adminerEnabled) {
