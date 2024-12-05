@@ -15,7 +15,7 @@ services:
         environment:
             APACHE_DOCUMENT_ROOT: /var/www/html/public
     db:
-        image: mysql:5.7.22
+        image: mysql:8.0.40
         expose:
             - 3306
         volumes:
