@@ -87,7 +87,11 @@ parse_user_name() {
     if echo "$1" | grep -q ':'; then
         echo "$1" | cut -d: -f 2
     else
-        echo "www-data"
+        if [ "$1" = "db" ]; then
+            echo "mysql"
+        else
+            echo "www-data"
+        fi
     fi
 }
 
