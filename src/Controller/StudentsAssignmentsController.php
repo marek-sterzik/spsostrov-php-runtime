@@ -56,7 +56,11 @@ class StudentsAssignmentsController extends AbstractDbTableController
 
     private function getAssignmentCell(Assignment $assignment): mixed
     {
-        return $assignment->getCaption();
+        $content = $this->renderView(
+            "snippets/student-assignment.html.twig",
+            ["assignment" => $assignment]
+        );
+        return Cell::html($content);
     }
 
     private function getAssignmentActions(Assignment $assignment): array
