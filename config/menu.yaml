@@ -5,6 +5,9 @@ menu:
   - name: zadání
     route: assignments
     roles: ['ROLE_ADMIN']
+  - name: odevzdat
+    route: submit
+    roles: ['ROLE_STUDENT']
   - name: uživatelé
     route: users
     routes: ["user"]
