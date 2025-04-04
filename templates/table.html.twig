@@ -1,22 +1,24 @@
 {% extends "base.html.twig" %}
 {% macro paginator(paginator) %}
-    <ul class="pagination pagination-sm justify-content-center">
-        {% for page in paginator %}
-            <li class="page-item{% if page.skip %} ms-3{% endif %}{% if page.active %} active{% endif %}">
-                <a class="page-link{% if page.disabled %} disabled{% endif %}" href="{{ page.link }}" aria-label="{{ page.label }}">
-                    {% if page.type == 'prev' %}
-                        <span aria-hidden="true">&laquo;</span>
-                    {% elseif page.type == 'next' %}
-                        <span aria-hidden="true">&raquo;</span>
-                    {% elseif page.type == 'normal' %}
-                        {{ page.label }}
-                    {% else %}
-                        ?
-                    {% endif %}
-                </a>
-            </li>
-        {% endfor %}
-    </ul>
+    {% if paginator is not empty %}
+        <ul class="pagination pagination-sm justify-content-center">
+            {% for page in paginator %}
+                <li class="page-item{% if page.skip %} ms-3{% endif %}{% if page.active %} active{% endif %}">
+                    <a class="page-link{% if page.disabled %} disabled{% endif %}" href="{{ page.link }}" aria-label="{{ page.label }}">
+                        {% if page.type == 'prev' %}
+                            <span aria-hidden="true">&laquo;</span>
+                        {% elseif page.type == 'next' %}
+                            <span aria-hidden="true">&raquo;</span>
+                        {% elseif page.type == 'normal' %}
+                            {{ page.label }}
+                        {% else %}
+                            ?
+                        {% endif %}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 {% endmacro %}
 {% block body %}
     {% if form is defined and form is not null %}

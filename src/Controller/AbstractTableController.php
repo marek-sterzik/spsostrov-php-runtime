@@ -210,6 +210,9 @@ abstract class AbstractTableController extends AbstractController
 
     private function createPaginator(int $pageCount, int $currentPage, callable $selfLink): array
     {
+        if ($pageCount <= 1) {
+            return [];
+        }
         $beginEndCount = 1;
         $middleCount = 2;
 
