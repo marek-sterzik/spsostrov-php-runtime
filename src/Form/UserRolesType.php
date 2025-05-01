@@ -22,6 +22,7 @@ class UserRolesType extends AbstractType
             ->add('effectiveRole', ChoiceType::class, [
                 "label" => "Role",
                 "choices" => $choices,
+                "choice_attr" => fn($choice) => ["data-choice" => $choice],
             ])
             ->add('effectiveStudentClass', TextType::class, [
                 "label" => "Třída",

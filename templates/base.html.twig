@@ -30,9 +30,9 @@
                         nepřihlášen
                     {% endif %}
                     {% if user is not null %}
-                        <a href="{{ path("logout") }}" class="btn btn-secondary btn-sm ms-3" role="button">odhlásit <i class="bi ms-2 bi-arrow-right-square-fill"></i></a>
+                        <a href="{{ path("logout") }}" class="btn btn-secondary btn-sm ms-3" role="button"><i class="bi me-1 bi-arrow-right-square-fill"></i> odhlásit</a>
                     {% else %}
-                        <a href="{{ path("login") }}" class="btn btn-secondary btn-sm ms-3" role="button">přihlásit <i class="bi ms-2 bi-arrow-left-square-fill"></i></a>
+                        <a href="{{ path("login") }}" class="btn btn-secondary btn-sm ms-3" role="button"><i class="bi me-1 bi-arrow-left-square-fill"></i> přihlásit</a>
                     {% endif %}
                 </div>
             </div>
