@@ -18,7 +18,7 @@
         "doctrine/doctrine-migrations-bundle": "^3.0",
         "doctrine/orm": "^3.3",
         "phpdocumentor/reflection-docblock": ">=5.2",
-        "spsostrov/libsso-symfony": "^0.2.1",
+        "spsostrov/libsso-symfony": "^0.3.0",
         "symfony/asset": "7.2.*",
         "symfony/console": "7.2.*",
         "symfony/dotenv": "7.2.*",
