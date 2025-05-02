@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9d7e9957bc844562d12cd5dbf7d97a84",
+    "content-hash": "8e915ba80f5c4ed80492417dda96ae41",
     "packages": [
         {
             "name": "composer/package-versions-deprecated",
@@ -1998,16 +1998,16 @@
         },
         {
             "name": "spsostrov/libsso",
-            "version": "v1.6.2",
+            "version": "v1.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/marek-sterzik/spsostrov-libsso.git",
-                "reference": "aa06261948300674a3799795a354d6142ce2180d"
+                "reference": "b78e49b77dd62f970f5b4d73f40f85e071e380de"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/marek-sterzik/spsostrov-libsso/zipball/aa06261948300674a3799795a354d6142ce2180d",
-                "reference": "aa06261948300674a3799795a354d6142ce2180d",
+                "url": "https://api.github.com/repos/marek-sterzik/spsostrov-libsso/zipball/b78e49b77dd62f970f5b4d73f40f85e071e380de",
+                "reference": "b78e49b77dd62f970f5b4d73f40f85e071e380de",
                 "shasum": ""
             },
             "require": {
@@ -2033,27 +2033,27 @@
             "homepage": "https://github.com/marek-sterzik/spsostrov-libsso",
             "support": {
                 "issues": "https://github.com/marek-sterzik/spsostrov-libsso/issues",
-                "source": "https://github.com/marek-sterzik/spsostrov-libsso/tree/v1.6.2"
+                "source": "https://github.com/marek-sterzik/spsostrov-libsso/tree/v1.7.0"
             },
-            "time": "2024-12-14T19:47:30+00:00"
+            "time": "2025-05-02T13:01:31+00:00"
         },
         {
             "name": "spsostrov/libsso-symfony",
-            "version": "v0.3.1",
+            "version": "v0.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/marek-sterzik/spsostrov-libsso-symfony.git",
-                "reference": "0b3df2eee2fffaa92ea1e2a647a90da777093403"
+                "reference": "29dabc2845a2d2b84af13c9186dc5683e4aec082"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/marek-sterzik/spsostrov-libsso-symfony/zipball/0b3df2eee2fffaa92ea1e2a647a90da777093403",
-                "reference": "0b3df2eee2fffaa92ea1e2a647a90da777093403",
+                "url": "https://api.github.com/repos/marek-sterzik/spsostrov-libsso-symfony/zipball/29dabc2845a2d2b84af13c9186dc5683e4aec082",
+                "reference": "29dabc2845a2d2b84af13c9186dc5683e4aec082",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.4",
-                "spsostrov/libsso": ">=1.5",
+                "spsostrov/libsso": ">=1.7",
                 "symfony/security-bundle": ">=6.2"
             },
             "type": "library",
@@ -2076,9 +2076,9 @@
             "homepage": "https://github.com/marek-sterzik/spsostrov-libsso-symfony",
             "support": {
                 "issues": "https://github.com/marek-sterzik/spsostrov-libsso-symfony/issues",
-                "source": "https://github.com/marek-sterzik/spsostrov-libsso-symfony/tree/v0.3.1"
+                "source": "https://github.com/marek-sterzik/spsostrov-libsso-symfony/tree/v0.3.2"
             },
-            "time": "2025-05-02T11:34:40+00:00"
+            "time": "2025-05-02T13:05:09+00:00"
         },
         {
             "name": "symfony/asset",
