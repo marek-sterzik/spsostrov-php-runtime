@@ -32,7 +32,7 @@ class AssignmentsController extends AbstractDbTableController
                 $qb->andWhere($qb->expr()->orX(
                     $qb->expr()->eq("a.owner", ":owner"),
                     $qb->expr()->andX(
-                        $qb->expr()->eq("a.published", true),
+                        $qb->expr()->neq("a.state", "draft"),
                         $qb->expr()->eq("a.public", true),
                     )
                 ));
@@ -71,7 +71,7 @@ class AssignmentsController extends AbstractDbTableController
             "caption" => $assignment->getCaption(),
             "owner" => $assignment->getOwner()->getName(),
             "type" => $assignment->isPublic() ? "veřejné" : "soukromé",
-            "state" => $assignment->isPublished() ? "publikováno" : "rozpracováno",
+            "state" => $assignment->getState(),
             "_actions" => $this->getAssignmentActions($assignment),
         ];
     }

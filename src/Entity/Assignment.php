@@ -29,8 +29,8 @@ class Assignment
     #[ORM\Column]
     private bool $public = false;
 
-    #[ORM\Column]
-    private bool $published = false;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $state = null;
 
     #[ORM\ManyToOne(inversedBy: 'ownedAssignments')]
     #[ORM\JoinColumn(nullable: false)]
@@ -144,18 +144,6 @@ class Assignment
     public function setHardDeadline(?\DateTimeImmutable $hardDeadline): static
     {
         $this->hardDeadline = $hardDeadline;
-
-        return $this;
-    }
-
-    public function isPublished(): bool
-    {
-        return $this->published;
-    }
-
-    public function setPublished(bool $published): static
-    {
-        $this->published = $published;
 
         return $this;
     }
