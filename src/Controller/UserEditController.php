@@ -8,9 +8,13 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Entity\User;
 use App\Form\UserRolesType;
 use App\Utility\RoleComparator;
+use App\Validator\StudentClassValidator;
 
 class UserEditController extends AbstractController
 {
+    public function __construct(private StudentClassValidator $studentClassValidator)
+    {
+    }
 
     #[IsGranted('ROLE_ADMIN')]
     #[Route("/user/{user}", name: "user")]
@@ -29,6 +33,14 @@ class UserEditController extends AbstractController
             ->action("Uložit", function (User $user) use ($restorableRole) {
                 if ($user->getEffectiveRole() !== 'ROLE_STUDENT') {
                     $user->setEffectiveStudentClass(null);
+                } else {
+                    $studentClass = $user->getEffectiveStudentClass();
+                    if ($studentClass !== null) {
+                        $studentClass = $this->studentClassValidator->normalizeStudentClass($studentClass);
+                    }
+                    if ($studentClass !== null) {
+                        $user->setEffectiveStudentClass($studentClass);
+                    }
                 }
                 $user->setRestorableRole($restorableRole);
                 $this->getEntityManager()->flush();

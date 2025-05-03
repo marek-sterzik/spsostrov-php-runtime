@@ -3,11 +3,13 @@
 namespace App\Entity;
 
 use DateTimeImmutable;
+use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
 use App\Utility\RoleComparator;
+use App\Validator\StudentClass as StudentClassConstraint;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User
@@ -44,7 +46,14 @@ class User
     
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $effectiveRole = null;
-    
+
+    #[Assert\When(
+        expression: 'this.getEffectiveRole() == "ROLE_STUDENT"',
+        constraints: [
+            new Assert\NotNull(message:"Třída musí být vyplněna."),
+            new StudentClassConstraint(message:"Neplatný název třídy."),
+        ],
+    )]
     #[ORM\Column(length: 16, nullable: true)]
     private ?string $effectiveStudentClass = null;
     
