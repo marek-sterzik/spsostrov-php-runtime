@@ -15,5 +15,4 @@ class StudentClass extends Constraint
     {
         parent::__construct();
     }
-
 }

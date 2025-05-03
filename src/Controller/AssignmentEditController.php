@@ -12,10 +12,6 @@ use App\Validator\StudentClassValidator;
 
 class AssignmentEditController extends AbstractController
 {
-    public function __construct(private StudentClassValidator $studentClassValidator)
-    {
-    }
-
     #[IsGranted('ROLE_TEACHER')]
     #[Route("/assignment/{assignment}", name: "assignment")]
     public function index(Assignment $assignment): Response

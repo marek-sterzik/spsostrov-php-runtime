@@ -9,7 +9,7 @@ class StudentClassValidator extends ConstraintValidator
 {
     public function validate(mixed $value, Constraint $constraint): void
     {
-        /* @var StudentClass $constraint */
+        /** @var StudentClass $constraint */
 
         if (null === $value || '' === $value) {
             return;
