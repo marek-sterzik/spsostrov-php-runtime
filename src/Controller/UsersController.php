@@ -95,18 +95,13 @@ class UsersController extends AbstractDbTableController
     private function getUserActions(User $user): array
     {
         $actions = [
-            Action::get(
-                $this->generateUrl("user", ["user" => $user->getId(), "_back" => true]),
-                "nastavit roli",
-                "btn-primary"
-            )
+            Action::get($this->generateUrl("user", ["user" => $user->getId(), "_back" => true]))
+                ->label("nastavit roli")->cssClass("btn-primary")->icon("bi-person-fill-gear")
         ];
         if ($user->isRoleRestorable()) {
             array_unshift($actions, Action::get(
                 $this->generateUrl("restore_role_user", ["user" => $user->getId(), "_back" => true]),
-                "obnovit roli",
-                "btn-danger me-2"
-            ));
+            )->label("obnovit roli")->cssClass("btn-danger me-2")->icon("bi-back"));
         }
         return $actions;
     }

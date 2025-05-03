@@ -78,9 +78,7 @@ class AssignmentsController extends AbstractDbTableController
         if ($assignment->canBeEditedBy($this->getUserEntity())) {
             $actions[] = Action::get(
                 $this->generateUrl("assignment", ["assignment" => $assignment->getId(), "_back" => true]),
-                "upravit",
-                "btn-primary"
-            );
+            )->label("upravit")->cssClass("btn-primary")->icon('bi-pencil-square');
         }
         return $actions;
     }
