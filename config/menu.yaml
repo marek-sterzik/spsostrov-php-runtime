@@ -4,7 +4,7 @@ menu:
     roles: ['PUBLIC_ACCESS']
   - name: zadání
     route: assignments
-    roles: ['ROLE_ADMIN']
+    roles: ['ROLE_TEACHER']
   - name: odevzdat
     route: submit
     roles: ['ROLE_STUDENT']
