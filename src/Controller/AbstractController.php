@@ -20,6 +20,7 @@ class AbstractController extends AbstractControllerBase
     private MenuGenerator $menuGenerator;
     private RequestStack $requestStack;
     private EntityManager $entityManager;
+    private array $modulesEnabled = [];
 
     public function setServices(
         MenuGenerator $menuGenerator,
@@ -44,9 +45,22 @@ class AbstractController extends AbstractControllerBase
         return $request;
     }
 
+    protected function enableModule(string $moduleName): self
+    {
+        $this->modulesEnabled[$moduleName] = true;
+        return $this;
+    }
+
+    protected function disableModule(string $moduleName): self
+    {
+        unset($this->modulesEnabled[$moduleName]);
+        return $this;
+    }
+
     protected function getDefaultParameters(): array
     {
         return [
+            "jsLoadModules" => empty($this->modulesEnabled) ? null : implode(" ", array_keys($this->modulesEnabled)),
             "menu" => $this->menuGenerator->generateMenu(),
             "user" => $this->getUser(),
         ];

@@ -18,7 +18,7 @@
             <script src="{{ asset('js/main.js') }}"></script>
         {% endblock %}
     </head>
-    <body>
+    <body{% if jsLoadModules is defined and jsLoadModules is not null %} data-modules="{{ jsLoadModules }}"{% endif %}>
         <nav class="navbar bg-dark" data-bs-theme="dark">
             <div class="container-fluid">
                 <a class="navbar-brand" href="{{ path('main')}}">submitter</a>
