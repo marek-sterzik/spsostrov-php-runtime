@@ -16,6 +16,7 @@ class UserEditController extends AbstractController
     #[Route("/user/{user}", name: "user")]
     public function index(User $user): Response
     {
+        $this->enableModule('user-edit');
         $superadmin = $this->isGranted('ROLE_SUPERADMIN');
         $restorableRole = $this->getRestorableRole($user, $superadmin);
         $userMayBeSuperadmin = $user->getEffectiveRole() === 'ROLE_SUPERADMIN' ||
