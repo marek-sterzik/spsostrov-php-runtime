@@ -41,6 +41,10 @@ services:
         arguments:
             $assetBaseDir: '%kernel.project_dir%/public'
             $versionLinkWildCard: 'assets-v*'
+    App\Framework\Router:
+        decorates: router
+        arguments:
+            $router: '@.inner'
     App\Framework\MenuGenerator:
         arguments:
             $menuFile: '%kernel.project_dir%/config/menu.yaml'

@@ -49,8 +49,26 @@ class Action implements Component
     {
         return $this->renderAs(sprintf(
             "class=\"dropdown-item%s\"",
-            isset($this->cssClass) ? (" " . $this->cssClass) : ""
+            isset($this->cssClass) ? (" " . $this->cssToDropdown($this->cssClass)) : ""
         ));
+    }
+
+    public function getCssForDropdown(): ?string
+    {
+        return $this->cssClass;
+    }
+
+    private function cssToDropdown(string $css): string
+    {
+        return implode(" ", array_filter(array_map(function ($item) {
+            if ($item === 'btn-danger') {
+                return 'text-danger';
+            } elseif ($item === "" || preg_match('/^btn-/', $item)) {
+                return null;
+            } else {
+                return $item;
+            }
+        }, preg_split('/\s+/', trim($css))), fn ($item) => ($item !== null)));
     }
 
     public function render(): string

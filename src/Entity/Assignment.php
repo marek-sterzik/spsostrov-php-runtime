@@ -173,4 +173,12 @@ class Assignment
         }
         return true;
     }
+
+    public function canBeDeletedBy(?User $user): bool
+    {
+        if (!$this->canBeEditedBy($user)) {
+            return false;
+        }
+        return true;
+    }
 }

@@ -13,7 +13,7 @@ use App\Validator\StudentClassValidator;
 class AssignmentEditController extends AbstractController
 {
     #[IsGranted('ROLE_TEACHER')]
-    #[Route("/assignment/{assignment}", name: "assignment")]
+    #[Route("/assignment/{assignment}/edit", name: "assignment")]
     public function index(Assignment $assignment): Response
     {
         return $this->editAssignment($assignment, false);
@@ -26,6 +26,17 @@ class AssignmentEditController extends AbstractController
         $assignment = new Assignment($this->getUserEntity());
         $this->getEntityManager()->persist($assignment);
         return $this->editAssignment($assignment, true);
+    }
+
+    #[IsGranted('ROLE_TEACHER')]
+    #[Route("/assignment/{assignment}/delete", name: "assignment-delete")]
+    public function deleteAssignment(Assignment $assignment): Response
+    {
+        if ($assignment->canBeDeletedBy($this->getUserEntity())) {
+            $this->getEntityManager()->remove($assignment);
+            $this->getEntityManager()->flush();
+        }
+        return $this->redirectBack(true);
     }
 
     private function editAssignment(Assignment $assignment, bool $new): Response

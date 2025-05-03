@@ -8,10 +8,10 @@ class MultiAction implements Component
 {
     public static function get(...$actions): self
     {
-        return new self($actions, null);
+        return new self($actions);
     }
 
-    private function __construct(private array $actions, private ?string $cssClass)
+    private function __construct(private array $actions)
     {
         foreach ($actions as $action) {
             if ($action !== null && !($action instanceof Action)) {
@@ -22,19 +22,13 @@ class MultiAction implements Component
 
     public function action(Action $action): self
     {
-        return new self(array_merge($this->actions, [$action]), $this->cssClass);
+        return new self(array_merge($this->actions, [$action]));
     }
 
     public function separator(): self
     {
-        return new self(array_merge($this->actions, [null]), $this->cssClass);
+        return new self(array_merge($this->actions, [null]));
     }
-
-    public function cssClass(?string $cssClass): self
-    {
-        return new self($this->actions, $cssClass);
-    }
-
 
     public function render(): string
     {
@@ -46,11 +40,18 @@ class MultiAction implements Component
         if (empty($actions)) {
             return $primaryAction->render();
         }
-        $cssClass = isset($this->cssClass) ? (" " . $this->cssClass) : "";
+
+        $cssClass = $primaryAction->getCssForDropdown();
+        $cssClass = ($cssClass !== null) ? (" " . $cssClass) : "";
+
+        $dropdownButtonTemplate = "<button type=\"button\" ".
+            "class=\"btn btn-sm dropdown-toggle dropdown-toggle-split%s\" ".
+            "data-bs-toggle=\"dropdown\" aria-expanded=\"false\">";
+        
         $html = "";
         $html .= "<div class=\"btn-group\">";
-        $html .= $primaryAction->cssClass($this->cssClass)->render();
-        $html .= sprintf("<button type=\"button\" class=\"btn btn-sm dropdown-toggle dropdown-toggle-split%s\" data-bs-toggle=\"dropdown\" aria-expanded=\"false\">", $cssClass);
+        $html .= $primaryAction->render();
+        $html .= sprintf($dropdownButtonTemplate, $cssClass);
         $html .= "<span class=\"visually-hidden\">Toggle Dropdown</span>";
         $html .= "</button>";
         $html .= "<ul class=\"dropdown-menu\">";

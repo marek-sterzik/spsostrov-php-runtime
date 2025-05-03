@@ -92,25 +92,23 @@ class AbstractController extends AbstractControllerBase
         );
     }
 
-    protected function generateUrl(
-        string $route,
-        array $parameters = [],
-        int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
-    ): string {
-        if (isset($parameters['_back']) && $parameters['_back'] === true) {
-            $parameters['_back'] = $this->getRequest()->getRequestUri();
+    protected function redirectBack(bool $always = false): ?Response
+    {
+        $back = $this->getBackUrl($always);
+        if ($back !== null) {
+            return $this->redirect($back);
         }
-        return parent::generateUrl($route, $parameters, $referenceType);
+        return null;
     }
 
-    protected function redirectBack(bool $always = false): ?Response
+    protected function getBackUrl(bool $always = false): ?string
     {
         $back = $this->getRequest()->query->get("_back");
         if (is_string($back)) {
-            return $this->redirect($back);
+            return $back;
         }
         if ($always) {
-            return $this->redirect($this->getDefaultBackUrl());
+            return $this->getDefaultBackUrl();
         }
         return null;
     }

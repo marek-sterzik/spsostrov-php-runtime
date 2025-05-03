@@ -1,0 +1,16 @@
+{% extends "base.html.twig" %}
+{% block body %}
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-12">
+                <h1>{{ assignment.caption }}</h1>
+                <div>
+                    {% for action in actions %}
+                        {{ action.render()|raw }}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

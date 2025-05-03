@@ -13,9 +13,14 @@ use App\Component\Action;
 use App\Component\MultiAction;
 use App\Utility\SearchTool;
 use App\Form\Filter\AssignmentsType;
+use App\Actions\AssignmentActions;
 
 class AssignmentsController extends AbstractDbTableController
 {
+    public function __construct(private AssignmentActions $assignmentActions)
+    {
+    }
+
     #[IsGranted('ROLE_TEACHER')]
     #[Route("/assignments", name: "assignments")]
     public function index(): Response
@@ -80,22 +85,10 @@ class AssignmentsController extends AbstractDbTableController
     private function getAssignmentActions(Assignment $assignment): array
     {
         $actions = [];
+
+        $actions = $this->assignmentActions->generate($assignment, true);
         
-        $actions[] = Action::get(
-            "/detail"
-        )->label("detail")->icon("bi-eye");
-
-        if ($assignment->canBeEditedBy($this->getUserEntity())) {
-            $actions[] = Action::get(
-                $this->generateUrl("assignment", ["assignment" => $assignment->getId(), "_back" => true]),
-            )->label("upravit")->cssClass("btn-primary")->icon('bi-pencil-square');
-            $actions[] = null;
-            $actions[] = Action::get(
-                "/delete",
-            )->label("smazat")->cssClass("text-danger")->icon('bi-trash');
-        }
-
-        return [MultiAction::get(...$actions)->cssClass("btn-primary")];
+        return [MultiAction::get(...$actions)];
     }
 
     protected function getForm(array $formData): ?FormInterface
