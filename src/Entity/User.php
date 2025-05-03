@@ -26,6 +26,9 @@ class User
         "ROLE_ADMIN" => "admin",
         "ROLE_SUPERADMIN" => "superadmin",
     ];
+    const STUDENT_ROLES = ['ROLE_STUDENT'];
+    const TEACHER_ROLES = ['ROLE_TEACHER', 'ROLE_ADMIN', 'ROLE_SUPERADMIN'];
+    const ADMIN_ROLES = ['ROLE_ADMIN', 'ROLE_SUPERADMIN'];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -226,5 +229,20 @@ class User
     public function getOwnedAssignments(): Collection
     {
         return $this->ownedAssignments;
+    }
+
+    public function isStudent(): bool
+    {
+        return in_array($this->getRealRole(), self::STUDENT_ROLES);
+    }
+
+    public function isTeacher(): bool
+    {
+        return in_array($this->getRealRole(), self::TEACHER_ROLES);
+    }
+
+    public function isAdmin(): bool
+    {
+        return in_array($this->getRealRole(), self::ADMIN_ROLES);
     }
 }

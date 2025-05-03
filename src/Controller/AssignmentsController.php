@@ -74,29 +74,22 @@ class AssignmentsController extends AbstractDbTableController
 
     private function getAssignmentActions(Assignment $assignment): array
     {
-        return [];
-        /*
-        $actions = [
-            Action::get(
-                $this->generateUrl("user", ["user" => $user->getId(), "_back" => true]),
-                "nastavit roli",
+        $actions = [];
+        if ($assignment->canBeEditedBy($this->getUserEntity())) {
+            $actions[] = Action::get(
+                $this->generateUrl("assignment", ["assignment" => $assignment->getId(), "_back" => true]),
+                "upravit",
                 "btn-primary"
-            )
-        ];
-        if ($user->isRoleRestorable()) {
-            array_unshift($actions, Action::get(
-                $this->generateUrl("restore_role_user", ["user" => $user->getId(), "_back" => true]),
-                "obnovit roli",
-                "btn-danger me-2"
-            ));
+            );
         }
         return $actions;
-        */
     }
 
     protected function getForm(array $formData): ?FormInterface
     {
-        return $this->createForm(AssignmentsType::class, $formData);
+        return $this->createForm(AssignmentsType::class, $formData, [
+            "add_link_url" => $this->generateUrl("new-assignment", ["_back" => true])
+        ]);
     }
 
     protected function getDefaultFilterData(): array

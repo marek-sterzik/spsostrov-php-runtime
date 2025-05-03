@@ -4,6 +4,7 @@ menu:
     roles: ['PUBLIC_ACCESS']
   - name: zadání
     route: assignments
+    routes: ["new-assignment"]
     roles: ['ROLE_TEACHER']
   - name: odevzdat
     route: submit

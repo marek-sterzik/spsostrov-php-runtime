@@ -42,6 +42,10 @@ class Assignment
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $hardDeadline = null;
 
+    public function __construct(User $owner)
+    {
+        $this->owner = $owner;
+    }
 
     public function getId(): ?int
     {
@@ -154,5 +158,19 @@ class Assignment
         $this->published = $published;
 
         return $this;
+    }
+
+    public function canBeEditedBy(?User $user): bool
+    {
+        if ($user === null) {
+            return false;
+        }
+        if (!$user->isTeacher()) {
+            return false;
+        }
+        if ($this->owner !== $user && !$user->isAdmin()) {
+            return false;
+        }
+        return true;
     }
 }

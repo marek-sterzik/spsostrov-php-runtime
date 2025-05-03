@@ -10,6 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 
 class AssignmentsType extends AbstractType
 {
@@ -45,9 +46,16 @@ class AssignmentsType extends AbstractType
             ->add('s', SubmitType::class, [
                 "label" => "<i class=\"bi bi-search\"></i>",
                 "label_html" => true,
-                "attr" => ["class" => "btn btn-primary"]
+                "attr" => ["class" => "btn btn-primary me-3"]
             ])
         ;
+        if ($options['add_link_url'] !== null) {
+            $builder->add('add', ButtonType::class, [
+                "label" => "<i class=\"bi bi-plus-square me-1\"></i> nové zadání",
+                "label_html" => true,
+                "attr" => ["class" => "btn btn-success", "data-link-href" => $options['add_link_url']]
+            ]);
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -57,6 +65,7 @@ class AssignmentsType extends AbstractType
                 "class" => "btn-toolbar justify-content-center mb-3 mt-4",
                 "role" => "toolbar",
             ],
+            "add_link_url" => null,
         ]);
     }
 }

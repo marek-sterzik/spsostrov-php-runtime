@@ -14,6 +14,7 @@ use Doctrine\ORM\EntityManagerInterface as EntityManager;
 use SPSOstrov\SSOBundle\SSOUser;
 use App\Framework\MenuGenerator;
 use App\Utility\Form;
+use App\Entity\User;
 
 class AbstractController extends AbstractControllerBase
 {
@@ -123,6 +124,13 @@ class AbstractController extends AbstractControllerBase
     {
         $user = parent::getUser();
         assert($user === null || $user instanceof SSOUser);
+        return $user;
+    }
+
+    public function getUserEntity(): ?User
+    {
+        $user = $this->getUser()?->getUserData();
+        assert($user === null || $user instanceof User);
         return $user;
     }
 }
