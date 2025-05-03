@@ -2,7 +2,7 @@
 
 namespace App\Component;
 
-class MultiAction
+class MultiAction implements Component
 {
     public static function get(): self
     {

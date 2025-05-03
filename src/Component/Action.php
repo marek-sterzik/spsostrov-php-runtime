@@ -2,7 +2,7 @@
 
 namespace App\Component;
 
-class Action
+class Action implements Component
 {
     public static function get(
         string $uri,

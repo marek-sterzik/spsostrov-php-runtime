@@ -14,7 +14,7 @@ class Cell
             foreach ($cell as $item) {
                 if (is_string($item)) {
                     $cellHtml .= $item;
-                } elseif (($item instanceof self) || ($item instanceof Action) || ($item instanceof MultiAction)) {
+                } elseif (($item instanceof self) || ($item instanceof Component)) {
                     $cellHtml .= $item->render();
                 } else {
                     $cellHtml .= (string)$item;
