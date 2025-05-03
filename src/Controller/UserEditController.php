@@ -26,7 +26,7 @@ class UserEditController extends AbstractController
         ];
         return $this->form(UserRolesType::class, $user, $options)
             ->action("Uložit", function (User $user) use ($restorableRole) {
-                if ($user->getRealRole() !== 'ROLE_STUDENT') {
+                if ($user->getEffectiveRole() !== 'ROLE_STUDENT') {
                     $user->setEffectiveStudentClass(null);
                 }
                 $user->setRestorableRole($restorableRole);
