@@ -20,12 +20,12 @@ class UserRolesType extends AbstractType
         $choices = $this->getRoleChoices($options['superadmin'], $options['default_role']);
         $builder
             ->add('effectiveRole', ChoiceType::class, [
-                "label" => "Role",
+                "label" => "role:",
                 "choices" => $choices,
                 "choice_attr" => fn($choice) => ["data-rqcls" => ($choice  === 'ROLE_STUDENT') ? 'true' : 'false'],
             ])
             ->add('effectiveStudentClass', TextType::class, [
-                "label" => "Třída",
+                "label" => "třída:",
                 "required" => false,
             ])
         ;

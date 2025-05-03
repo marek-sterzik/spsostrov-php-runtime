@@ -24,6 +24,7 @@ class AssignmentEditController extends AbstractController
     public function newAssignment(): Response
     {
         $assignment = new Assignment($this->getUserEntity());
+        $this->getEntityManager()->persist($assignment);
         return $this->editAssignment($assignment, true);
     }
 
