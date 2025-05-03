@@ -13,6 +13,7 @@ security:
             provider: spsostrov_sso
             spsostrov_sso:
               login_path: login
+              sso_variant: testing
             logout:
               path: logout
     access_control:

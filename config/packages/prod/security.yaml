@@ -1,0 +1,27 @@
+security:
+    providers:
+        spsostrov_sso:
+          spsostrov_sso:
+            user_data_provider: App\Framework\UserDataProvider
+            role_decider: App\Framework\UserDataProvider
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        main:
+            lazy: true
+            provider: spsostrov_sso
+            spsostrov_sso:
+              login_path: login
+              sso_variant: production
+            logout:
+              path: logout
+    access_control:
+        # - { path: ^/admin, roles: ROLE_ADMIN }
+        # - { path: ^/profile, roles: ROLE_USER }
+    role_hierarchy:
+        ROLE_SUPERADMIN: ROLE_ADMIN
+        ROLE_ADMIN: ROLE_TEACHER
+        ROLE_TEACHER: ROLE_USER
+        ROLE_STUDENT: ROLE_USER
+        ROLE_OTHER: ROLE_USER
