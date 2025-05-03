@@ -10,6 +10,7 @@ use Doctrine\ORM\QueryBuilder;
 use App\Entity\Assignment;
 use App\Component\Cell;
 use App\Component\Action;
+use App\Component\MultiAction;
 use App\Utility\SearchTool;
 use App\Form\Filter\AssignmentsType;
 
@@ -79,12 +80,22 @@ class AssignmentsController extends AbstractDbTableController
     private function getAssignmentActions(Assignment $assignment): array
     {
         $actions = [];
+        
+        $actions[] = Action::get(
+            "/detail"
+        )->label("detail")->icon("bi-eye");
+
         if ($assignment->canBeEditedBy($this->getUserEntity())) {
             $actions[] = Action::get(
                 $this->generateUrl("assignment", ["assignment" => $assignment->getId(), "_back" => true]),
             )->label("upravit")->cssClass("btn-primary")->icon('bi-pencil-square');
+            $actions[] = null;
+            $actions[] = Action::get(
+                "/delete",
+            )->label("smazat")->cssClass("text-danger")->icon('bi-trash');
         }
-        return $actions;
+
+        return [MultiAction::get(...$actions)->cssClass("btn-primary")];
     }
 
     protected function getForm(array $formData): ?FormInterface

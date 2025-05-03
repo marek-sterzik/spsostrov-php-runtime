@@ -45,7 +45,23 @@ class Action implements Component
         return new self(...$data);
     }
 
+    public function renderAsDropdown(): string
+    {
+        return $this->renderAs(sprintf(
+            "class=\"dropdown-item%s\"",
+            isset($this->cssClass) ? (" " . $this->cssClass) : ""
+        ));
+    }
+
     public function render(): string
+    {
+        return $this->renderAs(sprintf(
+            "class=\"btn btn-sm%s\" role=\"button\"",
+            isset($this->cssClass) ? (" " . $this->cssClass) : ""
+        ));
+    }
+
+    private function renderAs(string $attrs): string
     {
         if ($this->icon === null || $this->icon === "") {
             $icon = "";
@@ -53,9 +69,9 @@ class Action implements Component
             $icon = sprintf("<i class=\"bi me-1 %s\"></i>", $this->icon);
         }
         return sprintf(
-            "<a href=\"%s\" class=\"btn btn-sm%s\" role=\"button\">%s%s</a>",
+            "<a href=\"%s\"%s>%s%s</a>",
             htmlspecialchars($this->uri),
-            isset($this->cssClass) ? (" " . $this->cssClass) : "",
+            ($attrs === "") ? "" : (" " . $attrs),
             $icon,
             htmlspecialchars($this->label ?? "!")
         );
