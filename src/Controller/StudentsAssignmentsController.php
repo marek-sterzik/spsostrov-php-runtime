@@ -8,8 +8,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Form\FormInterface;
 use Doctrine\ORM\QueryBuilder;
 use App\Entity\Assignment;
-use App\Utility\Cell;
-use App\Utility\Action;
+use App\Component\Cell;
+use App\Component\Action;
 use App\Utility\SearchTool;
 use App\Form\Filter\StudentAssignmentsType;
 

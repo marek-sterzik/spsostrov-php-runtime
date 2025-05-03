@@ -7,8 +7,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormInterface;
 use App\Exception\RequestCorrectionException;
 use App\Utility\RequestUtility;
-use App\Utility\Cell;
 use App\Utility\UrlJson;
+use App\Component\Cell;
 
 abstract class AbstractTableController extends AbstractController
 {

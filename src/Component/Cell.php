@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Utility;
+namespace App\Component;
 
 class Cell
 {
@@ -14,7 +14,7 @@ class Cell
             foreach ($cell as $item) {
                 if (is_string($item)) {
                     $cellHtml .= $item;
-                } elseif (($item instanceof self) || ($item instanceof Action)) {
+                } elseif (($item instanceof self) || ($item instanceof Action) || ($item instanceof MultiAction)) {
                     $cellHtml .= $item->render();
                 } else {
                     $cellHtml .= (string)$item;

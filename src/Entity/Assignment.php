@@ -112,6 +112,18 @@ class Assignment
         return $this;
     }
 
+    public function getState(): string
+    {
+        return $this->state;
+    }
+
+    public function setState(string $state): static
+    {
+        $this->state = $state;
+
+        return $this;
+    }
+
     public function getOwner(): User
     {
         return $this->owner;
