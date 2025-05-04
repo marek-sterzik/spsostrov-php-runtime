@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\AssignmentRepository;
+use App\Assignment\AssignmentState;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -29,8 +30,8 @@ class Assignment
     #[ORM\Column]
     private bool $public = false;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $state = null;
+    #[ORM\Column(type: Types::STRING, length: 255, enumType: AssignmentState::class, nullable: true)]
+    private ?AssignmentState $state = null;
 
     #[ORM\ManyToOne(inversedBy: 'ownedAssignments')]
     #[ORM\JoinColumn(nullable: false)]
@@ -112,12 +113,12 @@ class Assignment
         return $this;
     }
 
-    public function getState(): string
+    public function getState(): AssignmentState
     {
         return $this->state;
     }
 
-    public function setState(string $state): static
+    public function setState(AssignmentState $state): static
     {
         $this->state = $state;
 

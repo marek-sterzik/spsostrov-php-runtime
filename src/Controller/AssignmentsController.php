@@ -14,6 +14,7 @@ use App\Component\MultiAction;
 use App\Utility\SearchTool;
 use App\Form\Filter\AssignmentsType;
 use App\Assignment\AssignmentActions;
+use App\Assignment\AssignmentState;
 
 class AssignmentsController extends AbstractDbTableController
 {
@@ -38,11 +39,12 @@ class AssignmentsController extends AbstractDbTableController
                 $qb->andWhere($qb->expr()->orX(
                     $qb->expr()->eq("a.owner", ":owner"),
                     $qb->expr()->andX(
-                        $qb->expr()->neq("a.state", "draft"),
+                        $qb->expr()->neq("a.state", ":notState"),
                         $qb->expr()->eq("a.public", true),
                     )
                 ));
                 $qb->setParameter(":owner", $me);
+                $qb->setParameter(":notState", AssignmentState::Draft);
             }
         } else {
             $qb->andWhere("a.owner = :owner");
@@ -79,7 +81,7 @@ class AssignmentsController extends AbstractDbTableController
             "studentClass" => $assignment->getClasses(),
             "owner" => $assignment->getOwner()->getName(),
             "type" => $assignment->isPublic() ? "veřejné" : "soukromé",
-            "state" => $assignment->getState(),
+            "state" => $assignment->getState()->getDescription(),
             "_actions" => $this->getAssignmentActions($assignment),
         ];
     }
