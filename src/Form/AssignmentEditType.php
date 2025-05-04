@@ -21,7 +21,7 @@ class AssignmentEditType extends AbstractType
         $markdown = "<a href=\"https://cs.wikipedia.org/wiki/Markdown\" target=\"_blank\">markdown</a>";
         $builder
             ->add('caption', TextType::class, [
-                "label" => "nadpis:",
+                "label" => "název:",
                 "required" => true,
             ])
             ->add('description', TextareaType::class, [
