@@ -26,6 +26,9 @@
                     {% if user is not null %}
                         <a href="{{ path("user_detail") }}">{{ user.name }}</a>
                         {% include 'snippets/fundamental-roles.html.twig' with {'user': user.userData} %}
+                        {% if user.isStudent() %}
+                        {% include 'snippets/class.html.twig' with {'user': user.userData} %}
+                        {% endif %}
                     {% else %}
                         nepřihlášen
                     {% endif %}
