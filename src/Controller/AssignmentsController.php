@@ -64,9 +64,10 @@ class AssignmentsController extends AbstractDbTableController
     {
         return [
             "caption" => "název",
-            "owner" => "vlastník",
+            "studentClass" => "třídy",
             "type" => "typ",
-            "state" => "stav"
+            "state" => "stav",
+            "owner" => "vlastník",
         ];
     }
 
@@ -75,6 +76,7 @@ class AssignmentsController extends AbstractDbTableController
         assert($assignment instanceof Assignment);
         return [
             "caption" => $assignment->getCaption(),
+            "studentClass" => $assignment->getClasses(),
             "owner" => $assignment->getOwner()->getName(),
             "type" => $assignment->isPublic() ? "veřejné" : "soukromé",
             "state" => $assignment->getState(),
