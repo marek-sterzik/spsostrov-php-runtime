@@ -68,7 +68,13 @@ const setButtonType = (button, type) => {
 
 const showModalConfirm = (config) => {
     const modal = getModal()
-    modal.find("div.modal-body > p").text(config.message)
+    const body = modal.find("div.modal-body")
+    body.html("")
+    for (var message of config.message.split(/\n/)) {
+        if (!message.match(/^\s*$/)) {
+            body.append($("<p>").text(message))
+        }
+    }
     const title = modal.find("h5")
     title.text(config.title)
     setCssClass(title, "text-danger", config.danger)

@@ -65,8 +65,8 @@ class AssignmentActions
 
     private function confirmCloseAction(Assignment $assignment): array
     {
-        $message = "Po uzavření už nebude možné zadání měnit. " .
-            "Po aktivaci bude zadání viditelné studentům. " .
+        $message = "Po uzavření už nebude možné zadání měnit.\n" .
+            "Po aktivaci bude zadání viditelné studentům.\n" .
             "Co si přejete udělat?";
         $title = "potvrdit uzavření";
         return [$message, $title];
