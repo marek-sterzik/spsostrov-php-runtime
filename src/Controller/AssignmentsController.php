@@ -13,7 +13,7 @@ use App\Component\Action;
 use App\Component\MultiAction;
 use App\Utility\SearchTool;
 use App\Form\Filter\AssignmentsType;
-use App\Actions\AssignmentActions;
+use App\Assignment\AssignmentActions;
 
 class AssignmentsController extends AbstractDbTableController
 {

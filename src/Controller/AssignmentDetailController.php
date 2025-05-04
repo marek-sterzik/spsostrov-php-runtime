@@ -9,7 +9,7 @@ use App\Entity\Assignment;
 use App\Form\AssignmentEditType;
 use App\Utility\RoleComparator;
 use App\Validator\StudentClassValidator;
-use App\Actions\AssignmentActions;
+use App\Assignment\AssignmentActions;
 use App\Component\Action;
 
 class AssignmentDetailController extends AbstractController

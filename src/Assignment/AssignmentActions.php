@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Actions;
+namespace App\Assignment;
 
 use Symfony\Bundle\SecurityBundle\Security;
 use App\Entity\Assignment;
