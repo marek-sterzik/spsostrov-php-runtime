@@ -13,8 +13,9 @@ const modal = `
         <p></p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="no btn btn-secondary" data-bs-dismiss="modal">No</button>
-        <button type="button" class="yes btn btn-primary">Yes</button>
+        <button type="button" class="cancel btn btn-secondary" data-bs-dismiss="modal">No</button>
+        <button type="button" class="confirm btn btn-primary">Yes</button>
+        <button type="button" class="third btn btn-primary">?</button>
       </div>
     </div>
   </div>
@@ -28,13 +29,15 @@ const getModal = () => {
         modalElement = $(modal)
         const modalElementConst = modalElement
         $('body').append(modalElement)
-        modalElement.find("button.yes").bind("click", function () {
+        const actionHandler = function () {
             const action = $(this).attr("data-action")
             if (action !== null && action !== undefined) {
                 window.location = action
             }
             modalElementConst.modal("hide")
-        })
+        }
+        modalElement.find("button.confirm").bind("click", actionHandler)
+        modalElement.find("button.third").bind("click", actionHandler)
     }
     return modalElement
 }
@@ -51,21 +54,41 @@ const setCssClass = (element, cssClass, enabled) => {
     }
 }
 
+const setButtonType = (button, type) => {
+    const newCls = "btn-" + type
+    for (var cls of button.prop("classList")) {
+        if (cls.match(/^btn-/) && cls !== newCls) {
+            button.removeClass(cls)
+        }
+    }
+    if (!button.hasClass(newCls)) {
+        button.addClass(newCls)
+    }
+}
+
 const showModalConfirm = (config) => {
     const modal = getModal()
-    console.log("modal-body", modal.find("div.modal-body > p"), config)
     modal.find("div.modal-body > p").text(config.message)
     const title = modal.find("h5")
     title.text(config.title)
     setCssClass(title, "text-danger", config.danger)
 
-    const yes = modal.find("button.yes")
-    const no = modal.find("button.no")
-    setCssClass(yes, "btn-primary", !config.danger)
-    setCssClass(yes, "btn-danger", config.danger)
-    yes.text(config.yesText)
-    no.text(config.noText)
-    yes.attr("data-action", config.action)
+    const confirmButton = modal.find("button.confirm")
+    const cancelButton = modal.find("button.cancel")
+    const thirdButton = modal.find("button.third")
+    setButtonType(confirmButton, config.danger ? "danger" : "primary")
+    confirmButton.text(config.confirmText)
+    cancelButton.text(config.cancelText)
+    confirmButton.attr("data-action", config.action)
+    if (config.thirdText && config.thirdAction) {
+        thirdButton.show()
+        thirdButton.text(config.thirdText)
+        thirdButton.attr("data-action", config.thirdAction)
+        setButtonType(thirdButton, config.thirdType)
+    } else {
+        thirdButton.hide()
+        thirdButton.removeAttr("data-action")
+    }
     modal.modal("show")
 }
 
@@ -73,8 +96,13 @@ const getConfigFromElement = (element) => {
     const message = element.attr("data-confirm-message")
     const title = element.attr("data-confirm-title") || "potvrdit"
     const danger = element.hasClass("btn-danger") || element.hasClass("text-danger")
+    const thirdType = element.attr("data-confirm-third-type") || "primary"
     const action = element.attr("href")
-    return {message, title, danger, action, yesText: "Ano", noText: "Ne"}
+    const confirmText = element.attr("data-confirm-confirm-label") || "potvrdit"
+    const cancelText = element.attr("data-confirm-cancel-label") || "zrušit"
+    const thirdText = element.attr("data-confirm-third-label")
+    const thirdAction = element.attr("data-confirm-third-action")
+    return {message, title, danger, action, confirmText, cancelText, thirdText, thirdAction, thirdType}
 }
 
 $(() => {

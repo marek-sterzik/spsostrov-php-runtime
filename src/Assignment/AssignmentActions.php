@@ -38,19 +38,37 @@ class AssignmentActions
                 $this->router->generate("assignment", ["assignment" => $assignment->getId(), "_back" => true]),
             )->label("upravit")->cssClass("btn-primary")->icon('bi-pencil-square');
         }
+        if ($assignment->canBeEditedBy($user)) {
+            $actions[] = Action::get(
+                "#close",
+            )->label("uzavřít")->cssClass("btn-success")->icon("bi-check-square")
+                ->confirm(...$this->confirmCloseAction($assignment))
+                ->confirmButtons("jenom uzavřít", null, "uzavřít a aktivovat")
+                ->thirdAction("#close-and-activate", "danger");
+        }
         if ($assignment->canBeDeletedBy($user)) {
             $actions[] = null;
             $actions[] = Action::get(
                 $this->router->generate("assignment-delete", ["assignment" => $assignment->getId(), "_back" => $forList]),
-            )->label("smazat")->cssClass("btn-danger")->icon('bi-trash')->confirm(...$this->confirmDeleteMessage($assignment));
+            )->label("smazat")->cssClass("btn-danger")->icon('bi-trash')
+                ->confirm(...$this->confirmDeleteMessage($assignment))->confirmButtons("opravdu smazat");
         }
         return $actions;
     }
 
     private function confirmDeleteMessage(Assignment $assignment): array
     {
-        $message = sprintf("Chcete opravdu smazat zadání \"%s\"", $assignment->getCaption());
+        $message = sprintf("Chcete opravdu smazat zadání \"%s\"?", $assignment->getCaption());
         $title = "potvrdit smazání";
+        return [$message, $title];
+    }
+
+    private function confirmCloseAction(Assignment $assignment): array
+    {
+        $message = "Po uzavření už nebude možné zadání měnit. " .
+            "Po aktivaci bude zadání viditelné studentům. " .
+            "Co si přejete udělat?";
+        $title = "potvrdit uzavření";
         return [$message, $title];
     }
 }

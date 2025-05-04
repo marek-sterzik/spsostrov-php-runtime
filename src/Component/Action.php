@@ -40,18 +40,48 @@ class Action implements Component
 
     public function attr(string $attr, ?string $value): self
     {
-        $attrs = $this->attrs;
-        if ($value !== null) {
-            $attrs[$attr] = $value;
-        } else {
-            unset($attrs[$attr]);
+        return $this->attrs([$attr => $value]);
+    }
+
+    public function attrs(array $attrs): self
+    {
+        $newAttrs = $this->attrs;
+        foreach ($attrs as $attr => $value) {
+            if ($value !== null) {
+                $newAttrs[$attr] = $value;
+            } else {
+                unset($newAttrs[$attr]);
+            }
         }
-        return $this->modify(["attrs" => $attrs]);
+        return $this->modify(["attrs" => $newAttrs]);
     }
 
     public function confirm(?string $message, ?string $title = null): self
     {
-        return $this->attr("data-confirm-message", $message)->attr("data-confirm-title", $title);
+        return $this->attrs([
+            "data-confirm-message" => $message,
+            "data-confirm-title" => $title
+        ]);
+    }
+
+    public function confirmButtons(
+        ?string $confirmLabel = null,
+        ?string $cancelLabel = null,
+        ?string $thirdLabel = null
+    ): self {
+        return $this->attrs([
+            "data-confirm-confirm-label" => $confirmLabel,
+            "data-confirm-cancel-label" => $cancelLabel,
+            "data-confirm-third-label" => $thirdLabel,
+        ]);
+    }
+
+    public function thirdAction(?string $action, ?string $type = null): self
+    {
+        return $this->attrs([
+            "data-confirm-third-action" => $action,
+            "data-confirm-third-type" => $type,
+        ]);
     }
 
     private function modify(array $modification): self
