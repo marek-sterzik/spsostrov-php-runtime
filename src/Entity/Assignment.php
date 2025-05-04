@@ -30,8 +30,8 @@ class Assignment
     #[ORM\Column]
     private bool $public = false;
 
-    #[ORM\Column(type: Types::STRING, length: 255, enumType: AssignmentState::class, nullable: true)]
-    private ?AssignmentState $state = null;
+    #[ORM\Column(type: Types::STRING, length: 255, enumType: AssignmentState::class)]
+    private AssignmentState $state = AssignmentState::Draft;
 
     #[ORM\ManyToOne(inversedBy: 'ownedAssignments')]
     #[ORM\JoinColumn(nullable: false)]

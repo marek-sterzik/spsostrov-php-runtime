@@ -9,6 +9,8 @@ enum AssignmentState: string
 {
     use EnumTrait;
 
+    #[Description("rozpracované")]
     case Draft = "draft";
+
     case Submitting = "submitting";
 }
