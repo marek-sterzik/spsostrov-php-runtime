@@ -42,8 +42,15 @@ class AssignmentActions
             $actions[] = null;
             $actions[] = Action::get(
                 $this->router->generate("assignment-delete", ["assignment" => $assignment->getId(), "_back" => $forList]),
-            )->label("smazat")->cssClass("btn-danger")->icon('bi-trash');
+            )->label("smazat")->cssClass("btn-danger")->icon('bi-trash')->confirm(...$this->confirmDeleteMessage($assignment));
         }
         return $actions;
+    }
+
+    private function confirmDeleteMessage(Assignment $assignment): array
+    {
+        $message = sprintf("Chcete opravdu smazat zadání \"%s\"", $assignment->getCaption());
+        $title = "potvrdit smazání";
+        return [$message, $title];
     }
 }
