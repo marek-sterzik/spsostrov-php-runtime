@@ -6,6 +6,7 @@ use App\Repository\AssignmentRepository;
 use App\Assignment\AssignmentState;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Validator\StudentClassPattern;
 
 #[ORM\Entity(repositoryClass: AssignmentRepository::class)]
 class Assignment
@@ -21,6 +22,7 @@ class Assignment
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
+    #[StudentClassPattern(message: "neplatný seznam tříd")]
     #[ORM\Column(length: 255)]
     private ?string $classes = null;
 

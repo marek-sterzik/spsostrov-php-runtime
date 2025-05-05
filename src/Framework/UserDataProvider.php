@@ -14,7 +14,7 @@ use App\StudentClass\StudentClass;
 class UserDataProvider implements SSOUserDataProviderInterface, SSORoleDeciderInterface
 {
     public function __construct(
-        private UserRepository $userRepository, 
+        private UserRepository $userRepository,
         private EntityManager $entityManager,
         private StudentClass $studentClass,
     ) {

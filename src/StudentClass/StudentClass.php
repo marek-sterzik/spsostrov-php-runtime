@@ -33,7 +33,7 @@ class StudentClass
     public function normalizeStudentClassPattern(string $studentClassPattern): ?string
     {
         $parsed = $this->parsePattern($studentClassPattern);
-        return implode(", ", $parsed);
+        return $this->parsedToNormalized($parsed);
     }
 
     public function studentClassPatternToRegexp(string $studentClassPattern): ?string
@@ -46,13 +46,24 @@ class StudentClass
     {
         $parsed = $this->parsePattern($studentClassPattern);
         return [
-            "normalized" => implode(", ", $parsed),
+            "normalized" => $this->parsedToNormalized($parsed),
             "regexp" => $this->parsedToRegexp($parsed),
         ];
     }
 
-    private function parsedToRegexp(array $parsed): string
+    private function parsedToNormalized(?array $parsed): ?string
     {
+        if ($parsed === null) {
+            return null;
+        }
+        return implode(", ", $parsed);
+    }
+
+    private function parsedToRegexp(?array $parsed): ?string
+    {
+        if ($parsed === null) {
+            return null;
+        }
         $parsed = array_map(fn ($item) => $this->studentClassSinglePatternToRegexp($item), $parsed);
         return '^' . implode("|", $parsed) . "$";
     }
@@ -92,25 +103,25 @@ class StudentClass
         }
 
         switch ($patternType) {
-        case 'single_class':
-            return $matches[1];
-        case 'everything':
-            return '[A-Z]+[0-9]*[A-Z]*';
-        case 'num_suffix':
-            return $matches[1] . '[0-9]*[A-Z]*';   
-        case 'suffix':
-            return $matches[1] . '[A-Z]*';
-        case 'prefix_num':
-            return '[A-Z]+[0-9]*' . $matches[1];
-        case 'num':
-            return $matches[1] . '[0-9]+' . $matches[2];
-        case 'prefix_suffix':
-            return '[A-Z]+' . $matches[1] . '[A-Z]*';
-        case 'prefix':
-            return '[A-Z]+' . $matches[1];
-        default: throw new Exception("Bug occured");
+            case 'single_class':
+                return $matches[1];
+            case 'everything':
+                return '[A-Z]+[0-9]*[A-Z]*';
+            case 'num_suffix':
+                return $matches[1] . '[0-9]*[A-Z]*';
+            case 'suffix':
+                return $matches[1] . '[A-Z]*';
+            case 'prefix_num':
+                return '[A-Z]+[0-9]*' . $matches[1];
+            case 'num':
+                return $matches[1] . '[0-9]+' . $matches[2];
+            case 'prefix_suffix':
+                return '[A-Z]+' . $matches[1] . '[A-Z]*';
+            case 'prefix':
+                return '[A-Z]+' . $matches[1];
+            default:
+                throw new Exception("Bug occured");
         }
-        
     }
 
     private function normalizeStudentClassSinglePattern(string $studentClassSinglePattern): ?string
