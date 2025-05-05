@@ -42,11 +42,21 @@ class StudentClass
         return $this->parsedToRegexp($parsed);
     }
 
+    public function parseStudentClassPattern(string $studentClassPattern): array
+    {
+        $parsed = $this->parsePattern($studentClassPattern);
+        return [
+            "normalized" => implode(", ", $parsed),
+            "regexp" => $this->parsedToRegexp($parsed),
+        ];
+    }
+
     private function parsedToRegexp(array $parsed): string
     {
         $parsed = array_map(fn ($item) => $this->studentClassSinglePatternToRegexp($item), $parsed);
         return '^' . implode("|", $parsed) . "$";
     }
+
 
     private function parsePattern(string $studentClassPattern): ?array
     {
