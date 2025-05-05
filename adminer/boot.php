@@ -38,6 +38,20 @@ class AdminerLoginPasswordLess
         return ltrim(static::$dbConf['path'], '/');
     }
 
+    public function headers()
+    {
+        header("X-Frame-Options: SAMEORIGIN");
+    }
+
+    public function head()
+    {
+        $css = "#logout {display: none;}";
+        $data = "data:text/css;base64, " . base64_encode($css);
+        echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$data\">";
+        return true;
+
+    }
+
     public function loginForm()
     {
         $drivers = [

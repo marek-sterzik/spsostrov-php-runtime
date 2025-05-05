@@ -10,6 +10,27 @@ table.sso_user_table {margin: 0 auto;}
 
 img.spsostrov-logo {display: block; margin: 5em auto; max-width: 70%;}
 
+div.adminer-frame {
+    margin-top: .5em;
+    width: 100%;
+    height: 50vh;
+    border-top: 2px solid black;
+    position: relative;
+    overflow: hidden;
+}
+
+div.adminer-frame > iframe {
+    width: 100%;
+    height: 100%;
+    margin: 0; padding: 0;
+    
+}
+
+div.adminer-link {
+    padding: .5em 1em;
+    float: right;
+}
+
 /* modal progress bar */
 
 .modal-foreground {position: fixed; left: 0; top: 0; right: 0; bottom: 0; background-color: #b0b0b080;}

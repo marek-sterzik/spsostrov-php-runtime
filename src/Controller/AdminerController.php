@@ -17,7 +17,7 @@ class AdminerController extends AbstractController
     }
 
     #[IsGranted('ROLE_SUPERADMIN')]
-    #[Route("/adminer", name: "app.adminer")]
+    #[Route("/adminer/app", name: "app.adminer")]
     public function pageAdminer(): Response
     {
         return new StreamedResponse(
@@ -27,5 +27,13 @@ class AdminerController extends AbstractController
                 include $this->adminerBootFile;
             }
         );
+    }
+
+    #[IsGranted('ROLE_SUPERADMIN')]
+    #[Route("/adminer", name: "adminer-frame")]
+    public function adminerFrame(): Response
+    {
+        $this->enableModule('adminer-frame');
+        return $this->render("adminer.html.twig");
     }
 }

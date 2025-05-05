@@ -14,9 +14,8 @@ menu:
     routes: ["user"]
     roles: ['ROLE_ADMIN']
   - name: adminer
-    route: app.adminer
-    roles: ["ROLE_SUPERADMIN"]
-    target_blank: true
+    route: adminer-frame
+    roles: ['ROLE_SUPERADMIN']
   - name: detail uživatele
     route: user_detail
     roles: ['ROLE_USER']
