@@ -26,6 +26,9 @@ class Assignment
     #[ORM\Column(length: 255)]
     private ?string $classes = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $classesRegexp = null;
+
     #[ORM\Column(nullable: true)]
     private ?int $schoolYear = null;
 
@@ -87,6 +90,18 @@ class Assignment
     public function setClasses(string $classes): static
     {
         $this->classes = $classes;
+
+        return $this;
+    }
+
+    public function getClassesRegexp(): ?string
+    {
+        return $this->classesRegexp;
+    }
+
+    public function setClassesRegexp(string $classesRegexp): ?string
+    {
+        $this->classesRegexp = $classesRegexp;
 
         return $this;
     }

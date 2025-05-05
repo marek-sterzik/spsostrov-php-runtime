@@ -59,6 +59,7 @@ class AssignmentEditController extends AbstractController
             ->action($new ? "Vytvořit" : "Uložit", function (Assignment $assignment) {
                 $parsed = $this->studentClass->parseStudentClassPattern($assignment->getClasses());
                 $assignment->setClasses($parsed['normalized'] ?? $assignment->getClasses());
+                $assignment->setClassesRegexp($parsed['regexp']);
                 $this->getEntityManager()->flush();
                 return $this->redirectBack(true);
             })
