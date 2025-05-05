@@ -13,9 +13,9 @@ const modal = `
         <p></p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="cancel btn btn-secondary" data-bs-dismiss="modal">No</button>
-        <button type="button" class="confirm btn btn-primary">Yes</button>
-        <button type="button" class="third btn btn-primary">?</button>
+        <button type="button" class="cancel btn btn-sm btn-secondary" data-bs-dismiss="modal">No</button>
+        <button type="button" class="confirm btn btn-sm btn-primary">Yes</button>
+        <button type="button" class="third btn btn-sm btn-primary">?</button>
       </div>
     </div>
   </div>
@@ -57,7 +57,7 @@ const setCssClass = (element, cssClass, enabled) => {
 const setButtonType = (button, type) => {
     const newCls = "btn-" + type
     for (var cls of button.prop("classList")) {
-        if (cls.match(/^btn-/) && cls !== newCls) {
+        if (cls !== 'btn-sm' && cls.match(/^btn-/) && cls !== newCls) {
             button.removeClass(cls)
         }
     }
@@ -82,7 +82,7 @@ const showModalConfirm = (config) => {
     const confirmButton = modal.find("button.confirm")
     const cancelButton = modal.find("button.cancel")
     const thirdButton = modal.find("button.third")
-    setButtonType(confirmButton, config.danger ? "danger" : "primary")
+    setButtonType(confirmButton, config.confirmType)
     confirmButton.text(config.confirmText)
     cancelButton.text(config.cancelText)
     confirmButton.attr("data-action", config.action)
@@ -103,12 +103,13 @@ const getConfigFromElement = (element) => {
     const title = element.attr("data-confirm-title") || "potvrdit"
     const danger = element.hasClass("btn-danger") || element.hasClass("text-danger")
     const thirdType = element.attr("data-confirm-third-type") || "primary"
+    const confirmType = element.attr("data-confirm-confirm-type") || (danger ? "danger" : "primary")
     const action = element.attr("href")
     const confirmText = element.attr("data-confirm-confirm-label") || "potvrdit"
     const cancelText = element.attr("data-confirm-cancel-label") || "zrušit"
     const thirdText = element.attr("data-confirm-third-label")
     const thirdAction = element.attr("data-confirm-third-action")
-    return {message, title, danger, action, confirmText, cancelText, thirdText, thirdAction, thirdType}
+    return {message, title, danger, action, confirmText, cancelText, thirdText, thirdAction, confirmType, thirdType}
 }
 
 $(() => {

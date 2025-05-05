@@ -76,6 +76,11 @@ class Action implements Component
         ]);
     }
 
+    public function confirmType(?string $type): self
+    {
+        return $this->attrs(["data-confirm-confirm-type" => $type]);
+    }
+
     public function thirdAction(?string $action, ?string $type = null): self
     {
         return $this->attrs([

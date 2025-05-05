@@ -178,7 +178,7 @@ class Assignment
         return $this;
     }
 
-    public function canBeEditedBy(?User $user): bool
+    public function hasEditRights(?User $user): bool
     {
         if ($user === null) {
             return false;
@@ -192,11 +192,27 @@ class Assignment
         return true;
     }
 
-    public function canBeDeletedBy(?User $user): bool
+    public function canBeEditedBy(?User $user): bool
     {
-        if (!$this->canBeEditedBy($user)) {
+        if (!$this->hasEditRights($user)) {
             return false;
         }
-        return true;
+        return $this->state->editAllowed();
+    }
+
+    public function canBeDeletedBy(?User $user): bool
+    {
+        if (!$this->hasEditRights($user)) {
+            return false;
+        }
+        return $this->state->deleteAllowed();
+    }
+
+    public function canTransitTo(?User $user, AssignmentState $finalState): bool
+    {
+        if (!$this->hasEditRights($user)) {
+            return false;
+        }
+        return $this->state->canTransitTo($finalState);
     }
 }

@@ -44,13 +44,27 @@ class AssignmentActions
                 $this->router->generate("assignment", ["assignment" => $assignment->getId(), "_back" => true]),
             )->label("upravit")->cssClass("btn-primary")->icon('bi-pencil-square');
         }
-        if ($assignment->canBeEditedBy($user)) {
+        $allowReadyTransition = $assignment->canTransitTo($user, AssignmentState::Ready);
+        $allowActiveTransition = $assignment->canTransitTo($user, AssignmentState::Active);
+        if ($allowReadyTransition && $allowActiveTransition) {
             $actions[] = Action::get(
-                "#close",
-            )->label("uzavřít")->cssClass("btn-success")->icon("bi-check-square")
-                ->confirm(...$this->confirmCloseAction($assignment))
-                ->confirmButtons("jenom uzavřít", null, "uzavřít a aktivovat")
-                ->thirdAction("#close-and-activate", "danger");
+                $this->getTransitionAction($assignment, AssignmentState::Ready),
+            )->label("aktivovat")->cssClass("btn-success")->icon("bi-check-square")
+                ->confirm(...$this->confirmCloseActivateAction($assignment, $allowActiveTransition))
+                ->confirmButtons("uzavřít a připravit k aktivaci", null, "uzavřít a aktivovat")
+                ->thirdAction($this->getTransitionAction($assignment, AssignmentState::Active), "danger");
+        } elseif ($allowReadyTransition) {
+            $actions[] = Action::get(
+                $this->getTransitionAction($assignment, AssignmentState::Ready),
+            )->label("připravit k aktivaci")->cssClass("btn-success")->icon("bi-check-square")
+                ->confirm(...$this->confirmCloseActivateAction($assignment, $allowActiveTransition))
+                ->confirmButtons("uzavřít a připravit k aktivaci");
+        } elseif ($allowActiveTransition) {
+            $actions[] = Action::get(
+                $this->getTransitionAction($assignment, AssignmentState::Active),
+            )->label("aktivovat")->cssClass("btn-success")->icon("bi-check-square")
+                ->confirm(...$this->confirmCloseActivateAction($assignment, $allowActiveTransition))
+                ->confirmButtons("aktivovat")->confirmType("danger");
         }
         if ($assignment->canBeDeletedBy($user)) {
             $actions[] = null;
@@ -65,6 +79,14 @@ class AssignmentActions
         return $actions;
     }
 
+    private function getTransitionAction(Assignment $assignment, AssignmentState $state): string
+    {
+        return $this->router->generate(
+            "assignment-set-state",
+            ["assignment" => $assignment->getId(), "state" => $state->value]
+        );
+    }
+
     private function confirmDeleteMessage(Assignment $assignment): array
     {
         $message = sprintf("Chcete opravdu smazat zadání \"%s\"?", $assignment->getCaption());
@@ -72,12 +94,18 @@ class AssignmentActions
         return [$message, $title];
     }
 
-    private function confirmCloseAction(Assignment $assignment): array
+    private function confirmCloseActivateAction(Assignment $assignment, bool $activationAvailable): array
     {
-        $message = "Po uzavření už nebude možné zadání měnit.\n" .
-            "Po aktivaci bude zadání viditelné studentům.\n" .
-            "Co si přejete udělat?";
-        $title = "potvrdit uzavření";
+        if ($assignment->getState() === AssignmentState::Draft) {
+            $message = "Po uzavření už nebude možné zadání měnit.\n" .
+                ($activationAvailable ? "Po aktivaci bude zadání viditelné studentům.\n" : "") .
+                "Co si přejete udělat?";
+            $title = "potvrdit uzavření";
+        } else {
+            $message = "Po aktivaci bude zadání viditelné studentům.\n" .
+                "Chcete skutečně pokračovat?";
+            $title = "potvrdit aktivaci";
+        }
         return [$message, $title];
     }
 }

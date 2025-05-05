@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -9,6 +10,7 @@ use App\Entity\Assignment;
 use App\Form\AssignmentEditType;
 use App\Utility\RoleComparator;
 use App\StudentClass\StudentClass;
+use App\Assignment\AssignmentState;
 
 class AssignmentEditController extends AbstractController
 {
@@ -38,6 +40,23 @@ class AssignmentEditController extends AbstractController
     {
         if ($assignment->canBeDeletedBy($this->getUserEntity())) {
             $this->getEntityManager()->remove($assignment);
+            $this->getEntityManager()->flush();
+        }
+        return $this->redirectBack(true);
+    }
+
+    #[IsGranted('ROLE_TEACHER')]
+    #[Route("/assignment/{assignment}/set-state", name: "assignment-set-state")]
+    public function setStateAssignment(Assignment $assignment, Request $request): Response
+    {
+        $state = $request->query->get("state");
+        if (is_string($state)) {
+            $state = AssignmentState::tryFrom($state);
+        } else {
+            $state = null;
+        }
+        if ($state !== null && $assignment->canTransitTo($this->getUserEntity(), $state)) {
+            $assignment->setState($state);
             $this->getEntityManager()->flush();
         }
         return $this->redirectBack(true);
