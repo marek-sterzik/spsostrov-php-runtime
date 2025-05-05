@@ -76,12 +76,13 @@ class AssignmentsController extends AbstractDbTableController
     protected function recordToArray(mixed $assignment): array
     {
         assert($assignment instanceof Assignment);
+        $state = $this->renderView('snippets/assignment-state.html.twig', ['state' => $assignment->getState()]);
         return [
             "caption" => $assignment->getCaption(),
             "studentClass" => $assignment->getClasses(),
             "owner" => $assignment->getOwner()->getName(),
             "type" => $assignment->isPublic() ? "veřejné" : "soukromé",
-            "state" => $assignment->getState()->getDescription(),
+            "state" => Cell::html($state),
             "_actions" => $this->getAssignmentActions($assignment),
         ];
     }

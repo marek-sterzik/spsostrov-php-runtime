@@ -1,0 +1,4 @@
+{% if state is not null %}
+    <span class="badge bg-{{ state.getParam("type") }}">{{ state.description() }}</span>
+{% endif %}
+

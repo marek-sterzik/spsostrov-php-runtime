@@ -3,6 +3,7 @@
 namespace App\Assignment;
 
 use App\Enum\Description;
+use App\Enum\Parameter;
 use App\Enum\EnumTrait;
 
 enum AssignmentState: string
@@ -10,18 +11,23 @@ enum AssignmentState: string
     use EnumTrait;
 
     #[Description("rozpracované")]
+    #[Parameter("type", "success")]
     case Draft = "draft";
 
     #[Description("připraveno k aktivaci")]
+    #[Parameter("type", "primary")]
     case Ready = "ready";
 
     #[Description("aktivováno")]
+    #[Parameter("type", "danger")]
     case Active = "active";
 
     #[Description("odevzdávání ukončeno")]
+    #[Parameter("type", "warning")]
     case Finished = "finished";
 
     #[Description("uzavřeno")]
+    #[Parameter("type", "secondary")]
     case Closed = "closed";
 
     public function canTransitTo(self $state): bool
