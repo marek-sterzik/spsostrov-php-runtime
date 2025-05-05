@@ -8,7 +8,6 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Entity\Assignment;
 use App\Form\AssignmentEditType;
 use App\Utility\RoleComparator;
-use App\Validator\StudentClassValidator;
 use App\Assignment\AssignmentActions;
 use App\Component\Action;
 

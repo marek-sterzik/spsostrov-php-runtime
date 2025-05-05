@@ -13,6 +13,7 @@ class Form
 {
     private string $template = "form.html.twig";
     private array $templateVars = [];
+    private ?string $caption = null;
 
     /** @var callable */
     private $renderer;
@@ -21,6 +22,19 @@ class Form
     public function __construct(private FormComponent $form, private Request $request, callable $renderer)
     {
         $this->renderer = $renderer;
+    }
+
+    public function useTemplate(string $template, array $templateVars = []): self
+    {
+        $this->template = $template;
+        $this->templateVars = $templateVars;
+        return $this;
+    }
+
+    public function caption(?string $caption): self
+    {
+        $this->caption = $caption;
+        return $this;
     }
 
     public function handle(): Response
@@ -92,6 +106,9 @@ class Form
     private function renderForm(): Response
     {
         $renderer = $this->renderer;
-        return $renderer($this->template, array_merge($this->templateVars, ["form" => $this->form->createView()]));
+        return $renderer($this->template, array_merge($this->templateVars, [
+            "form" => $this->form->createView(),
+            "caption" => $this->caption,
+        ]));
     }
 }

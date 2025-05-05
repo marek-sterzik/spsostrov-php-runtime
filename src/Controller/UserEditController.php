@@ -9,10 +9,11 @@ use App\Entity\User;
 use App\Form\UserRolesType;
 use App\Utility\RoleComparator;
 use App\Validator\StudentClassValidator;
+use App\StudentClass\StudentClass;
 
 class UserEditController extends AbstractController
 {
-    public function __construct(private StudentClassValidator $studentClassValidator)
+    public function __construct(private StudentClass $studentClass)
     {
     }
 
@@ -36,7 +37,7 @@ class UserEditController extends AbstractController
                 } else {
                     $studentClass = $user->getEffectiveStudentClass();
                     if ($studentClass !== null) {
-                        $studentClass = $this->studentClassValidator->normalizeStudentClass($studentClass);
+                        $studentClass = $this->studentClass->normalizeStudentClass($studentClass);
                     }
                     if ($studentClass !== null) {
                         $user->setEffectiveStudentClass($studentClass);
@@ -49,6 +50,7 @@ class UserEditController extends AbstractController
             ->action("Zrušit", function (User $user) {
                 return $this->redirectBack(true);
             }, type: 'btn-secondary', validated: false)
+            ->caption(sprintf("nastavit roli uživateli \"%s\"", $user->getName()))
             ->handle()
         ;
     }

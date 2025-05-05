@@ -3,6 +3,9 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-6 col-12">
+                {% if caption is not null %}
+                    <h3>{{ caption }}</h3>
+                {% endif %}
                 {{ form(form) }}
             </div>
         </div>

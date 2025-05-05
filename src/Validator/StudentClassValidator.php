@@ -4,9 +4,14 @@ namespace App\Validator;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use App\StudentClass\StudentClass;
 
 class StudentClassValidator extends ConstraintValidator
 {
+    public function __construct(private StudentClass $studentClass)
+    {
+    }
+
     public function validate(mixed $value, Constraint $constraint): void
     {
         /** @var StudentClass $constraint */
@@ -15,22 +20,8 @@ class StudentClassValidator extends ConstraintValidator
             return;
         }
 
-        if (!is_string($value) || $this->normalizeStudentClass($value) === null) {
+        if (!is_string($value) || $this->studentClass->normalizeStudentClass($value) === null) {
             $this->context->buildViolation($constraint->message)->addViolation();
         }
-    }
-
-    public function normalizeStudentClass(string $studentClass): ?string
-    {
-        $studentClass = preg_replace('/\s+/', '', $studentClass);
-        if ($studentClass === '') {
-            return null;
-        }
-        $studentClass = strtoupper($studentClass);
-
-        if (!preg_match('/^[A-Z]+[0-9]*[A-Z]*$/', $studentClass)) {
-            return null;
-        }
-        return $studentClass;
     }
 }
