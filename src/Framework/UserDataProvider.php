@@ -9,11 +9,15 @@ use SPSOstrov\SSOBundle\SSOUser;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface as EntityManager;
 use App\Entity\User;
+use App\StudentClass\StudentClass;
 
 class UserDataProvider implements SSOUserDataProviderInterface, SSORoleDeciderInterface
 {
-    public function __construct(private UserRepository $userRepository, private EntityManager $entityManager)
-    {
+    public function __construct(
+        private UserRepository $userRepository, 
+        private EntityManager $entityManager,
+        private StudentClass $studentClass,
+    ) {
     }
 
     public function getUserData(SSOUser $user): mixed
@@ -50,7 +54,8 @@ class UserDataProvider implements SSOUserDataProviderInterface, SSORoleDeciderIn
                 $changed = true;
             }
 
-            $studentClass = ($originalRole === 'ROLE_STUDENT') ? $user->getClass() : null;
+            
+            $studentClass = ($originalRole === 'ROLE_STUDENT') ? $this->getStudentClass($user) : null;
             if ($userEntity->getOriginalStudentClass() !== $studentClass) {
                 $userEntity->setOriginalStudentClass($studentClass);
                 $changed = true;
@@ -62,6 +67,15 @@ class UserDataProvider implements SSOUserDataProviderInterface, SSORoleDeciderIn
         }
 
         return $userEntity;
+    }
+
+    private function getStudentClass(SSOUser $user): ?string
+    {
+        $studentClass = $user->getClass();
+        if ($studentClass !== null) {
+            $studentClass = $this->studentClass->normalizeStudentClass($studentClass);
+        }
+        return $studentClass;
     }
 
     public function decideRoles(SSOUser $user): array
