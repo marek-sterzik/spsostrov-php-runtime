@@ -77,10 +77,12 @@ class AssignmentsController extends AbstractDbTableController
     {
         assert($assignment instanceof Assignment);
         $state = $this->renderView('snippets/assignment-state.html.twig', ['state' => $assignment->getState()]);
+        $isMe = ($assignment->getOwner() === $this->getUserEntity()) ? true : false;
+        $meBadge = $isMe ? (' ' . $this->renderView('snippets/me.html.twig')) : '';
         return [
             "caption" => $assignment->getCaption(),
             "studentClass" => $assignment->getClasses(),
-            "owner" => $assignment->getOwner()->getName(),
+            "owner" => Cell::html(htmlspecialchars($assignment->getOwner()->getName()) . $meBadge),
             "type" => $assignment->isPublic() ? "veřejné" : "soukromé",
             "state" => Cell::html($state),
             "_actions" => $this->getAssignmentActions($assignment),
