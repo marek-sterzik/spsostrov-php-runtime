@@ -14,6 +14,7 @@ class StudentClass
         'prefix_num' => '/^\*([A-Z]+)$/',
         'num' => '/^([A-Z]+)\*([A-Z]+)$/',
         'prefix_suffix' => '/^\*([0-9]+)\*$/',
+        'prefix' => '/^\*([0-9]+[A-Z]*)$/',
     ];
     public function normalizeStudentClass(string $studentClass): ?string
     {
@@ -55,7 +56,7 @@ class StudentClass
         }
 
         $studentClassPattern = strtoupper($studentClassPattern);
-        $parsed = preg_split('\s*,\s*', $studentClassPattern);
+        $parsed = preg_split('/\s*,\s*/', $studentClassPattern);
         $parsed = array_filter($parsed, fn ($item) => ($item !== ""));
         foreach ($parsed as &$studentClassSinglePattern) {
             $studentClassSinglePattern = $this->normalizeStudentClassSinglePattern($studentClassSinglePattern);
@@ -95,6 +96,8 @@ class StudentClass
             return $matches[1] . '[0-9]+' . $matches[2];
         case 'prefix_suffix':
             return '[A-Z]+' . $matches[1] . '[A-Z]*';
+        case 'prefix':
+            return '[A-Z]+' . $matches[1];
         default: throw new Exception("Bug occured");
         }
         
