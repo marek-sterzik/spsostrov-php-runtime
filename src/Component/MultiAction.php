@@ -6,18 +6,13 @@ use Exception;
 
 class MultiAction implements Component
 {
-    public static function get(...$actions): self
+    public static function get(?Action ...$actions): self
     {
         return new self($actions);
     }
 
     private function __construct(private array $actions)
     {
-        foreach ($actions as $action) {
-            if ($action !== null && !($action instanceof Action)) {
-                throw new Exception("Multiaction must consist of instances of " . Action::class);
-            }
-        }
     }
 
     public function action(Action $action): self

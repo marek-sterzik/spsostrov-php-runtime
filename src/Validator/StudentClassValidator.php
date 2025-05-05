@@ -4,11 +4,11 @@ namespace App\Validator;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use App\StudentClass\StudentClass;
+use App\StudentClass\StudentClass as StudentClassUtil;
 
 class StudentClassValidator extends ConstraintValidator
 {
-    public function __construct(private StudentClass $studentClass)
+    public function __construct(private StudentClassUtil $studentClass)
     {
     }
 

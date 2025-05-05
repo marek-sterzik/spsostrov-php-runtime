@@ -25,7 +25,9 @@ class AssignmentDetailController extends AbstractController
             $this->assignmentActions->generate($assignment, false),
             fn ($item) => ($item !== null)
         );
-        $actions[] = Action::get($this->getBackUrl(true))->label("zpět")->cssClass("btn-secondary")->icon("bi-arrow-left");
+        $actions[] = Action::get($this->getBackUrl(true))
+            ->label("zpět")->cssClass("btn-secondary")->icon("bi-arrow-left")
+        ;
         return $this->render("assignment-detail.html.twig", [
             "assignment" => $assignment,
             "actions" => $actions,

@@ -11,10 +11,6 @@ use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Bundle\SecurityBundle\Security;
-use App\Entity\Blog;
-use App\Repository\BlogRepository;
-
 
 /**
  * @SuppressWarnings(PHPMD.CyclomaticComplexity)
@@ -23,8 +19,7 @@ class Router implements WarmableInterface, RouterInterface, RequestMatcherInterf
 {
     public function __construct(
         private SymfonyRouter $router,
-        private RequestStack $requestStack,
-        private Security $security
+        private RequestStack $requestStack
     ) {
     }
 
@@ -33,17 +28,11 @@ class Router implements WarmableInterface, RouterInterface, RequestMatcherInterf
         return $this->router->getRouteCollection();
     }
 
-    /**
-     * @return mixed
-     */
     public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
         return $this->router->warmUp($cacheDir, $buildDir);
     }
 
-    /**
-     * @return mixed
-     */
     public function setContext(RequestContext $context): void
     {
         $this->router->setContext($context);

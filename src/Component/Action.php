@@ -87,6 +87,7 @@ class Action implements Component
     private function modify(array $modification): self
     {
         $data = [];
+        /** @phpstan-ignore-next-line */
         foreach ($this as $var => $value) {
             $data[$var] = array_key_exists($var, $modification) ? $modification[$var] : $value;
         }

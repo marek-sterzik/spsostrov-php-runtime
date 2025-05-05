@@ -7,6 +7,7 @@ use App\Entity\Assignment;
 use App\Entity\User;
 use App\Component\Action;
 use App\Framework\Router;
+use SPSOstrov\SSOBundle\SSOUser;
 
 class AssignmentActions
 {
@@ -16,7 +17,9 @@ class AssignmentActions
 
     private function getUser(): ?User
     {
-        $user = $this->security->getUser()?->getUserData();
+        $user = $this->security->getUser();
+        assert($user === null || $user instanceof SSOUser);
+        $user = $user?->getUserData();
         assert($user === null || $user instanceof User);
         return $user;
     }
@@ -29,7 +32,10 @@ class AssignmentActions
 
         if ($forList) {
             $actions[] = Action::get(
-                $this->router->generate("assignment-detail", ["assignment" => $assignment->getId(), "_back" => true]),
+                $this->router->generate(
+                    "assignment-detail",
+                    ["assignment" => $assignment->getId(), "_back" => true]
+                )
             )->label("detail")->cssClass("btn-primary")->icon("bi-eye");
         }
 
@@ -49,7 +55,10 @@ class AssignmentActions
         if ($assignment->canBeDeletedBy($user)) {
             $actions[] = null;
             $actions[] = Action::get(
-                $this->router->generate("assignment-delete", ["assignment" => $assignment->getId(), "_back" => $forList]),
+                $this->router->generate(
+                    "assignment-delete",
+                    ["assignment" => $assignment->getId(), "_back" => $forList]
+                )
             )->label("smazat")->cssClass("btn-danger")->icon('bi-trash')
                 ->confirm(...$this->confirmDeleteMessage($assignment))->confirmButtons("opravdu smazat");
         }

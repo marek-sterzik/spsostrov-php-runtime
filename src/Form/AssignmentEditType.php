@@ -66,10 +66,19 @@ class AssignmentEditType extends AbstractType
     {
         $currentSchoolYear = CurrentSchoolYear::get();
         $choices = [
-            sprintf("%d/%d (tento školní rok)", $currentSchoolYear, $currentSchoolYear + 1) => $currentSchoolYear,
-            sprintf("%d/%d (příští školní rok)", $currentSchoolYear + 1, $currentSchoolYear + 2) => $currentSchoolYear + 1,
+            $this->formatSchoolYear($currentSchoolYear, "tento školní rok") => $currentSchoolYear,
+            $this->formatSchoolYear($currentSchoolYear + 1, "příští školní rok") => $currentSchoolYear + 1,
         ];
         return $choices;
+    }
+
+    private function formatSchoolYear(int $schoolYear, ?string $note = null): string
+    {
+        $formatted = sprintf("%d/%d", $schoolYear, $schoolYear + 1);
+        if ($note !== null) {
+            $formatted = sprintf("%s (%s)", $formatted, $note);
+        }
+        return $formatted;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

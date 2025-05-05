@@ -62,5 +62,5 @@ if is_module phpstan; then
     echo "=======" 1>&2
     echo 1>&2
 
-    vendor/bin/phpstan analyse --level 6 src
+    vendor/bin/phpstan analyse --memory-limit 256M --level 6 src
 fi
