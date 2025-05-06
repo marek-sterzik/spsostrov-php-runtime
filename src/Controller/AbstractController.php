@@ -132,10 +132,4 @@ class AbstractController extends AbstractControllerBase
         assert($user === null || $user instanceof User);
         return $user;
     }
-
-    protected function cron(): self
-    {
-        $this->getEntityManager()->getRepository(Assignment::class)->updateStates();
-        return $this;
-    }
 }

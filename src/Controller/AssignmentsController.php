@@ -27,7 +27,7 @@ class AssignmentsController extends AbstractDbTableController
     #[Route("/assignments", name: "assignments")]
     public function index(): Response
     {
-        $this->cron();
+        $this->getEntityManager()->getRepository(Assignment::class)->updateStates();
         return $this->renderTable();
     }
 
