@@ -15,6 +15,7 @@ use SPSOstrov\SSOBundle\SSOUser;
 use App\Framework\MenuGenerator;
 use App\Utility\Form;
 use App\Entity\User;
+use App\Entity\Assignment;
 
 class AbstractController extends AbstractControllerBase
 {
@@ -130,5 +131,11 @@ class AbstractController extends AbstractControllerBase
         $user = $this->getUser()?->getUserData();
         assert($user === null || $user instanceof User);
         return $user;
+    }
+
+    protected function cron(): self
+    {
+        $this->getEntityManager()->getRepository(Assignment::class)->updateStates();
+        return $this;
     }
 }

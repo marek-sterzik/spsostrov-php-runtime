@@ -148,6 +148,9 @@ class Assignment
 
     public function setState(AssignmentState $state): static
     {
+        if ($state === AssignmentState::Active && $this->isAfterDeadline()) {
+            $state = AssignmentState::Finished;
+        }
         $this->state = $state;
         if ($state === AssignmentState::Active && $this->activatedAt === null) {
             $this->activatedAt = new DateTimeImmutable();
@@ -156,6 +159,14 @@ class Assignment
 
         return $this;
     }
+
+    public function updateState(): bool
+    {
+        $oldState = $this->state;
+        $this->setState($this->state);
+        return $this->state !== $oldState;
+    }
+
 
     public function getOwner(): User
     {
@@ -169,28 +180,38 @@ class Assignment
         return $this;
     }
 
-    public function getSoftDeadline(): ?\DateTimeImmutable
+    public function getSoftDeadline(): ?DateTimeImmutable
     {
         return $this->softDeadline;
     }
 
-    public function setSoftDeadline(?\DateTimeImmutable $softDeadline): static
+    public function setSoftDeadline(?DateTimeImmutable $softDeadline): static
     {
         $this->softDeadline = $softDeadline;
 
         return $this;
     }
 
-    public function getHardDeadline(): ?\DateTimeImmutable
+    public function getHardDeadline(): ?DateTimeImmutable
     {
         return $this->hardDeadline;
     }
 
-    public function setHardDeadline(?\DateTimeImmutable $hardDeadline): static
+    public function setHardDeadline(?DateTimeImmutable $hardDeadline): static
     {
         $this->hardDeadline = $hardDeadline;
 
         return $this;
+    }
+
+    public function getCreatedAt(): DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function getActivatedAt(): DateTimeImmutable
+    {
+        return $this->activatedAt;
     }
 
     public function fillFrom(
@@ -266,6 +287,22 @@ class Assignment
         if (!$this->hasEditRights($user)) {
             return false;
         }
-        return $this->state->canTransitTo($finalState);
+        if (!$this->state->canTransitTo($finalState)) {
+            return false;
+        }
+
+        if ($finalState === AssignmentState::Active &&
+            $this->state === AssignmentState::Finished &&
+            $this->isAfterDeadline()
+        ) {
+            return false;
+        }
+        
+        return true;
+    }
+
+    private function isAfterDeadline(): bool
+    {
+        return ($this->hardDeadline !== null && (new DateTimeImmutable()) > $this->hardDeadline);
     }
 }

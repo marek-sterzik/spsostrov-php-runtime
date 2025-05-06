@@ -44,7 +44,7 @@ enum AssignmentState: string
             self::Draft => ($state === self::Ready || $state === self::Active),
             self::Ready => ($state === self::Active),
             self::Active => ($state === self::Finished),
-            self::Finished => ($state === self::Archived),
+            self::Finished => ($state === self::Archived || $state === self::Active),
             default => false
         };
     }

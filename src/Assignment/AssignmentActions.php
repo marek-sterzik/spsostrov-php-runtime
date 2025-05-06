@@ -60,11 +60,19 @@ class AssignmentActions
                 ->confirm(...$this->confirmCloseActivateAction($assignment, $allowActiveTransition))
                 ->confirmButtons("uzavřít a připravit k aktivaci");
         } elseif ($allowActiveTransition) {
-            $actions[] = Action::get(
-                $this->getTransitionAction($assignment, AssignmentState::Active),
-            )->label("aktivovat")->cssClass("btn-success")->icon("bi-check-square")
-                ->confirm(...$this->confirmCloseActivateAction($assignment, $allowActiveTransition))
-                ->confirmButtons("aktivovat")->confirmType("danger");
+            if (AssignmentState::Active->getParam("order") > $assignment->getState()->getParam("order")) {
+                $actions[] = Action::get(
+                    $this->getTransitionAction($assignment, AssignmentState::Active),
+                )->label("aktivovat")->cssClass("btn-success")->icon("bi-check-square")
+                    ->confirm(...$this->confirmCloseActivateAction($assignment, $allowActiveTransition))
+                    ->confirmButtons("aktivovat")->confirmType("danger");
+            } else {
+                $actions[] = Action::get(
+                    $this->getTransitionAction($assignment, AssignmentState::Active),
+                )->label("reaktivovat")->cssClass("btn-success")->icon("bi-check-square")
+                    ->confirm(...$this->confirmReactivateAction($assignment))
+                    ->confirmButtons("reaktivovat")->confirmType("danger");
+            }
         }
 
         if ($assignment->canTransitTo($user, AssignmentState::Finished)) {
@@ -78,7 +86,7 @@ class AssignmentActions
         if ($assignment->canBeViewedBy($user)) {
             $actions[] = Action::get(
                 $this->router->generate("new-assignment", ["template" => $assignment->getId(), "_back" => true]),
-            )->label("vytvořit nové zadání")->cssClass("btn-primary")->icon('bi-pencil-square');
+            )->label("vytvořit nové zadání")->cssClass("btn-primary")->icon('bi-plus-square');
         }
 
 
@@ -135,6 +143,13 @@ class AssignmentActions
                 "Chcete skutečně pokračovat?";
             $title = "potvrdit aktivaci";
         }
+        return [$message, $title];
+    }
+
+    private function confirmReactivateAction(Assignment $assignment): array
+    {
+        $message = "Přejete si zadání znovu reaktivovat?";
+        $title = "potvrdit reaktivaci";
         return [$message, $title];
     }
 

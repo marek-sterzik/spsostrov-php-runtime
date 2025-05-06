@@ -26,6 +26,7 @@ class AssignmentsController extends AbstractDbTableController
     #[Route("/assignments", name: "assignments")]
     public function index(): Response
     {
+        $this->cron();
         return $this->renderTable();
     }
 
@@ -63,6 +64,8 @@ class AssignmentsController extends AbstractDbTableController
             $qb->setParameter(":${var}", "%$string%");
         });
         $searchTool->search($qb, $filterData['q'] ?? '');
+        $qb->addOrderBy("a.mainOrder", "ASC");
+        $qb->addOrderBy("a.createdAt", "DESC");
         return $qb;
     }
 
@@ -74,6 +77,7 @@ class AssignmentsController extends AbstractDbTableController
             "type" => "typ",
             "state" => "stav",
             "owner" => "vlastník",
+            "createdAt" => "vytvořeno",
         ];
     }
 
@@ -84,12 +88,14 @@ class AssignmentsController extends AbstractDbTableController
         $isMe = ($assignment->getOwner() === $this->getUserEntity()) ? true : false;
         $meBadge = $isMe ? (' ' . $this->renderView('snippets/me.html.twig')) : '';
         $type = $this->renderView('snippets/assignment-public.html.twig', ["public" => $assignment->isPublic()]);
+        $createdAt = $this->renderView('snippets/datetime.html.twig', ["date" => $assignment->getCreatedAt()]);
         return [
             "caption" => $assignment->getCaption(),
             "studentClass" => $assignment->getClasses(),
             "owner" => Cell::html(htmlspecialchars($assignment->getOwner()->getName()) . $meBadge),
             "type" => Cell::html($type),
             "state" => Cell::html($state),
+            "createdAt" => Cell::html($createdAt),
             "_actions" => $this->getAssignmentActions($assignment),
         ];
     }

@@ -5,17 +5,13 @@
             <div class="col-lg-6 col-12">
                 {{ backAction.render()|raw }}
                 <h1>{{ assignment.caption }}</h1>
-                <ul class="list-group">
-                    <li class="list-group-item"><strong>třídy:</strong> {{ assignment.classes }}</li>
-                    <li class="list-group-item"><strong>typ:</strong> {% include "snippets/assignment-public.html.twig" with {"public": assignment.public} %}</li>
-                    <li class="list-group-item"><strong>stav:</strong> {% include "snippets/assignment-state.html.twig" with {"state": assignment.state} %}</li>
-                    <li class="list-group-item"><strong>vlastník:</strong> {{ assignment.owner.name }} {% if ownerIsMe %}{% include "snippets/me.html.twig" %}{% endif %}</li>
-                    <li class="list-group-item">
-                        {% for action in actions %}
-                            {{ action.render()|raw }}
-                        {% endfor %}
-                    </li>
-               </ul>
+                <table class="table table-bordered thin-headings">
+                    <tr><th>třídy:</th><td>{{ assignment.classes }}</td></tr>
+                    <tr><th>typ:</th><td>{% include "snippets/assignment-public.html.twig" with {"public": assignment.public} %}</td></tr>
+                    <tr><th>stav:</th><td>{% include "snippets/assignment-state.html.twig" with {"state": assignment.state} %}</td></tr>
+                    <tr><th>vlastník:</th><td>{{ assignment.owner.name }} {% if ownerIsMe %}{% include "snippets/me.html.twig" %}{% endif %}</td></tr>
+                    <tr><th>vytvořeno:</th><td>{% include "snippets/datetime.html.twig" with {"date": assignment.createdAt} %}</td></tr>
+                </table>
             </div>
         </div>
     </div>
