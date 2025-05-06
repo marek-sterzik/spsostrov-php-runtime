@@ -34,6 +34,15 @@ class AssignmentsType extends AbstractType
                 },
                 "label" => false,
             ])
+            ->add('d', CheckboxType::class, [
+                "required" => false,
+                "label" => "včetně archivovaných",
+                'attr' => [
+                    "class" => "btn-check autosubmit",
+                ],
+                "row_attr" => ["class" => "me-2"],
+                'label_attr' => ['class' => 'btn btn-outline-secondary'],
+            ])
             ->add('q', TextType::class, [
                 "label" => false,
                 "required" => false,

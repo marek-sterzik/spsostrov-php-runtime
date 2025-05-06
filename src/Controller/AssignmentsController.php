@@ -50,6 +50,10 @@ class AssignmentsController extends AbstractDbTableController
             $qb->andWhere("a.owner = :owner");
             $qb->setParameter(":owner", $me);
         }
+        if (!$filterData['d']) {
+            $qb->andWhere("a.state != :archived");
+            $qb->setParameter(":archived", AssignmentState::Archived);
+        }
         $searchTool = new SearchTool();
         $searchTool->handle(null, function (QueryBuilder $qb, string $string, ?string $type, string $var) {
             $qb->andWhere($qb->expr()->orX(
@@ -109,6 +113,7 @@ class AssignmentsController extends AbstractDbTableController
     {
         return [
             "a" => false,
+            "d" => false,
         ];
     }
 }
