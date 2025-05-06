@@ -6,3 +6,4 @@
 * deadlines needs to be checked against the school year
 * better deadline date picker
 * caching markdown compiler
+* action log (log all actions and set who was responsible for setting them)

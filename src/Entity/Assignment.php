@@ -66,6 +66,7 @@ class Assignment
     {
         $this->owner = $owner;
         $this->createdAt = new DateTimeImmutable();
+        $this->updateMainOrder();
     }
 
     public function getId(): ?int
@@ -155,9 +156,11 @@ class Assignment
     {
         if ($this->state === AssignmentState::Active && $this->isAfterDeadline()) {
             $this->state = AssignmentState::Finished;
+            $this->updateMainOrder();
         }
         if ($this->schoolYear < CurrentSchoolYear::get() && $this->state !== AssignmentState::Draft) {
             $this->state = AssignmentState::Archived;
+            $this->updateMainOrder();
         }
         return $this->state;
     }
@@ -168,11 +171,17 @@ class Assignment
             $state = AssignmentState::Finished;
         }
         $this->state = $state;
+        $this->updateMainOrder();
         if ($state === AssignmentState::Active && $this->activatedAt === null) {
             $this->activatedAt = new DateTimeImmutable();
         }
-        $this->mainOrder = $state->getParam("order");
 
+        return $this;
+    }
+
+    private function updateMainOrder(): self
+    {
+        $this->mainOrder = $this->state->getParam("order");
         return $this;
     }
 

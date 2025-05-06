@@ -6,6 +6,9 @@ doctrine:
         # either here or in the DATABASE_URL env var (see .env file)
         #server_version: '5.7'
     orm:
+        dql:
+            string_functions:
+                regexp: DoctrineExtensions\Query\Mysql\Regexp
         controller_resolver:
             auto_mapping: false
         auto_generate_proxy_classes: true

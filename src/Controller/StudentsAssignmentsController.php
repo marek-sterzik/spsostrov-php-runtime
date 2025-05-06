@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -12,6 +13,8 @@ use App\Component\Cell;
 use App\Component\Action;
 use App\Utility\SearchTool;
 use App\Form\Filter\StudentAssignmentsType;
+use App\Assignment\AssignmentState;
+use App\Utility\CurrentSchoolYear;
 
 class StudentsAssignmentsController extends AbstractDbTableController
 {
@@ -24,9 +27,22 @@ class StudentsAssignmentsController extends AbstractDbTableController
 
     protected function getBaseQueryBuilder(array $filterData): QueryBuilder
     {
-        $me = $this->getUser()->getUserData();
+        $me = $this->getUserEntity();
         $qb = $this->getEntityManager()->getRepository(Assignment::class)->createQueryBuilder('a');
-                $searchTool = new SearchTool();
+        $qb
+            ->andWhere("a.state = :activeState")
+            ->setParameter(":activeState", AssignmentState::Active)
+            ->andWhere("a.schoolYear = :schoolYear")
+            ->setParameter(":schoolYear", CurrentSchoolYear::get())
+            ->andWhere('REGEXP(:myClass, a.classesRegexp) = true')
+            ->setParameter(":myClass", $me->getRealStudentClass())
+            ->andWhere($qb->expr()->orX(
+                $qb->expr()->isNull("a.hardDeadline"),
+                $qb->expr()->gte("a.hardDeadline", ":now")
+            ))
+            ->setParameter(":now", new DateTimeImmutable())
+        ;
+        $searchTool = new SearchTool();
         $searchTool->handle(null, function (QueryBuilder $qb, string $string, ?string $type, string $var) {
             $qb->andWhere($qb->expr()->orX(
                 $qb->expr()->like("a.caption", ":${var}"),
@@ -35,6 +51,8 @@ class StudentsAssignmentsController extends AbstractDbTableController
             $qb->setParameter(":${var}", "%$string%");
         });
         $searchTool->search($qb, $filterData['q'] ?? '');
+        $qb->addOrderBy("a.mainOrder", "DESC");
+        $qb->addOrderBy("a.createdAt", "DESC");
         return $qb;
     }
 

@@ -12,22 +12,22 @@ enum AssignmentState: string
 
     #[Description("rozpracované")]
     #[Parameter("type", "success")]
-    #[Parameter("order", 5)]
+    #[Parameter("order", 2)]
     case Draft = "draft";
 
     #[Description("připraveno k aktivaci")]
     #[Parameter("type", "primary")]
-    #[Parameter("order", 4)]
+    #[Parameter("order", 3)]
     case Ready = "ready";
 
     #[Description("aktivováno")]
     #[Parameter("type", "danger")]
-    #[Parameter("order", 3)]
+    #[Parameter("order", 4)]
     case Active = "active";
 
     #[Description("odevzdávání ukončeno")]
     #[Parameter("type", "warning")]
-    #[Parameter("order", 2)]
+    #[Parameter("order", 5)]
     case Finished = "finished";
 
     #[Description("archivováno")]
