@@ -16,6 +16,8 @@ div.adminer-link {padding: .5em 1em; float: right;}
 
 table.thin-headings th {width: 1em;}
 
+span.student-class-pattern .sg {font-weight: bold; color: #006;}
+span.student-class-pattern .wc {font-weight: bold; color: #A00;}
 /* modal progress bar */
 
 .modal-foreground {position: fixed; left: 0; top: 0; right: 0; bottom: 0; background-color: #b0b0b080;}

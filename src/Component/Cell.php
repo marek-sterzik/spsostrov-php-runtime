@@ -9,6 +9,9 @@ class Cell
         if ($cell instanceof self) {
             return $cell;
         }
+        if ($cell instanceof Component) {
+            $cell = [$cell];
+        }
         if (is_array($cell)) {
             $cellHtml = "";
             foreach ($cell as $item) {

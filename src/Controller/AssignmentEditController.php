@@ -12,10 +12,11 @@ use App\Utility\RoleComparator;
 use App\StudentClass\StudentClass;
 use App\Assignment\AssignmentState;
 use App\Utility\CurrentSchoolYear;
+use App\Markdown\Markdown;
 
 class AssignmentEditController extends AbstractController
 {
-    public function __construct(private StudentClass $studentClass)
+    public function __construct(private StudentClass $studentClass, private Markdown $markdown)
     {
     }
 
@@ -58,6 +59,7 @@ class AssignmentEditController extends AbstractController
     {
         if ($assignment->canBeDeletedBy($this->getUserEntity())) {
             $this->getEntityManager()->remove($assignment);
+            $this->markdown->invalidate($assignment);
             $this->getEntityManager()->flush();
         }
         return $this->redirectBack(true);
@@ -98,6 +100,7 @@ class AssignmentEditController extends AbstractController
                 $assignment->setClasses($parsed['normalized'] ?? $assignment->getClasses());
                 $assignment->setClassesRegexp($parsed['regexp']);
                 $this->getEntityManager()->flush();
+                $this->markdown->refresh($assignment);
                 return $this->redirectBack(true);
             })
             ->action("Zrušit", function (Assignment $assignment) {

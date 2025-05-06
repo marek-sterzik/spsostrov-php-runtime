@@ -10,10 +10,12 @@ use App\Form\AssignmentEditType;
 use App\Utility\RoleComparator;
 use App\Assignment\AssignmentActions;
 use App\Component\Action;
+use App\Markdown\Markdown;
+use App\Component\StudentClassPattern as StudentClassPatternComponent;
 
 class AssignmentDetailController extends AbstractController
 {
-    public function __construct(private AssignmentActions $assignmentActions)
+    public function __construct(private AssignmentActions $assignmentActions, private Markdown $markdown)
     {
     }
 
@@ -36,6 +38,8 @@ class AssignmentDetailController extends AbstractController
             "assignment" => $assignment,
             "actions" => $actions,
             "ownerIsMe" => $isMe,
+            "studentClassPattern" => StudentClassPatternComponent::get($assignment->getClasses()),
+            "descriptionHtml" => $this->markdown->getDescriptionHtml($assignment, "h2"),
         ]);
     }
 

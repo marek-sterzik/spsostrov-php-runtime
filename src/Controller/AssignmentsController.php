@@ -15,6 +15,7 @@ use App\Utility\SearchTool;
 use App\Form\Filter\AssignmentsType;
 use App\Assignment\AssignmentActions;
 use App\Assignment\AssignmentState;
+use App\Component\StudentClassPattern as StudentClassPatternComponent;
 
 class AssignmentsController extends AbstractDbTableController
 {
@@ -91,7 +92,7 @@ class AssignmentsController extends AbstractDbTableController
         $createdAt = $this->renderView('snippets/datetime.html.twig', ["date" => $assignment->getCreatedAt()]);
         return [
             "caption" => $assignment->getCaption(),
-            "studentClass" => $assignment->getClasses(),
+            "studentClass" => StudentClassPatternComponent::get($assignment->getClasses()),
             "owner" => Cell::html(htmlspecialchars($assignment->getOwner()->getName()) . $meBadge),
             "type" => Cell::html($type),
             "state" => Cell::html($state),
