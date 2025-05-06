@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use DateTimeImmutable;
 use App\Repository\AssignmentRepository;
 use App\Assignment\AssignmentState;
 use Doctrine\DBAL\Types\Types;
@@ -43,14 +44,24 @@ class Assignment
     private User $owner;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $softDeadline = null;
+    private ?DateTimeImmutable $softDeadline = null;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $hardDeadline = null;
+    private ?DateTimeImmutable $hardDeadline = null;
+
+    #[ORM\Column]
+    private int $order = 0;
+
+    #[ORM\Column]
+    private ?DateTimeImmutable $createdAt = null;
+    
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $activatedAt = null;
 
     public function __construct(User $owner)
     {
         $this->owner = $owner;
+        $this->createdAt = new DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -138,6 +149,10 @@ class Assignment
     public function setState(AssignmentState $state): static
     {
         $this->state = $state;
+        if ($state === AssignmentState::Active && $this->activatedAt === null) {
+            $this->activatedAt = new DateTimeImmutable();
+        }
+        $this->order = $state->getParam("order");
 
         return $this;
     }
