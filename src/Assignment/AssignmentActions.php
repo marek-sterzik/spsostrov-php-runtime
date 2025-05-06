@@ -60,7 +60,7 @@ class AssignmentActions
                 ->confirm(...$this->confirmCloseActivateAction($assignment, $allowActiveTransition))
                 ->confirmButtons("uzavřít a připravit k aktivaci");
         } elseif ($allowActiveTransition) {
-            if (AssignmentState::Active->getParam("order") > $assignment->getState()->getParam("order")) {
+            if ($assignment->getState() !== AssignmentState::Finished) {
                 $actions[] = Action::get(
                     $this->getTransitionAction($assignment, AssignmentState::Active),
                 )->label("aktivovat")->cssClass("btn-success")->icon("bi-check-square")
@@ -120,7 +120,7 @@ class AssignmentActions
     {
         return $this->router->generate(
             "assignment-set-state",
-            ["assignment" => $assignment->getId(), "state" => $state->value]
+            ["assignment" => $assignment->getId(), "state" => $state->value, "_back" => true]
         );
     }
 
