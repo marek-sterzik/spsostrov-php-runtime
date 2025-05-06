@@ -8,10 +8,12 @@ use App\Assignment\AssignmentState;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Validator\StudentClassPattern;
+use App\Utility\CurrentSchoolYear;
 
 #[ORM\Entity(repositoryClass: AssignmentRepository::class)]
 #[ORM\Index(name: 'main_order_created_at_index', fields: ['mainOrder', 'createdAt'])]
 #[ORM\Index(name: 'state_hard_deadline_index', fields: ['state', 'hardDeadline'])]
+#[ORM\Index(name: 'school_year_state', fields: ['schoolYear', 'state'])]
 class Assignment
 {
     #[ORM\Id]
@@ -121,6 +123,12 @@ class Assignment
 
     public function getSchoolYear(): ?int
     {
+        if ($this->state === AssignmentState::Draft) {
+            $currentSchoolYear = CurrentSchoolYear::get();
+            if ($this->schoolYear < $currentSchoolYear) {
+                $this->schoolYear = $currentSchoolYear;
+            }
+        }
         return $this->schoolYear;
     }
 
@@ -145,6 +153,12 @@ class Assignment
 
     public function getState(): AssignmentState
     {
+        if ($this->state === AssignmentState::Active && $this->isAfterDeadline()) {
+            $this->state = AssignmentState::Finished;
+        }
+        if ($this->schoolYear < CurrentSchoolYear::get() && $this->state !== AssignmentState::Draft) {
+            $this->state = AssignmentState::Archived;
+        }
         return $this->state;
     }
 
@@ -161,14 +175,6 @@ class Assignment
 
         return $this;
     }
-
-    public function updateState(): bool
-    {
-        $oldState = $this->state;
-        $this->setState($this->state);
-        return $this->state !== $oldState;
-    }
-
 
     public function getOwner(): User
     {
@@ -216,20 +222,15 @@ class Assignment
         return $this->activatedAt;
     }
 
-    public function fillFrom(
-        self $template,
-        ?int $allowedSchoolYearMin = null,
-        ?int $allowedSchoolYearMax = null
-    ): self {
+    public function fillFrom(self $template): self
+    {
         $this->setCaption($template->getCaption());
         $this->setDescription($template->getDescription());
         $this->setClasses($template->getClasses());
         $this->setPublic($template->isPublic());
 
         $schoolYear = $template->getSchoolYear();
-        if (($allowedSchoolYearMin === null || $schoolYear >= $allowedSchoolYearMin) &&
-            ($allowedSchoolYearMax === null || $schoolYear <= $allowedSchoolYearMax)
-        ) {
+        if ($schoolYear !== null && $schoolYear >= CurrentSchoolYear::get()) {
             $this->setSchoolYear($schoolYear);
         }
 
@@ -261,7 +262,7 @@ class Assignment
         if ($this->owner === $user || $user->isAdmin()) {
             return true;
         }
-        if ($this->public && $this->state !== AssignmentState::Draft) {
+        if ($this->public && $this->getState() !== AssignmentState::Draft) {
             return true;
         }
         return false;
@@ -272,7 +273,7 @@ class Assignment
         if (!$this->hasEditRights($user)) {
             return false;
         }
-        return $this->state->editAllowed();
+        return $this->getState()->editAllowed();
     }
 
     public function canBeDeletedBy(?User $user): bool
@@ -280,7 +281,7 @@ class Assignment
         if (!$this->hasEditRights($user)) {
             return false;
         }
-        return $this->state->deleteAllowed();
+        return $this->getState()->deleteAllowed();
     }
 
     public function canTransitTo(?User $user, AssignmentState $finalState): bool
@@ -288,12 +289,12 @@ class Assignment
         if (!$this->hasEditRights($user)) {
             return false;
         }
-        if (!$this->state->canTransitTo($finalState)) {
+        if (!$this->getState()->canTransitTo($finalState)) {
             return false;
         }
 
         if ($finalState === AssignmentState::Active &&
-            $this->state === AssignmentState::Finished &&
+            $this->getState() === AssignmentState::Finished &&
             $this->isAfterDeadline()
         ) {
             return false;

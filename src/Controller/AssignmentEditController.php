@@ -46,8 +46,7 @@ class AssignmentEditController extends AbstractController
         }
         $assignment = new Assignment($this->getUserEntity());
         if ($template !== null) {
-            $schoolYear = CurrentSchoolYear::get();
-            $assignment->fillFrom($template, $schoolYear, $schoolYear + 1);
+            $assignment->fillFrom($template);
         }
         $this->getEntityManager()->persist($assignment);
         return $this->editAssignment($assignment, true);
