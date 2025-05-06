@@ -66,8 +66,37 @@ class AssignmentActions
                 ->confirm(...$this->confirmCloseActivateAction($assignment, $allowActiveTransition))
                 ->confirmButtons("aktivovat")->confirmType("danger");
         }
-        if ($assignment->canBeDeletedBy($user)) {
+
+        if ($assignment->canTransitTo($user, AssignmentState::Finished)) {
+            $actions[] = Action::get(
+                $this->getTransitionAction($assignment, AssignmentState::Finished),
+            )->label("ukončit")->cssClass("btn-success")->icon("bi-skip-end")
+                ->confirm(...$this->confirmFinishMessage($assignment))
+                ->confirmButtons("ukončit")->confirmType("danger");
+        }
+
+        if ($assignment->canBeViewedBy($user)) {
+            $actions[] = Action::get(
+                $this->router->generate("new-assignment", ["template" => $assignment->getId(), "_back" => true]),
+            )->label("vytvořit nové zadání")->cssClass("btn-primary")->icon('bi-pencil-square');
+        }
+
+
+        $separated = false;
+        if ($assignment->canTransitTo($user, AssignmentState::Archived)) {
             $actions[] = null;
+            $separated = true;
+            $actions[] = Action::get(
+                $this->getTransitionAction($assignment, AssignmentState::Archived),
+            )->label("archivovat")->cssClass("btn-danger")->icon("bi-archive")
+                ->confirm(...$this->confirmArchiveMessage($assignment))
+                ->confirmButtons("archivovat")->confirmType("danger");
+        }
+        if ($assignment->canBeDeletedBy($user)) {
+            if (!$separated) {
+                $actions[] = null;
+                $separated = true;
+            }
             $actions[] = Action::get(
                 $this->router->generate(
                     "assignment-delete",
@@ -108,4 +137,19 @@ class AssignmentActions
         }
         return [$message, $title];
     }
+
+    private function confirmFinishMessage(Assignment $assignment): array
+    {
+        $message = "Chcete opravdu ukončit odevzdávání?";
+        $title = "ukončit odevzdávání";
+        return [$message, $title];
+    }
+
+    private function confirmArchiveMessage(Assignment $assignment): array
+    {
+        $message = "Chcete opravdu archivovat zadání?";
+        $title = "archivovat zadání";
+        return [$message, $title];
+    }
+
 }

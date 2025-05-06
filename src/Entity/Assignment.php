@@ -99,7 +99,7 @@ class Assignment
         return $this->classesRegexp;
     }
 
-    public function setClassesRegexp(string $classesRegexp): ?string
+    public function setClassesRegexp(string $classesRegexp): self
     {
         $this->classesRegexp = $classesRegexp;
 
@@ -190,6 +190,23 @@ class Assignment
             return false;
         }
         return true;
+    }
+
+    public function canBeViewedBy(?User $user): bool
+    {
+        if ($user === null) {
+            return false;
+        }
+        if (!$user->isTeacher()) {
+            return false;
+        }
+        if ($this->owner === $user || $user->isAdmin()) {
+            return true;
+        }
+        if ($this->public && $this->state !== AssignmentState::Draft) {
+            return true;
+        }
+        return false;
     }
 
     public function canBeEditedBy(?User $user): bool

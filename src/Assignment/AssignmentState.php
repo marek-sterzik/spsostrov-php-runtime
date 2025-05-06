@@ -26,9 +26,9 @@ enum AssignmentState: string
     #[Parameter("type", "warning")]
     case Finished = "finished";
 
-    #[Description("uzavřeno")]
+    #[Description("archivováno")]
     #[Parameter("type", "secondary")]
-    case Closed = "closed";
+    case Archived = "archived";
 
     public function canTransitTo(self $state): bool
     {
@@ -38,6 +38,8 @@ enum AssignmentState: string
         return match ($this) {
             self::Draft => ($state === self::Ready || $state === self::Active),
             self::Ready => ($state === self::Active),
+            self::Active => ($state === self::Finished),
+            self::Finished => ($state === self::Archived),
             default => false
         };
     }
