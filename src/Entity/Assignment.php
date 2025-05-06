@@ -178,6 +178,27 @@ class Assignment
         return $this;
     }
 
+    public function fillFrom(
+        self $template,
+        ?int $allowedSchoolYearMin = null,
+        ?int $allowedSchoolYearMax = null
+    ): self
+    {
+        $this->setCaption($template->getCaption());
+        $this->setDescription($template->getDescription());
+        $this->setClasses($template->getClasses());
+        $this->setPublic($template->isPublic());
+
+        $schoolYear = $template->getSchoolYear();
+        if (($allowedSchoolYearMin === null || $schoolYear >= $allowedSchoolYearMin) &&
+            ($allowedSchoolYearMax === null || $schoolYear <= $allowedSchoolYearMax)
+        ) {
+            $this->setSchoolYear($schoolYear);
+        }
+
+        return $this;
+    }
+
     public function hasEditRights(?User $user): bool
     {
         if ($user === null) {

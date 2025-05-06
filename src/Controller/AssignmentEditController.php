@@ -11,6 +11,7 @@ use App\Form\AssignmentEditType;
 use App\Utility\RoleComparator;
 use App\StudentClass\StudentClass;
 use App\Assignment\AssignmentState;
+use App\Utility\CurrentSchoolYear;
 
 class AssignmentEditController extends AbstractController
 {
@@ -27,9 +28,26 @@ class AssignmentEditController extends AbstractController
 
     #[IsGranted('ROLE_TEACHER')]
     #[Route("/new-assignment", name: "new-assignment")]
-    public function newAssignment(): Response
+    public function newAssignment(Request $request): Response
     {
+        $template = $request->query->get("template");
+        if (is_string($template)) {
+            if (preg_match('/^[0-9]+$/', $template)) {
+                $template = $this->getEntityManager()->getRepository(Assignment::class)->find((int)$template);
+            } else {
+                $template = null;
+            }
+            if ($template === null || !$template->canBeViewedBy($this->getUserEntity())) {
+                return $this->redirectBack(true);
+            }
+        } else {
+            $template = null;
+        }
         $assignment = new Assignment($this->getUserEntity());
+        if ($template !== null) {
+            $schoolYear = CurrentSchoolYear::get();
+            $assignment->fillFrom($template, $schoolYear, $schoolYear + 1);
+        }
         $this->getEntityManager()->persist($assignment);
         return $this->editAssignment($assignment, true);
     }

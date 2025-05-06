@@ -21,16 +21,21 @@ class AssignmentDetailController extends AbstractController
     #[Route("/assignment/{assignment}", name: "assignment-detail")]
     public function index(Assignment $assignment): Response
     {
+        $me = $this->getUserEntity();
         $actions = array_filter(
             $this->assignmentActions->generate($assignment, false),
             fn ($item) => ($item !== null)
         );
-        $actions[] = Action::get($this->getBackUrl(true))
+        $back = Action::get($this->getBackUrl(true))
             ->label("zpět")->cssClass("btn-secondary")->icon("bi-arrow-left")
         ;
+
+        $isMe = ($assignment->getOwner() === $me) ? true : false;
         return $this->render("assignment-detail.html.twig", [
+            "backAction" => $back,
             "assignment" => $assignment,
             "actions" => $actions,
+            "ownerIsMe" => $isMe,
         ]);
     }
 
