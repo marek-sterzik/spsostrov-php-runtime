@@ -32,7 +32,7 @@ class AssignmentEditType extends AbstractType
             ])
             ->add('classes', TextType::class, [
                 "label" => "třídy, pro které je zadání určeno:",
-                "help" => "zadejte čárkami oddělený seznam tříd, lze také používat hvězdičku <code>*</code> ".
+                "help" => "Zadejte čárkami oddělený seznam tříd, lze také používat hvězdičku <code>*</code> ".
                 "pro libovolné znaky, např. <code>I*</code> pro všechny třídy <code>I1</code> až <code>I4</code>.",
                 "help_html" => true,
             ])
@@ -40,13 +40,13 @@ class AssignmentEditType extends AbstractType
                 'widget' => 'single_text',
                 "required" => false,
                 'label' => "termín odevzdání:",
-                'help' => 'po tomto termínu bude odevzdaná práce označena jako pozdní',
+                'help' => 'Po tomto termínu bude odevzdaná práce označena jako pozdní.',
             ])
             ->add('hardDeadline', DateTimeType::class, [
                 'widget' => 'single_text',
                 "required" => false,
                 'label' => "nepřekročitelný termín odevzdání:",
-                'help' => 'po tomto termínu nebude možné odevzdat práci',
+                'help' => 'Po tomto termínu nebude možné odevzdat práci.',
             ])
             ->add('public', ChoiceType::class, [
                 'label' => "typ zadání:",

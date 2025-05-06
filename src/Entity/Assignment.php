@@ -2,18 +2,21 @@
 
 namespace App\Entity;
 
+use DateInterval;
 use DateTimeImmutable;
 use App\Repository\AssignmentRepository;
 use App\Assignment\AssignmentState;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Validator\StudentClassPattern;
+use App\Validator\DeadlineInSchoolYear;
 use App\Utility\CurrentSchoolYear;
 
 #[ORM\Entity(repositoryClass: AssignmentRepository::class)]
 #[ORM\Index(name: 'main_order_created_at_index', fields: ['mainOrder', 'createdAt'])]
 #[ORM\Index(name: 'state_hard_deadline_index', fields: ['state', 'hardDeadline'])]
 #[ORM\Index(name: 'school_year_state', fields: ['schoolYear', 'state'])]
+#[DeadlineInSchoolYear]
 class Assignment
 {
     #[ORM\Id]
@@ -127,7 +130,15 @@ class Assignment
         if ($this->state === AssignmentState::Draft) {
             $currentSchoolYear = CurrentSchoolYear::get();
             if ($this->schoolYear < $currentSchoolYear) {
+                $offset = $currentSchoolYear - $this->schoolYear;
                 $this->schoolYear = $currentSchoolYear;
+                $interval = new DateInterval("P" . $offset . "Y");
+                if ($this->softDeadline !== null) {
+                    $this->softDeadline = $this->softDeadline->add($interval);
+                }
+                if ($this->hardDeadline !== null) {
+                    $this->hardDeadline = $this->hardDeadline->add($interval);
+                }
             }
         }
         return $this->schoolYear;
@@ -167,6 +178,7 @@ class Assignment
 
     public function setState(AssignmentState $state): static
     {
+        $this->getSchoolYear(); //Just calling this because of the side effect fixing the school year
         if ($state === AssignmentState::Active && $this->isAfterDeadline()) {
             $state = AssignmentState::Finished;
         }
@@ -241,6 +253,8 @@ class Assignment
         $schoolYear = $template->getSchoolYear();
         if ($schoolYear !== null && $schoolYear >= CurrentSchoolYear::get()) {
             $this->setSchoolYear($schoolYear);
+            $this->setSoftDeadline($template->getSoftDeadline());
+            $this->setHardDeadline($template->getHardDeadline());
         }
 
         return $this;
