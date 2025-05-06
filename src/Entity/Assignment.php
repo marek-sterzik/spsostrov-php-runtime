@@ -220,8 +220,7 @@ class Assignment
         self $template,
         ?int $allowedSchoolYearMin = null,
         ?int $allowedSchoolYearMax = null
-    ): self
-    {
+    ): self {
         $this->setCaption($template->getCaption());
         $this->setDescription($template->getDescription());
         $this->setClasses($template->getClasses());

@@ -18,7 +18,7 @@ class AssignmentRepository extends ServiceEntityRepository
         parent::__construct($registry, Assignment::class);
     }
 
-    public function updateStates()
+    public function updateStates(): void
     {
         $this->createQueryBuilder("a")
             ->update()

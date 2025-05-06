@@ -166,5 +166,4 @@ class AssignmentActions
         $title = "archivovat zadání";
         return [$message, $title];
     }
-
 }
