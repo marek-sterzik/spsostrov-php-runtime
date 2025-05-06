@@ -3,6 +3,7 @@
 namespace App\Validator;
 
 use Exception;
+use DateTimeImmutable;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use App\Entity\Assignment;
@@ -23,6 +24,7 @@ class DeadlineInSchoolYearValidator extends ConstraintValidator
         }
 
         $schoolYear = $value->getSchoolYear();
+        $now = new DateTimeImmutable();
         $validationData = [
             "softDeadline" => $value->getSoftDeadline(),
             "hardDeadline" => $value->getHardDeadline(),
@@ -34,7 +36,13 @@ class DeadlineInSchoolYearValidator extends ConstraintValidator
             }
             if ($schoolYear !== CurrentSchoolYear::get($date)) {
                 $this->context
-                    ->buildViolation($constraint->message)
+                    ->buildViolation("Datum musí být nastaven v rámci nastaveného školního roku.")
+                    ->atPath($path)
+                    ->addViolation();
+            }
+            if ($date < $now) {
+                $this->context
+                    ->buildViolation("Datum a čas nesmí být v minulosti.")
                     ->atPath($path)
                     ->addViolation();
             }
@@ -45,7 +53,7 @@ class DeadlineInSchoolYearValidator extends ConstraintValidator
             $validationData['hardDeadline'] < $validationData['softDeadline']
         ) {
             $this->context
-                ->buildViolation($constraint->deadlineWrongOrderMessage)
+                ->buildViolation('Nepřekročitelný termín odevzdání nesmí být nastaven před termínem odevzdání.')
                 ->atPath("hardDeadline")
                 ->addViolation();
         }

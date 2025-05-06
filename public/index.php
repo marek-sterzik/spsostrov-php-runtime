@@ -9,6 +9,10 @@ require dirname(__DIR__).'/vendor/autoload.php';
 
 (new Dotenv())->bootEnv(dirname(__DIR__).'/.env');
 
+if (isset($_SERVER['APP_TIMEZONE'])) {
+    date_default_timezone_set($_SERVER["APP_TIMEZONE"]);
+}
+
 if ($_SERVER['APP_DEBUG']) {
     umask(0000);
 
