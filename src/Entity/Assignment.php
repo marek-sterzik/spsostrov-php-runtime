@@ -50,7 +50,7 @@ class Assignment
     private ?DateTimeImmutable $hardDeadline = null;
 
     #[ORM\Column]
-    private int $order = 0;
+    private int $mainOrder = 0;
 
     #[ORM\Column]
     private ?DateTimeImmutable $createdAt = null;
@@ -152,7 +152,7 @@ class Assignment
         if ($state === AssignmentState::Active && $this->activatedAt === null) {
             $this->activatedAt = new DateTimeImmutable();
         }
-        $this->order = $state->getParam("order");
+        $this->mainOrder = $state->getParam("order");
 
         return $this;
     }
