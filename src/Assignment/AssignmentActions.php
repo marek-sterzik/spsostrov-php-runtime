@@ -83,6 +83,12 @@ class AssignmentActions
                 ->confirmButtons("ukončit")->confirmType("danger");
         }
 
+        if ($assignment->canTransitTo($user, AssignmentState::Draft)) {
+            $actions[] = Action::get(
+                $this->getTransitionAction($assignment, AssignmentState::Draft),
+            )->label("znovuotevřít k rozpracovaní")->cssClass("btn-success")->icon("bi-pencil");
+        }
+
         if ($assignment->canBeViewedBy($user)) {
             $actions[] = Action::get(
                 $this->router->generate("new-assignment", ["template" => $assignment->getId(), "_back" => true]),
