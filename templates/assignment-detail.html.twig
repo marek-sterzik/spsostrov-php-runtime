@@ -11,6 +11,9 @@
                     <tr><th>stav:</th><td>{% include "snippets/assignment-state.html.twig" with {"state": assignment.state} %}</td></tr>
                     <tr><th>vlastník:</th><td>{{ assignment.owner.name }} {% if ownerIsMe %}{% include "snippets/me.html.twig" %}{% endif %}</td></tr>
                     <tr><th>vytvořeno:</th><td>{% include "snippets/datetime.html.twig" with {"date": assignment.createdAt} %}</td></tr>
+                    <tr><td colspan="2">
+                        {% for action in actions %}{{ action.render()|raw }} {% endfor %}
+                    </td></tr>
                 </table>
             </div>
         </div>

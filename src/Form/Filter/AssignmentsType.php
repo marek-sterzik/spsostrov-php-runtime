@@ -60,7 +60,7 @@ class AssignmentsType extends AbstractType
         ;
         if ($options['add_link_url'] !== null) {
             $builder->add('add', ButtonType::class, [
-                "label" => "<i class=\"bi bi-plus-square me-1\"></i> nové zadání",
+                "label" => "<i class=\"bi bi-plus-square me-1\"></i> vytvořit nové zadání",
                 "label_html" => true,
                 "attr" => ["class" => "btn btn-success", "data-link-href" => $options['add_link_url']]
             ]);

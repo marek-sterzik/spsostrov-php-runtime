@@ -50,7 +50,7 @@ class UserEditController extends AbstractController
             ->action("Zrušit", function (User $user) {
                 return $this->redirectBack(true);
             }, type: 'btn-secondary', validated: false)
-            ->caption(sprintf("nastavit roli uživateli \"%s\"", $user->getName()))
+            ->caption(sprintf("Nastavit roli uživateli \"%s\"", $user->getName()))
             ->handle()
         ;
     }

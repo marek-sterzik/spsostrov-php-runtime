@@ -87,9 +87,9 @@ class AssignmentEditController extends AbstractController
         }
 
         if ($new) {
-            $caption = "nové zadání";
+            $caption = "Nové zadání";
         } else {
-            $caption = "upravit zadání";
+            $caption = "Upravit zadání";
         }
 
         return $this->form(AssignmentEditType::class, $assignment)
