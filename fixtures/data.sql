@@ -21,7 +21,7 @@
 
 LOCK TABLES `assignment` WRITE;
 /*!40000 ALTER TABLE `assignment` DISABLE KEYS */;
-INSERT INTO `assignment` (`id`, `caption`, `description`, `classes`, `classes_regexp`, `school_year`, `public`, `state`, `soft_deadline`, `hard_deadline`, `main_order`, `created_at`, `activated_at`, `owner_id`) VALUES (1,'Maturitní práce','Odevzdejte sem **maturitní práci**.','I4, I2','^I4|I2$',2024,1,'archived',NULL,NULL,5,'2025-05-06 15:11:18','2025-05-06 15:31:09',1),(2,'Test DOCTRINE',NULL,'I4','^I4$',2024,1,'active',NULL,NULL,3,'2025-05-06 15:11:18','2025-05-06 15:34:22',8),(3,'Test Symfony','Test symfony','I4','^I4$',2024,1,'draft',NULL,NULL,1,'2025-05-06 15:11:18',NULL,8),(4,'Test','testovací pokus','I4','^I4$',2024,0,'archived',NULL,NULL,5,'2025-05-06 15:11:18','2025-05-06 15:36:02',1),(5,'Test','Toto je **test**.','I4','^I4$',2024,1,'archived',NULL,NULL,5,'2025-05-06 15:11:18','2025-05-06 15:42:14',1),(6,'Zadání 1',NULL,'E1A','^E1A$',2024,0,'finished',NULL,NULL,4,'2025-05-06 15:43:48','2025-05-06 16:23:42',1),(7,'Zadání 2',NULL,'E2A','^E2A$',2024,0,'draft',NULL,NULL,0,'2025-05-06 15:44:06',NULL,1);
+INSERT INTO `assignment` (`id`, `caption`, `description`, `classes`, `classes_regexp`, `school_year`, `public`, `state`, `soft_deadline`, `hard_deadline`, `main_order`, `created_at`, `activated_at`, `owner_id`) VALUES (1,'Maturitní práce','Odevzdejte sem **maturitní práci**.','I4, I2','^I4|I2$',2024,1,'archived',NULL,NULL,1,'2025-05-06 15:11:18','2025-05-06 15:31:09',1),(2,'Test DOCTRINE',NULL,'I4','^I4$',2024,1,'active',NULL,NULL,3,'2025-05-06 15:11:18','2025-05-06 15:34:22',8),(3,'Test Symfony','Test symfony','I4','^I4$',2024,1,'draft',NULL,NULL,5,'2025-05-06 15:11:18',NULL,8),(4,'Test','testovací pokus','I4','^I4$',2024,0,'archived',NULL,NULL,1,'2025-05-06 15:11:18','2025-05-06 15:36:02',1),(5,'Test','Toto je **test**.','I4','^I4$',2024,1,'archived',NULL,NULL,1,'2025-05-06 15:11:18','2025-05-06 15:42:14',1),(6,'Zadání 1',NULL,'E1A','^E1A$',2024,0,'finished',NULL,NULL,2,'2025-05-06 15:43:48','2025-05-06 16:23:42',1),(7,'Zadání 2',NULL,'E2A','^E2A$',2024,0,'draft',NULL,NULL,6,'2025-05-06 15:44:06',NULL,1);
 /*!40000 ALTER TABLE `assignment` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -44,4 +44,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-05-06 16:56:50
+-- Dump completed on 2025-05-06 17:07:31

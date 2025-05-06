@@ -12,12 +12,12 @@ enum AssignmentState: string
 
     #[Description("rozpracované")]
     #[Parameter("type", "success")]
-    #[Parameter("order", 1)]
+    #[Parameter("order", 5)]
     case Draft = "draft";
 
     #[Description("připraveno k aktivaci")]
     #[Parameter("type", "primary")]
-    #[Parameter("order", 2)]
+    #[Parameter("order", 4)]
     case Ready = "ready";
 
     #[Description("aktivováno")]
@@ -27,12 +27,12 @@ enum AssignmentState: string
 
     #[Description("odevzdávání ukončeno")]
     #[Parameter("type", "warning")]
-    #[Parameter("order", 4)]
+    #[Parameter("order", 2)]
     case Finished = "finished";
 
     #[Description("archivováno")]
     #[Parameter("type", "secondary")]
-    #[Parameter("order", 5)]
+    #[Parameter("order", 1)]
     case Archived = "archived";
 
     public function canTransitTo(self $state): bool

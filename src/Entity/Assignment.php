@@ -10,6 +10,8 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Validator\StudentClassPattern;
 
 #[ORM\Entity(repositoryClass: AssignmentRepository::class)]
+#[ORM\Index(name: 'main_order_created_at_index', fields: ['mainOrder', 'createdAt'])]
+#[ORM\Index(name: 'state_hard_deadline_index', fields: ['state', 'hardDeadline'])]
 class Assignment
 {
     #[ORM\Id]

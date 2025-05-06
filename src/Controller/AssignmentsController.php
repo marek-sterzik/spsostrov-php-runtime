@@ -64,7 +64,7 @@ class AssignmentsController extends AbstractDbTableController
             $qb->setParameter(":${var}", "%$string%");
         });
         $searchTool->search($qb, $filterData['q'] ?? '');
-        $qb->addOrderBy("a.mainOrder", "ASC");
+        $qb->addOrderBy("a.mainOrder", "DESC");
         $qb->addOrderBy("a.createdAt", "DESC");
         return $qb;
     }
