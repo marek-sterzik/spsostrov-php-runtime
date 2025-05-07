@@ -174,7 +174,12 @@ if (defined("SID") && session_status() !== PHP_SESSION_ACTIVE){
     session_start();
 }
 
-if (isset($_GET['username']) && is_string($_GET['username']) && !isset($_GET['db'])) {
+if (
+    AdminerLoginPasswordLess::isConfigured() &&
+    isset($_GET['username']) &&
+    is_string($_GET['username']) &&
+    !isset($_GET['db'])
+) {
     $database = (new AdminerLoginPasswordLess())->database();
     $queryString = 'username='.urlencode($_GET['username']).'&db='.urlencode($database);
     $uri = preg_replace('/\?.*$/', '', $_SERVER['REQUEST_URI']) . "?" . $queryString;
