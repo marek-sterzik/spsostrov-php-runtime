@@ -1,6 +1,6 @@
 module.exports = {
   entry: './js/index.js',
-  mode: 'production',
+  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
   output: {
     path: __dirname + '/public/js'
   },

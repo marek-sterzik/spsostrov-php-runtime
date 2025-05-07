@@ -3,17 +3,58 @@
 cd "$(dirname "$(which "$0")")/.."
 
 usage() {
-    echo "usage: $0 [--watch]" 2>&1
+    echo "usage: $0 [-w|--watch] [-p|--production]" 2>&1
 }
 
+invalid=""
 watch=""
-if [ "$#" -ne 0 ]; then
-    if [ "$#" -eq 1 -a \( "$1" = "-w" -o "$1" = "--watch" -o "$1" = "watch" \) ]; then
-        watch="-w"
-    else
-        usage
-        exit
-    fi
+production=""
+help=""
+
+options="`getopt -o hwp --long help --long watch --long production --long prod -- "$@"`"
+
+if [ "$?" -eq "0" ]; then
+    eval set -- "$options"
+    args=("$@")
+    while [ "$1" != "--" ]; do
+        case "$1" in
+        --watch|-w)
+            watch="-w";;
+        --production|--prod|-p)
+            production="1";;
+        --help|-h)
+            help="1";;
+        *)
+            invalid=1;;
+        esac
+        shift
+    done
+    shift
+else
+    invalid=1
 fi
 
-node_modules/.bin/webpack $watch
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+    watch|w)
+        watch="-w";;
+    prod|production|p)
+        production="1";;
+    help|h)
+        help="1";;
+    *)
+        invalid="1";;
+    esac
+    shift
+done
+
+if [ -n "$help" -o -n "$invalid" ]; then
+    usage
+    exit
+fi
+
+ne="development"
+if [ -n "$production" ]; then
+    ne="production"
+fi
+NODE_ENV="$ne" node_modules/.bin/webpack $watch
