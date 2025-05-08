@@ -23,6 +23,8 @@ div.student-assignment-box {display: none;}
 div.student-assignment-owner {float: right; color: #888;}
 div.student-assignment-actions {text-align: center;}
 
+div.foot {height: 2em;}
+
 /* modal progress bar */
 .modal-foreground {position: fixed; left: 0; top: 0; right: 0; bottom: 0; background-color: #b0b0b080;}
 .progress {width: 150px; height: 150px; background: none; margin: 0; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);}
