@@ -6,6 +6,7 @@ use DateInterval;
 use DateTimeImmutable;
 use App\Repository\AssignmentRepository;
 use App\Assignment\AssignmentState;
+use App\Assignment\SubmissionMode;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Validator\StudentClassPattern;
@@ -42,10 +43,16 @@ class Assignment
 
     #[ORM\Column]
     private bool $public = false;
+    
+    #[ORM\Column(type: Types::STRING, length: 16, enumType: SubmissionMode::class)]
+    private SubmissionMode $submissionMode = SubmissionMode::Once;
+    
+    #[ORM\Column]
+    private bool $backedUp = false;
 
-    #[ORM\Column(type: Types::STRING, length: 255, enumType: AssignmentState::class)]
+    #[ORM\Column(type: Types::STRING, length: 16, enumType: AssignmentState::class)]
     private AssignmentState $state = AssignmentState::Draft;
-
+    
     #[ORM\ManyToOne(inversedBy: 'ownedAssignments')]
     #[ORM\JoinColumn(nullable: false)]
     private User $owner;
@@ -163,6 +170,30 @@ class Assignment
         return $this;
     }
 
+    public function getSubmissionMode(): SubmissionMode
+    {
+        return $this->submissionMode;
+    }
+
+    public function setSubmissionMode(SubmissionMode $submissionMode): self
+    {
+        $this->submissionMode = $submissionMode;
+
+        return $this;
+    }
+
+    public function isBackedUp(): bool
+    {
+        return $this->backedUp;
+    }
+
+    public function setBackedUp(bool $backedUp): self
+    {
+        $this->backedUp = $backedUp;
+
+        return $this;
+    }
+    
     public function getState(): AssignmentState
     {
         if ($this->state === AssignmentState::Active && $this->isAfterDeadline()) {
