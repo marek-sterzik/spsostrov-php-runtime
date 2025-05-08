@@ -54,7 +54,9 @@ class AssignmentEditType extends AbstractType
                 'choices' => [
                     "soukromé (vidím ho jenom já)" => false,
                     "veřejné (vidí ho všichni učitelé)" => true,
-                ]
+                ],
+                'help' => 'Veřejná zadání jsou ostatními učiteli jenom viditelná. ' .
+                    'Upravovat zadání může vždy pouze jeho vlastník nebo administrátor.',
             ])
             ->add('submissionMode', ChoiceType::class, [
                 'label' => "způsob odevzdávání:",
