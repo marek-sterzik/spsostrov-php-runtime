@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Assignment;
 use App\Entity\User;
 use App\Utility\CurrentSchoolYear;
+use App\Assignment\SubmissionMode;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -54,6 +55,10 @@ class AssignmentEditType extends AbstractType
                     "soukromé (vidím ho jenom já)" => false,
                     "veřejné (vidí ho všichni učitelé)" => true,
                 ]
+            ])
+            ->add('submissionMode', ChoiceType::class, [
+                'label' => "způsob odevzdávání:",
+                'choices' => SubmissionMode::choices(),
             ])
             ->add('schoolYear', ChoiceType::class, [
                 "label" => "školní rok:",

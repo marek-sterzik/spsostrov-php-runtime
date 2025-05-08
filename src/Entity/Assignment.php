@@ -45,7 +45,7 @@ class Assignment
     private bool $public = false;
     
     #[ORM\Column(type: Types::STRING, length: 16, enumType: SubmissionMode::class)]
-    private SubmissionMode $submissionMode = SubmissionMode::Once;
+    private SubmissionMode $submissionMode = SubmissionMode::MultipleTimes;
     
     #[ORM\Column]
     private bool $backedUp = false;
