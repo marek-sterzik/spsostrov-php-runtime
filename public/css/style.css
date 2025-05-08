@@ -18,8 +18,12 @@ table.thin-headings th {width: 1em;}
 
 span.student-class-pattern .sg {font-weight: bold; color: #006;}
 span.student-class-pattern .wc {font-weight: bold; color: #A00;}
-/* modal progress bar */
 
+div.student-assignment-box {display: none;}
+div.student-assignment-owner {float: right; color: #888;}
+div.student-assignment-actions {text-align: center;}
+
+/* modal progress bar */
 .modal-foreground {position: fixed; left: 0; top: 0; right: 0; bottom: 0; background-color: #b0b0b080;}
 .progress {width: 150px; height: 150px; background: none; margin: 0; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);}
 .progress:after {content: ""; width: 100%; height: 100%; border-radius: 50%; border: 12px solid #fff; position: absolute; top: 0; left: 0;}

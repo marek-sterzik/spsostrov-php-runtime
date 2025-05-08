@@ -15,13 +15,19 @@ use App\Utility\SearchTool;
 use App\Form\Filter\StudentAssignmentsType;
 use App\Assignment\AssignmentState;
 use App\Utility\CurrentSchoolYear;
+use App\Markdown\Markdown;
 
 class StudentsAssignmentsController extends AbstractDbTableController
 {
+    public function __construct(private Markdown $markdown)
+    {
+    }
+
     #[IsGranted('ROLE_STUDENT')]
     #[Route("/submit", name: "submit")]
     public function index(): Response
     {
+        $this->enableModule("students-assignments");
         return $this->renderTable();
     }
 
@@ -68,39 +74,25 @@ class StudentsAssignmentsController extends AbstractDbTableController
         assert($assignment instanceof Assignment);
         return [
             "assignment" => $this->getAssignmentCell($assignment),
-            "_actions" => $this->getAssignmentActions($assignment),
         ];
     }
 
     private function getAssignmentCell(Assignment $assignment): mixed
     {
+        $descriptionHtml = $this->markdown->getDescriptionHtml($assignment, "h2");
+
+        $submitAction = Action::get("#")
+            ->label("odevzdat")->cssClass("btn-danger")->icon("bi-rocket-takeoff");
+
         $content = $this->renderView(
             "snippets/student-assignment.html.twig",
-            ["assignment" => $assignment]
+            [
+                "assignment" => $assignment,
+                "descriptionHtml" => $descriptionHtml,
+                "submit" => $submitAction
+            ]
         );
         return Cell::html($content);
-    }
-
-    private function getAssignmentActions(Assignment $assignment): array
-    {
-        return [];
-        /*
-        $actions = [
-            Action::get(
-                $this->generateUrl("user", ["user" => $user->getId(), "_back" => true]),
-                "nastavit roli",
-                "btn-primary"
-            )
-        ];
-        if ($user->isRoleRestorable()) {
-            array_unshift($actions, Action::get(
-                $this->generateUrl("restore_role_user", ["user" => $user->getId(), "_back" => true]),
-                "obnovit roli",
-                "btn-danger me-2"
-            ));
-        }
-        return $actions;
-        */
     }
 
     protected function getForm(array $formData): ?FormInterface

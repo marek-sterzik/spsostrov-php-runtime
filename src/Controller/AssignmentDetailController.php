@@ -39,7 +39,7 @@ class AssignmentDetailController extends AbstractController
             "actions" => $actions,
             "ownerIsMe" => $isMe,
             "studentClassPattern" => StudentClassPatternComponent::get($assignment->getClasses()),
-            "descriptionHtml" => $this->markdown->getDescriptionHtml($assignment, "h2"),
+            "descriptionHtml" => $this->markdown->getDescriptionHtml($assignment, "h4"),
         ]);
     }
 

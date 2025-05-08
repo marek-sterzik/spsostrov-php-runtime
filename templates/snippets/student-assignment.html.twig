@@ -1,1 +1,9 @@
+<div class="student-assignment-owner">{{ assignment.owner.name }}</div>
 <h3>{{ assignment.caption }}</h3>
+<div class="student-assignment-box">
+    {{ descriptionHtml|raw }}
+    <div class="student-assignment-actions">
+        {{ submit.render()|raw }}
+    </div>
+</div>
+<a href="#" class="toggle-show" data-less-label="méně..." data-more-label="více...">&nbsp;</a>
