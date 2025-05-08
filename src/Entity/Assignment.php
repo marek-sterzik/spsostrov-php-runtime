@@ -7,6 +7,8 @@ use DateTimeImmutable;
 use App\Repository\AssignmentRepository;
 use App\Assignment\AssignmentState;
 use App\Assignment\SubmissionMode;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Validator\StudentClassPattern;
@@ -72,11 +74,18 @@ class Assignment
     #[ORM\Column(nullable: true)]
     private ?DateTimeImmutable $activatedAt = null;
 
+    /**
+     * @var Collection<int, Submission>
+     */
+    #[ORM\OneToMany(targetEntity: Submission::class, mappedBy: 'assignment', orphanRemoval: true)]
+    private Collection $submissions;
+
     public function __construct(User $owner)
     {
         $this->owner = $owner;
         $this->createdAt = new DateTimeImmutable();
         $this->updateMainOrder();
+        $this->submissions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -360,5 +369,35 @@ class Assignment
     private function isAfterDeadline(): bool
     {
         return ($this->hardDeadline !== null && (new DateTimeImmutable()) > $this->hardDeadline);
+    }
+
+    /**
+     * @return Collection<int, Submission>
+     */
+    public function getSubmissions(): Collection
+    {
+        return $this->submissions;
+    }
+
+    public function addSubmission(Submission $submission): static
+    {
+        if (!$this->submissions->contains($submission)) {
+            $this->submissions->add($submission);
+            $submission->setAssignment($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSubmission(Submission $submission): static
+    {
+        if ($this->submissions->removeElement($submission)) {
+            // set the owning side to null (unless already changed)
+            if ($submission->getAssignment() === $this) {
+                $submission->setAssignment(null);
+            }
+        }
+
+        return $this;
     }
 }
