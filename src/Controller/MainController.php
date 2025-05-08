@@ -10,7 +10,14 @@ class MainController extends AbstractController
     #[Route("/", name: "main")]
     public function index(): Response
     {
-        return $this->render('main.html.twig', [
-        ]);
+        $menu = $this->getMenu();
+
+        if (empty($menu)) {
+            return $this->render('main.html.twig');
+        }
+
+        $mainMenuItem = array_shift($menu);
+
+        return $this->redirectToRoute($mainMenuItem['route']);
     }
 }

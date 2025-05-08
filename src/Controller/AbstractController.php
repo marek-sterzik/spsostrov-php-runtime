@@ -63,9 +63,14 @@ class AbstractController extends AbstractControllerBase
     {
         return [
             "jsLoadModules" => empty($this->modulesEnabled) ? null : implode(" ", array_keys($this->modulesEnabled)),
-            "menu" => $this->menuGenerator->generateMenu(),
+            "menu" => $this->getMenu(),
             "user" => $this->getUser(),
         ];
+    }
+
+    protected function getMenu(): array
+    {
+        return $this->menuGenerator->generateMenu();
     }
 
     protected function renderView(string $view, array $parameters = []): string

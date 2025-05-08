@@ -1,7 +1,4 @@
 menu:
-  - name: domů
-    route: main
-    roles: ['PUBLIC_ACCESS']
   - name: zadání
     route: assignments
     routes: ["new-assignment", "assignment-detail", "assignment"]

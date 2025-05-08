@@ -1,4 +1,10 @@
 {% extends "base.html.twig" %}
 {% block body %}
     <img class="spsostrov-logo" src="{{ asset('media/spsostrov.png') }}">
+    {% if user is null %}
+        <div class="text-center">
+        <a href="{{ path("login") }}" class="btn btn-primary btn-lg ms-3" role="button"><i class="bi me-1 bi-arrow-right-square-fill"></i> přihlásit</a>
+        </div>
+    {% endif %}
+    
 {% endblock %}

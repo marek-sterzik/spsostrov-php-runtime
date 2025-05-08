@@ -15,6 +15,8 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 class MenuGenerator
 {
     private array $menuTemplate;
+    private ?array $menu = null;
+
     public function __construct(
         private RequestStack $requestStack,
         private AuthorizationCheckerInterface $authorizationChecker,
@@ -26,16 +28,18 @@ class MenuGenerator
     public function generateMenu(): array
     {
         $currentRoute = $this->requestStack->getCurrentRequest()->attributes->get('_route');
-        $menu = [];
-        foreach ($this->menuTemplate as $menuItem) {
-            if ($this->granted($menuItem['roles'] ?? null)) {
-                $finalItem = $this->createMenuItem($menuItem, $currentRoute);
-                if (!$finalItem['hidden'] || $finalItem['actual']) {
-                    $menu[] = $finalItem;
+        if ($this->menu === null) {
+            $this->menu = [];
+            foreach ($this->menuTemplate as $menuItem) {
+                if ($this->granted($menuItem['roles'] ?? null)) {
+                    $finalItem = $this->createMenuItem($menuItem, $currentRoute);
+                    if (!$finalItem['hidden'] || $finalItem['actual']) {
+                        $this->menu[] = $finalItem;
+                    }
                 }
             }
         }
-        return $menu;
+        return $this->menu;
     }
 
     private function createMenuItem(array $menuItem, string $currentRoute): array
