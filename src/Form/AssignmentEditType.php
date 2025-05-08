@@ -33,7 +33,7 @@ class AssignmentEditType extends AbstractType
             ])
             ->add('classes', TextType::class, [
                 "label" => "třídy, pro které je zadání určeno:",
-                "help" => "Zadejte čárkami oddělený seznam tříd, lze také používat hvězdičku <code>*</code> ".
+                "help" => "Zadejte čárkami oddělený seznam tříd, lze také používat hvězdičku <code>*</code> " .
                 "pro libovolné znaky, např. <code>I*</code> pro všechny třídy <code>I1</code> až <code>I4</code>.",
                 "help_html" => true,
             ])
@@ -63,6 +63,18 @@ class AssignmentEditType extends AbstractType
             ->add('schoolYear', ChoiceType::class, [
                 "label" => "školní rok:",
                 "choices" => $this->getSchoolYearChoices(),
+            ])
+            ->add('backedUp', ChoiceType::class, [
+                'label' => "zálohování:",
+                'choices' => [
+                    "vypnuto (standardní režim)" => false,
+                    "zapnuto (důležité zadání)" => true,
+                ],
+                "help" => "Je-li zálohování zapnuto, " .
+                    "bude každé odevzdání automaticky zálohováno na zálohovací server. " .
+                    "Odevzdaná díla tak budou dohledatelná i v případě havárie uložiště na serveru. " .
+                    "Zapněte zálohování pro důležité práce jako je maturitní práce a podobné, " .
+                    "kde je potřeba auditovatelné odevzdání."
             ])
         ;
     }
