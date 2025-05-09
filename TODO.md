@@ -11,3 +11,4 @@
 * better deadline date picker
 * caching markdown compiler
 * action log (log all actions and set who was responsible for setting them)
+* ajax-updated counts of submissions for an assignment

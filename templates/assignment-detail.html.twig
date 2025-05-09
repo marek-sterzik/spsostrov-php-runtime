@@ -17,7 +17,8 @@
                     <tr><th>vlastník:</th><td>{{ assignment.owner.name }} {% if ownerIsMe %}{% include "snippets/me.html.twig" %}{% endif %}</td></tr>
                     <tr><th>školní rok:</th><td>{{ assignment.schoolYear }}/{{ assignment.schoolYear + 1 }}</td></tr>
                     <tr><th>vytvořeno:</th><td>{% include "snippets/datetime.html.twig" with {"date": assignment.createdAt} %}</td></tr>
-                    <tr><td colspan="2">
+                        <tr><th>počet&nbsp;odevzdání:</th><td>{% include "snippets/submission-count.html.twig" with {"count": submissionCount} %}</td></tr>
+                        <tr><td colspan="2">
                         {% for action in actions %}{{ action.render()|raw }} {% endfor %}
                     </td></tr>
                 </table>

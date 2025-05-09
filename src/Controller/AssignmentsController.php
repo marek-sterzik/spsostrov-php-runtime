@@ -16,11 +16,14 @@ use App\Form\Filter\AssignmentsType;
 use App\Assignment\AssignmentActions;
 use App\Assignment\AssignmentState;
 use App\Component\StudentClassPattern as StudentClassPatternComponent;
+use App\Repository\SubmissionRepository;
 
 class AssignmentsController extends AbstractDbTableController
 {
-    public function __construct(private AssignmentActions $assignmentActions)
-    {
+    public function __construct(
+        private AssignmentActions $assignmentActions,
+        private SubmissionRepository $submissionRepository
+    ) {
     }
 
     #[IsGranted('ROLE_TEACHER')]
@@ -79,6 +82,7 @@ class AssignmentsController extends AbstractDbTableController
             "state" => "stav",
             "owner" => "vlastník",
             "createdAt" => "vytvořeno",
+            "submitted" => "odevzdáno",
         ];
     }
 
@@ -90,6 +94,9 @@ class AssignmentsController extends AbstractDbTableController
         $meBadge = $isMe ? (' ' . $this->renderView('snippets/me.html.twig')) : '';
         $type = $this->renderView('snippets/assignment-public.html.twig', ["public" => $assignment->isPublic()]);
         $createdAt = $this->renderView('snippets/datetime.html.twig', ["date" => $assignment->getCreatedAt()]);
+        $submissionCount = $this->submissionRepository->countSubmissions($assignment);
+        $submitted = $this->renderView('snippets/submission-count.html.twig', ["count" => $submissionCount]);
+
         return [
             "caption" => $assignment->getCaption(),
             "studentClass" => StudentClassPatternComponent::get($assignment->getClasses()),
@@ -97,6 +104,7 @@ class AssignmentsController extends AbstractDbTableController
             "type" => Cell::html($type),
             "state" => Cell::html($state),
             "createdAt" => Cell::html($createdAt),
+            "submitted" => Cell::html($submitted)->attribute("class", "text-center"),
             "_actions" => $this->getAssignmentActions($assignment),
         ];
     }

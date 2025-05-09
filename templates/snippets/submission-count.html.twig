@@ -1,0 +1,1 @@
+{% if count is not null %}{% if link is defined and link is not null %}<a href="{{link}}">{% endif %}<span class="badge rounded-pill {% if count == 0 %}bg-secondary{% else %}bg-info{% endif %}">{{ count }}</span>{% if link is defined and link is not null %}</a>{% endif %}{% endif %}

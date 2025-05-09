@@ -11,12 +11,16 @@ use App\Utility\RoleComparator;
 use App\Assignment\AssignmentActions;
 use App\Component\Action;
 use App\Markdown\Markdown;
+use App\Repository\SubmissionRepository;
 use App\Component\StudentClassPattern as StudentClassPatternComponent;
 
 class AssignmentDetailController extends AbstractController
 {
-    public function __construct(private AssignmentActions $assignmentActions, private Markdown $markdown)
-    {
+    public function __construct(
+        private AssignmentActions $assignmentActions,
+        private Markdown $markdown,
+        private SubmissionRepository $submissionRepository
+    ) {
     }
 
     #[IsGranted('ROLE_TEACHER')]
@@ -40,6 +44,7 @@ class AssignmentDetailController extends AbstractController
             "ownerIsMe" => $isMe,
             "studentClassPattern" => StudentClassPatternComponent::get($assignment->getClasses()),
             "descriptionHtml" => $this->markdown->getDescriptionHtml($assignment, "h4"),
+            "submissionCount" => $this->submissionRepository->countSubmissions($assignment),
         ]);
     }
 

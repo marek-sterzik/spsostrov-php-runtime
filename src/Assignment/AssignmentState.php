@@ -65,4 +65,14 @@ enum AssignmentState: string
             default => false
         };
     }
+
+    public function submissionsAvailable(): bool
+    {
+        return match ($this) {
+            self::Active => true,
+            self::Finished => true,
+            self::Archived => true,
+            default => false
+        };
+    }
 }
