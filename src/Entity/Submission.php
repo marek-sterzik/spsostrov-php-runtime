@@ -16,7 +16,7 @@ class Submission
     #[ORM\Column]
     private int $id;
 
-    #[ORM\Column(type: Types::GUID)]
+    #[ORM\Column(type: Types::GUID, unique: true)]
     private string $uuid;
 
     #[ORM\ManyToOne(inversedBy: 'submissions')]
