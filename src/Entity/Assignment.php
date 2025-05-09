@@ -274,6 +274,23 @@ class Assignment
         return $this;
     }
 
+    public function getStudentDeadline(): ?DateTimeImmutable
+    {
+        return $this->softDeadline ?? $this->hardDeadline;
+    }
+
+    public function isStudentDeadlineExceeded(): bool
+    {
+        $studentDeadline = $this->getStudentDeadline();
+        return ($studentDeadline !== null) ? ($studentDeadline < new DateTimeImmutable()) : false;
+    }
+
+    public function isStudentDeadlineNear(): bool
+    {
+        $studentDeadline = $this->getStudentDeadline();
+        return ($studentDeadline !== null) ? ($studentDeadline >= new DateTimeImmutable("-10 minutes")) : false;
+    }
+
     public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;

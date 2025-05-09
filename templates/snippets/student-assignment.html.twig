@@ -1,4 +1,19 @@
-<div class="student-assignment-owner">{{ assignment.owner.name }}</div>
+{% if assignment.studentDeadlineExceeded %}
+    {% set deadlineClass="text-danger" %}
+    {% set deadlineTitle="po termínu" %}
+{% elseif assignment.studentDeadlineNear %}
+    {% set deadlineClass="text-warning" %}
+    {% set deadlineTitle="termín se blíží" %}
+{% else %}
+    {% set deadlineClass="text-success" %}
+    {% set deadlineTitle="v termínu" %}
+{% endif %}
+<div class="student-assignment-sidebox">
+    {% if assignment.studentDeadline is not null %}
+        <div class="deadline {{ deadlineClass }}" title="{{ deadlineTitle }}">do {% include "snippets/datetime.html.twig" with {"date": assignment.studentDeadline} %}</div>
+    {% endif %}
+    <div class="owner">{{ assignment.owner.name }}</div>
+</div>
 <h3>{{ assignment.caption }}</h3>
 <div class="student-assignment-box">
     {{ descriptionHtml|raw }}

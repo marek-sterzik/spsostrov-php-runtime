@@ -20,7 +20,9 @@ span.student-class-pattern .sg {font-weight: bold; color: #006;}
 span.student-class-pattern .wc {font-weight: bold; color: #A00;}
 
 div.student-assignment-box {display: none;}
-div.student-assignment-owner {float: right; color: #888;}
+div.student-assignment-sidebox {float: right;}
+div.student-assignment-sidebox .owner {color: #888; text-align: right;}
+div.student-assignment-sidebox .deadline {font-size: .9em; text-align: right;}
 div.student-assignment-actions {text-align: center;}
 
 div.foot {height: 2em;}
