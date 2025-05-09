@@ -57,7 +57,6 @@ class SubmissionController extends AbstractController
         } finally {
             $this->lockManager->unlock($lock);
         }
-
     }
 
     private function submitFiles(array $files, Submission $submission): void
