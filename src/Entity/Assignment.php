@@ -77,7 +77,8 @@ class Assignment
     /**
      * @var Collection<int, Submission>
      */
-    #[ORM\OneToMany(targetEntity: Submission::class, mappedBy: 'assignment', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Submission::class, mappedBy: 'assignment', orphanRemoval: true, fetch: 'EXTRA_LAZY')]
+    #[ORM\OrderBy(["id" => "DESC"])]
     private Collection $submissions;
 
     public function __construct(User $owner)

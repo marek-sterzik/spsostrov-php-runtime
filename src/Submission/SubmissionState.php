@@ -12,4 +12,13 @@ enum SubmissionState: string
 
     #[Description("rozpracované")]
     case Draft = "draft";
+    
+    #[Description("odevzdáno")]
+    case Submitted = "submitted";
+    
+    #[Description("zkomprimováno")]
+    case Packed = "packed";
+    
+    #[Description("synchronizováno")]
+    case Synced = "synced";
 }

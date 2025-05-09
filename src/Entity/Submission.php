@@ -33,8 +33,8 @@ class Submission
     #[ORM\Column]
     private DateTimeImmutable $createdAt;
     
-    #[ORM\Column]
-    private DateTimeImmutable $submittedAt;
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $submittedAt = null;
 
     public function getId(): int
     {
@@ -101,12 +101,12 @@ class Submission
         return $this;
     }
 
-    public function getSubmittedAt(): DateTimeImmutable
+    public function getSubmittedAt(): ?DateTimeImmutable
     {
         return $this->submittedAt;
     }
 
-    public function setSubmittedAt(DateTimeImmutable $submittedAt): static
+    public function setSubmittedAt(?DateTimeImmutable $submittedAt): static
     {
         $this->submittedAt = $submittedAt;
 
