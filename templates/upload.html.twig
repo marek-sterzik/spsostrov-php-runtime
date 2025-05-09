@@ -8,11 +8,18 @@
 {% endblock %}
 
 {% block before_form_hook %}
+    {% if files|length > 0 %}
     <div class="alert alert-danger" role="alert">
         <strong>Pozor:</strong> Odevzdání není kompletní, dokud nebude uzavřeno.
         <div class="text-center mt-3">
                 <a class="btn btn-danger" role="button" href="#">uzavřít a odevzdat</a>
         </div>
     </div>
-    žádné soubory
+    <ul class="list-group mb-3">
+        {% for file in files %}
+            <li class="list-group-item font-monospace">{{ file.filename }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    
 {% endblock %}

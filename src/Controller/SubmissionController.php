@@ -16,12 +16,14 @@ use App\Entity\Assignment;
 use App\Entity\Submission;
 use App\Entity\User;
 use App\Lock\LockManager;
+use App\FileManager\FileManager;
 
 class SubmissionController extends AbstractController
 {
     public function __construct(
         private SubmissionRepository $submissionRepository,
-        private LockManager $lockManager
+        private LockManager $lockManager,
+        private FileManager $fileManager
     ) {
     }
 
@@ -43,15 +45,12 @@ class SubmissionController extends AbstractController
             return $this->form(FileSubmitType::class, [], ["attr" => ["class" => "with-progress"]])
             ->action("nahrát soubory", function (array $data) use ($submission) {
                 $this->submitFiles($data['file'], $submission);
-                return null;
+                return $this->redirect($this->getRequest()->getRequestUri());
             })
-            /*
-            ->action("zrušit", function (array $data) {
-                return $this->redirectBack(true);
-            }, type: 'btn-secondary', validated: false)
-             */
             ->caption("Nahrát soubory")
-            ->useTemplate("upload.html.twig")
+            ->useTemplate("upload.html.twig", [
+                "files" => $this->fileManager->listFiles($submission)
+            ])
             ->handle()
             ;
         } finally {
@@ -64,6 +63,7 @@ class SubmissionController extends AbstractController
         if ($submission->getId() === null) {
             $this->getEntityManager()->flush();
         }
+        $this->fileManager->addFiles($submission, $files);
     }
 
     private function ensureSubmissionExists(Assignment $assignment, User $user): ?Submission

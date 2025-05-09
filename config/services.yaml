@@ -52,3 +52,6 @@ services:
         arguments:
             $databaseUrl: '%env(resolve:DATABASE_URL)%'
             $adminerBootFile: '%kernel.project_dir%/adminer/boot.php'
+    App\FileManager\FileManager:
+        arguments:
+            $storageDir: '%kernel.project_dir%/var/storage'
