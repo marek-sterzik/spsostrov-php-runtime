@@ -1,0 +1,12 @@
+{% extends "form.html.twig" %}
+{% block form %}
+    <div class="card">
+        <div class="card-body">
+            {{ form(form) }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block before_form_hook %}
+    žádné soubory
+{% endblock %}

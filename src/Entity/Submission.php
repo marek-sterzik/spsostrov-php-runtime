@@ -15,7 +15,7 @@ class Submission
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private int $id;
+    private ?int $id = null;
 
     #[ORM\Column(type: Types::GUID, unique: true)]
     private string $uuid;
@@ -45,7 +45,7 @@ class Submission
         $this->createdAt = new DateTimeImmutable();
     }
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }

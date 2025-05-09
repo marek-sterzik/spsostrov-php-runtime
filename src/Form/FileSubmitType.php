@@ -15,6 +15,7 @@ class FileSubmitType extends AbstractType
         $builder
             ->add('file', FileType::class, [
                 'multiple' => true,
+                'label' => 'přidat soubory:',
             ])
         ;
     }

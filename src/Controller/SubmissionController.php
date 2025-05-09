@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 use App\Submission\SubmissionState;
 use App\Assignment\AssignmentState;
@@ -13,6 +14,7 @@ use App\Form\FileSubmitType;
 use App\Repository\SubmissionRepository;
 use App\Entity\Assignment;
 use App\Entity\Submission;
+use App\Entity\User;
 use App\Lock\LockManager;
 
 class SubmissionController extends AbstractController
@@ -24,48 +26,49 @@ class SubmissionController extends AbstractController
     }
 
     #[IsGranted('ROLE_STUDENT')]
-    #[Route("/submission/{submission}", name: 'edit-submission')]
-    public function index(Submission $submission): Response
-    {
-        return $this->form(FileSubmitType::class, [], ["attr" => ["class" => "with-progress"]])
-        ->action("Uložit", function (array $data) {
-            return $this->redirectBack(true);
-        })
-        ->action("Zrušit", function (array $data) {
-            return $this->redirectBack(true);
-        }, type: 'btn-secondary', validated: false)
-        ->handle()
-        ;
-    }
-
-    #[IsGranted('ROLE_STUDENT')]
-    #[Route("/create-submission/{assignment}", name: "create-submission")]
-    public function createSubmission(Assignment $assignment): Response
-    {
-        $lock = sprintf("sc-%d", $assignment->getId());
-        $this->lockManager->lock($lock);
-        $submission = null;
-        try {
-            $submission = $this->ensureSubmissionExists($assignment);
-        } finally {
-            $this->lockManager->unlock($lock);
-        }
-        if ($submission !== null) {
-            return $this->redirectToRoute("edit-submission", [
-                "submission" => $submission->getId(),
-                "_back" => false
-            ]);
-        } else {
-            return $this->redirectBack(true);
-        }
-    }
-
-    private function ensureSubmissionExists(Assignment $assignment): ?Submission
+    #[Route("/submission/{assignment}", name: 'create-submission')]
+    public function index(Assignment $assignment): Response
     {
         $user = $this->getUserEntity();
         if ($user === null) {
-            return null;
+            return $this->redirectBack(true);
         }
+        $lock = sprintf("sc-%d-%d", $assignment->getId(), $user->getId());
+        $this->lockManager->lock($lock);
+        try {
+            $submission = $this->ensureSubmissionExists($assignment, $user);
+            if ($submission === null) {
+                return $this->redirectBack(true);
+            }
+            return $this->form(FileSubmitType::class, [], ["attr" => ["class" => "with-progress"]])
+            ->action("nahrát soubory", function (array $data) use ($submission) {
+                $this->submitFiles($data['file'], $submission);
+                return null;
+            })
+            /*
+            ->action("zrušit", function (array $data) {
+                return $this->redirectBack(true);
+            }, type: 'btn-secondary', validated: false)
+             */
+            ->caption("Nahrát soubory")
+            ->useTemplate("upload.html.twig")
+            ->handle()
+            ;
+        } finally {
+            $this->lockManager->unlock($lock);
+        }
+
+    }
+
+    private function submitFiles(array $files, Submission $submission): void
+    {
+        if ($submission->getId() === null) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    private function ensureSubmissionExists(Assignment $assignment, User $user): ?Submission
+    {
         if ($assignment->getState() !== AssignmentState::Active) {
             return null;
         }
@@ -77,7 +80,6 @@ class SubmissionController extends AbstractController
         if ($submission === null || $assignment->getSubmissionMode()->allowMultiple()) {
             $submission = new Submission($assignment, $user);
             $this->getEntityManager()->persist($submission);
-            $this->getEntityManager()->flush();
             return $submission;
         }
 

@@ -6,7 +6,11 @@
                 {% if caption is not null %}
                     <h3>{{ caption }}</h3>
                 {% endif %}
-                {{ form(form) }}
+                {% block before_form_hook %}{% endblock %} 
+                {% block form %}
+                    {{ form(form) }}
+                {% endblock %}
+                {% block after_form_hook %}{% endblock %} 
             </div>
         </div>
     </div>
