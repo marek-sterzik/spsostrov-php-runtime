@@ -9,6 +9,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Form\FormInterface;
 use Doctrine\ORM\QueryBuilder;
 use App\Entity\Assignment;
+use App\Entity\Submission;
 use App\Component\Cell;
 use App\Component\Action;
 use App\Utility\SearchTool;
@@ -16,11 +17,15 @@ use App\Form\Filter\StudentAssignmentsType;
 use App\Assignment\AssignmentState;
 use App\Utility\CurrentSchoolYear;
 use App\Markdown\Markdown;
+use App\Repository\SubmissionRepository;
+use App\Submission\SubmissionState;
 
 class StudentsAssignmentsController extends AbstractDbTableController
 {
-    public function __construct(private Markdown $markdown)
-    {
+    public function __construct(
+        private Markdown $markdown,
+        private SubmissionRepository $submissionRepository
+    ) {
     }
 
     #[IsGranted('ROLE_STUDENT')]
@@ -81,9 +86,9 @@ class StudentsAssignmentsController extends AbstractDbTableController
     private function getAssignmentCell(Assignment $assignment): mixed
     {
         $descriptionHtml = $this->markdown->getDescriptionHtml($assignment, "h2");
+        $lastSubmission = $this->submissionRepository->getLastSubmission($assignment);
 
-        $submitAction = Action::get("#")
-            ->label("odevzdat")->cssClass("btn-danger")->icon("bi-rocket-takeoff");
+        $submitAction = $this->getSubmitAction($assignment, $lastSubmission);
 
         $content = $this->renderView(
             "snippets/student-assignment.html.twig",
@@ -104,5 +109,35 @@ class StudentsAssignmentsController extends AbstractDbTableController
     protected function getDefaultFilterData(): array
     {
         return [];
+    }
+
+    private function getSubmitAction(Assignment $assignment, ?Submission $lastSubmission): Action
+    {
+        if ($lastSubmission === null ||
+            $lastSubmission->getState() === SubmissionState::Draft ||
+            $assignment->getSubmissionMode()->allowMultiple()
+        ) {
+            $label = $this->getSubmitLabel($lastSubmission);
+            $submitAction = Action::get("#")
+                ->label($label)->cssClass("btn-danger")->icon("bi-rocket-takeoff");
+        } else {
+            $submitAction = Action::get("#")
+                ->label("již odevzdáno")->cssClass("btn-danger disabled")->icon("bi-rocket-takeoff");
+        }
+
+        return $submitAction;
+    }
+
+    private function getSubmitLabel(?Submission $lastSubmission): string
+    {
+        if ($lastSubmission === null) {
+            return "odevzdat";
+        }
+
+        if ($lastSubmission->getState() === SubmissionState::Draft) {
+            return "dokončit odevzdání";
+        }
+
+        return "znovu odevzdat";
     }
 }

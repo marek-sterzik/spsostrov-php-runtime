@@ -35,4 +35,20 @@ class SubmissionRepository extends ServiceEntityRepository
             ->getSingleScalarResult()
         ;
     }
+
+    public function getLastSubmission(Assignment $assignment): ?Submission
+    {
+        if (!$assignment->getState()->submissionsAvailable()) {
+            return null;
+        }
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.assignment = :assignment')
+            ->setParameter(':assignment', $assignment->getId())
+            ->addOrderBy('s.id', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+            
+    }
 }

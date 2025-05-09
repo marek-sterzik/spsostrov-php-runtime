@@ -24,4 +24,12 @@ enum SubmissionMode: string
     
     #[Description("odevzdat napoprvé, bez možnosti opravy")]
     case Once = "once";
+
+    public function allowMultiple(): bool
+    {
+        return match ($this) {
+            self::MultipleTimes => true,
+            default => false
+        };
+    }
 }
