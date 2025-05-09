@@ -86,7 +86,7 @@ class StudentsAssignmentsController extends AbstractDbTableController
     private function getAssignmentCell(Assignment $assignment): mixed
     {
         $descriptionHtml = $this->markdown->getDescriptionHtml($assignment, "h2");
-        $lastSubmission = $this->submissionRepository->getLastSubmission($assignment);
+        $lastSubmission = $this->submissionRepository->getLastSubmission($assignment, $this->getUserEntity());
 
         $submitAction = $this->getSubmitAction($assignment, $lastSubmission);
 
@@ -118,7 +118,8 @@ class StudentsAssignmentsController extends AbstractDbTableController
             $assignment->getSubmissionMode()->allowMultiple()
         ) {
             $label = $this->getSubmitLabel($lastSubmission);
-            $submitAction = Action::get("#")
+            $url = $this->generateUrl("create-submission", ["assignment" => $assignment->getId(), "_back" => true]);
+            $submitAction = Action::get($url)
                 ->label($label)->cssClass("btn-danger")->icon("bi-rocket-takeoff");
         } else {
             $submitAction = Action::get("#")

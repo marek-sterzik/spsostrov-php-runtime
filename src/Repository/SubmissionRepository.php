@@ -36,7 +36,7 @@ class SubmissionRepository extends ServiceEntityRepository
         ;
     }
 
-    public function getLastSubmission(Assignment $assignment): ?Submission
+    public function getLastSubmission(Assignment $assignment, User $submitter): ?Submission
     {
         if (!$assignment->getState()->submissionsAvailable()) {
             return null;
@@ -44,6 +44,8 @@ class SubmissionRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('s')
             ->andWhere('s.assignment = :assignment')
             ->setParameter(':assignment', $assignment->getId())
+            ->andWhere('s.submitter = :submitter')
+            ->setParameter(':submitter', $submitter->getId())
             ->addOrderBy('s.id', 'DESC')
             ->setMaxResults(1)
             ->getQuery()

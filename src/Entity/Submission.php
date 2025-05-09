@@ -7,6 +7,7 @@ use App\Submission\SubmissionState;
 use App\Repository\SubmissionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Utility\Uuid;
 
 #[ORM\Entity(repositoryClass: SubmissionRepository::class)]
 class Submission
@@ -35,6 +36,14 @@ class Submission
     
     #[ORM\Column(nullable: true)]
     private ?DateTimeImmutable $submittedAt = null;
+
+    public function __construct(Assignment $assignment, User $submitter)
+    {
+        $this->uuid = Uuid::uuid6()->toString();
+        $this->assignment = $assignment;
+        $this->submitter = $submitter;
+        $this->createdAt = new DateTimeImmutable();
+    }
 
     public function getId(): int
     {
