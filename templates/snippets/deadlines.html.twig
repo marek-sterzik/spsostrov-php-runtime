@@ -1,0 +1,16 @@
+{% set both = false %}
+{% if assignment.softDeadline is not null and assignment.hardDeadline is not null %}
+    {% set both = true %}
+{% endif %}
+<tr><th {% if both %}rowspan="2"{% endif %}>termín&nbsp;odevzdání:</th><td>
+        {% if assignment.softDeadline is not null %}
+            {% include "snippets/datetime.html.twig" with {"date": assignment.softDeadline} %}
+        {% endif %}
+{% if both %}</td></tr><tr><td>{% endif %}
+        {% if assignment.hardDeadline is not null %}
+            {% include "snippets/datetime.html.twig" with {"date": assignment.hardDeadline} %} (nepřekročitelný)
+        {% elseif assignment.softDeadline is null %}
+            není nastaven
+        {% endif %}
+</td></tr>
+
