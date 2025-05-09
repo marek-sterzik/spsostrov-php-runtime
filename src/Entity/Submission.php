@@ -77,12 +77,12 @@ class Submission
         return $this;
     }
 
-    public function getState(): string
+    public function getState(): SubmissionState
     {
         return $this->state;
     }
 
-    public function setState(string $state): static
+    public function setState(SubmissionState $state): static
     {
         $this->state = $state;
 

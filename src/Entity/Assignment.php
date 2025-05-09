@@ -379,26 +379,4 @@ class Assignment
     {
         return $this->submissions;
     }
-
-    public function addSubmission(Submission $submission): static
-    {
-        if (!$this->submissions->contains($submission)) {
-            $this->submissions->add($submission);
-            $submission->setAssignment($this);
-        }
-
-        return $this;
-    }
-
-    public function removeSubmission(Submission $submission): static
-    {
-        if ($this->submissions->removeElement($submission)) {
-            // set the owning side to null (unless already changed)
-            if ($submission->getAssignment() === $this) {
-                $submission->setAssignment(null);
-            }
-        }
-
-        return $this;
-    }
 }
