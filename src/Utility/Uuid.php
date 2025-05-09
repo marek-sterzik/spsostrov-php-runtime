@@ -7,20 +7,20 @@ use Ramsey\Uuid\Provider\NodeProviderInterface;
 use Ramsey\Uuid\Uuid as RamseyUuid;
 use Ramsey\Uuid\UuidInterface as RamseyUuidInterface;
 
-class Uuid
+final class Uuid
 {
     /** @var NodeProviderInterface */
     private static $nodeProvider = null;
 
     public static function uuid6(): RamseyUuidInterface
     {
-        return RamseyUuid::uuid6(static::getNodeProvider()->getNode());
+        return RamseyUuid::uuid6(self::getNodeProvider()->getNode());
     }
 
     private static function getNodeProvider(): NodeProviderInterface
     {
-        if (static::$nodeProvider === null) {
-            static::$nodeProvider = new RandomNodeProvider();
+        if (self::$nodeProvider === null) {
+            self::$nodeProvider = new RandomNodeProvider();
         }
         return static::$nodeProvider;
     }

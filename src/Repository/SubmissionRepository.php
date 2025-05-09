@@ -51,6 +51,5 @@ class SubmissionRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult()
         ;
-            
     }
 }
