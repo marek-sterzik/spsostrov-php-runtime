@@ -27,6 +27,7 @@ class StudentsAssignmentsController extends AbstractDbTableController
     #[Route("/submit", name: "submit")]
     public function index(): Response
     {
+        $this->getEntityManager()->getRepository(Assignment::class)->updateStates();
         $this->enableModule("students-assignments");
         return $this->renderTable();
     }
