@@ -15,15 +15,28 @@
                 <a class="btn btn-danger" role="button" href="#">uzavřít a odevzdat</a>
         </div>
     </div>
-    <ul class="list-group mb-3">
+    <table class="submitted-files table table-bordered thin-headings">
         {% for file in files %}
-            <li class="submitted-file-item list-group-item">
+            <tr><td class="submitted-file-item" style="position:relative">
                 <a href="#" class="submitted-file-left bi bi-caret-left-fill text-primary"></a>
                 <a href="#" class="submitted-file-right bi bi-caret-right-fill text-primary"></a>
-                <div class="submitted-file overflow-auto font-monospace text-nowrap">{{ file.filename }}</div>
-            </li>
+                <div class="submitted-file overflow-auto text-nowrap">
+                    <span class="badge rounded-pill bg-secondary submitted-file-size">1.2GB</span>
+                    <span class="font-monospace">{{ file.filename }}</span>
+                </div>
+            </td><td class="text-center" style="width: 5em">
+                <div class="btn-group btn-sm" role="group">
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-file-earmark-binary"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-pencil sm-3"></i> Přejmenovat</a></li>
+                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash sm-3"></i> Smazat</a></li>
+                    </ul>
+                </div>
+            </td></tr>
         {% endfor %}
-    </ul>
+    </table>
     {% endif %}
     
 {% endblock %}

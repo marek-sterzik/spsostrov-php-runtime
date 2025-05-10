@@ -4,7 +4,6 @@ const getMaxScroll = (scroll) => Math.max(scroll[0].scrollWidth - scroll.outerWi
 
 const setScrollStatus = (scroll, left, right) => {
     const maxScroll = getMaxScroll(scroll)
-    console.log(scroll, maxScroll)
     if (scroll.scrollLeft() > 0) {
         left.show()
     } else {

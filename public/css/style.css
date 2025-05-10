@@ -27,7 +27,10 @@ div.student-assignment-actions {text-align: center;}
 
 div.foot {height: 2em;}
 
-.submitted-file {scrollbar-width: none;}
+.submitted-files {table-layout: fixed; width: 100%;}
+.submitted-file-item {vertical-align: middle;}
+.submitted-file-size {width: 5em;}
+.submitted-file {scrollbar-width: none; margin-left: .5em;}
 .submitted-file-left {position: absolute; display: block; left: 0}
 .submitted-file-right {position: absolute; display: block; right: 0}
 
