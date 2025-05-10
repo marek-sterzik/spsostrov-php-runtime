@@ -17,7 +17,11 @@
     </div>
     <ul class="list-group mb-3">
         {% for file in files %}
-            <li class="list-group-item font-monospace">{{ file.filename }}</li>
+            <li class="submitted-file-item list-group-item">
+                <a href="#" class="submitted-file-left bi bi-caret-left-fill text-primary"></a>
+                <a href="#" class="submitted-file-right bi bi-caret-right-fill text-primary"></a>
+                <div class="submitted-file overflow-auto font-monospace text-nowrap">{{ file.filename }}</div>
+            </li>
         {% endfor %}
     </ul>
     {% endif %}

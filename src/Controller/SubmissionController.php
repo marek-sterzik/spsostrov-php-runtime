@@ -31,6 +31,7 @@ class SubmissionController extends AbstractController
     #[Route("/submission/{assignment}", name: 'create-submission')]
     public function index(Assignment $assignment): Response
     {
+        $this->enableModule("upload-files");
         $user = $this->getUserEntity();
         if ($user === null) {
             return $this->redirectBack(true);
