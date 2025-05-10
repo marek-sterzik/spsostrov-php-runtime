@@ -39,7 +39,7 @@ class FileManager
         }
         closedir($dd);
         sort($files);
-        return array_map(fn ($file) => new FileDescriptor($file), $files);
+        return array_map(fn ($file) => new FileDescriptor($submissionDirectory, $file), $files);
     }
 
     public function addFiles(Submission $submission, array $uploadedFiles): self
