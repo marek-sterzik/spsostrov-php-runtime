@@ -16,6 +16,9 @@ class SubmissionDetailController extends AbstractController
     #[Route("/submission/show/{submission}", name: 'submission-detail')]
     public function index(Submission $submission): Response
     {
-        die("submission");
+        if ($this->getUserEntity() !== $submission->getSubmitter()) {
+            return $this->redirectBack(true);
+        }
+        return $this->redirectBack(true);
     }
 }
