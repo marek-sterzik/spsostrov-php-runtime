@@ -3,15 +3,36 @@
 namespace App\FileManager;
 
 use Exception;
+use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Doctrine\ORM\EntityManagerInterface as EntityManager;
 use App\Submission\SubmissionState;
 use App\Entity\Submission;
 use App\Lock\LockManager;
+use App\Job\JobManager;
 
 class FileManager
 {
-    public function __construct(private string $storageDir, private LockManager $lockManager)
+    const MANIFEST_NAME = "_manifest.yaml";
+
+    public function __construct(
+        private string $storageDir,
+        private LockManager $lockManager,
+        private EntityManager $entityManager,
+        private JobManager $jobManager
+    ) {
+    }
+
+    public function putManifest(Submission $submission): self
     {
+        $data = $submission->getManifest();
+        $data = Yaml::dump($data, 3) . "\n";
+        $this->locked($submission, function () use ($submission, $data) {
+            $submissionDirectory = $this->getSubmissionDirectory($submission);
+            $this->ensureDirectoryExists($submissionDirectory);
+            file_put_contents($submissionDirectory . "/" . self::MANIFEST_NAME, $data);
+        });
+        return $this;
     }
 
     public function listFiles(Submission $submission): array
@@ -20,6 +41,13 @@ class FileManager
             return [];
         }
         $submissionDirectory = $this->getSubmissionDirectory($submission);
+        $files = $this->listFilesRaw($submissionDirectory);
+        sort($files);
+        return array_map(fn ($file) => new FileDescriptor($submissionDirectory, $file), $files);
+    }
+
+    private function listFilesRaw(string $submissionDirectory): array
+    {
         if (!is_dir($submissionDirectory)) {
             return [];
         }
@@ -29,7 +57,7 @@ class FileManager
         }
         $files = [];
         while (($file = readdir($dd)) !== false) {
-            if ($file === "." || $file === "..") {
+            if ($file === "." || $file === ".." || $file === self::MANIFEST_NAME) {
                 continue;
             }
             if (!is_file($submissionDirectory . "/" . $file)) {
@@ -38,8 +66,7 @@ class FileManager
             $files[] = $file;
         }
         closedir($dd);
-        sort($files);
-        return array_map(fn ($file) => new FileDescriptor($submissionDirectory, $file), $files);
+        return $files;
     }
 
     public function addFiles(Submission $submission, array $uploadedFiles): self
@@ -70,6 +97,14 @@ class FileManager
                 if (!@unlink($file)) {
                     return 'delete_file_failed';
                 }
+
+                if (empty($this->listFilesRaw($submissionDirectory))) {
+                    $submission->setState(SubmissionState::Trash);
+                    $this->entityManager->flush();
+                    $this->jobManager->invoke("remove_submission", ["id" => $submission->getId()]);
+                }
+
+                return null;
             });
         } else {
             $ret = 'invalid_file_name';
@@ -151,7 +186,7 @@ class FileManager
         if ($filename === "." || $filename === ".." || $filename === "") {
             return false;
         }
-        if ($filename === "_manifest.yaml") {
+        if ($filename === self::MANIFEST_NAME) {
             return false;
         }
         if (is_file($dir . "/" . $filename)) {

@@ -12,6 +12,9 @@ enum SubmissionState: string
 
     #[Description("rozpracované")]
     case Draft = "draft";
+
+    #[Description("zahozeno")]
+    case Trash = "trash";
     
     #[Description("odevzdáno")]
     case Submitted = "submitted";

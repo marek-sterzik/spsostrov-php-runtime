@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -17,6 +18,7 @@ use App\Entity\Submission;
 use App\Entity\User;
 use App\Lock\LockManager;
 use App\FileManager\FileManager;
+use App\Job\JobManager;
 
 class SubmissionController extends AbstractController
 {
@@ -31,7 +33,8 @@ class SubmissionController extends AbstractController
     public function __construct(
         private SubmissionRepository $submissionRepository,
         private LockManager $lockManager,
-        private FileManager $fileManager
+        private FileManager $fileManager,
+        private JobManager $jobManager,
     ) {
     }
 
@@ -85,7 +88,7 @@ class SubmissionController extends AbstractController
         $user = $this->getUserEntity();
         $submission = $this->ensureSubmissionExists($assignment, $user);
         $error = null;
-        if ($submission->getId() !== null) {
+        if ($submission->getId() !== null && $submission->getSubmitter() === $user) {
             $deleteFile = $request->query->get("delete");
             if (is_string($deleteFile)) {
                 $error = $this->fileManager->deleteFile($submission, $deleteFile);
@@ -104,6 +107,26 @@ class SubmissionController extends AbstractController
             $routeParams['err'] = $error;
         }
         return $this->redirectToRoute('create-submission', $routeParams);
+    }
+
+    #[IsGranted('ROLE_STUDENT')]
+    #[Route("/submission/{assignment}/close", name: 'submission-close')]
+    public function closeAction(Assignment $assignment, Request $request): Response
+    {
+        $user = $this->getUserEntity();
+        $submission = $this->ensureSubmissionExists($assignment, $user);
+        if ($submission->getId() === null || $submission->getSubmitter() !== $user) {
+            return $this->redirectToRoute('create-submission', [
+                "assignment" => $assignment->getId(),
+                "_back" => false,
+            ]);
+        }
+        $submission->setSubmittedAt(new DateTimeImmutable());
+        $submission->setState(SubmissionState::Submitted);
+        $this->fileManager->putManifest($submission);
+        $this->getEntityManager()->flush();
+        $this->jobManager->invoke("close_submission", ["id" => $submission->getId()]);
+        return $this->redirectToRoute('submission-detail', ["submission" => $submission->getId(), "_back" => false]);
     }
 
     private function submitFiles(array $files, Submission $submission): void

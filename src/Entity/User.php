@@ -245,4 +245,17 @@ class User
     {
         return in_array($this->getRealRole(), self::ADMIN_ROLES);
     }
+
+    public function getManifest(): array
+    {
+        $manifest = [
+            "id" => $this->getId(),
+            "name" => $this->getName(),
+            "role" => strtolower(preg_replace('/^ROLE_/', '', $this->getRealRole())),
+        ];
+        if ($this->isStudent()) {
+            $manifest['class'] = $this->getRealStudentClass();
+        }
+        return $manifest;
+    }
 }

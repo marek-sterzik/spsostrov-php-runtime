@@ -121,4 +121,16 @@ class Submission
 
         return $this;
     }
+
+    public function getManifest(): array
+    {
+        return [
+            "id" => $this->getId(),
+            "uuid" => $this->getUuid(),
+            "assignment" => $this->getAssignment()->getManifest(),
+            "submitter" => $this->getSubmitter()->getManifest(),
+            "createdAt" => $this->getCreatedAt()?->format("Y-m-d H:i:s"),
+            "submittedAt" => $this->getSubmittedAt()?->format("Y-m-d H:i:s"),
+        ];
+    }
 }

@@ -396,4 +396,22 @@ class Assignment
     {
         return $this->submissions;
     }
+
+    public function getManifest(): array
+    {
+        return [
+            "id" => $this->getId(),
+            "caption" => $this->getCaption(),
+            "classes" => $this->getClasses(),
+            "schoolYear" => $this->getSchoolYear(),
+            "softDeadline" => $this->getSoftDeadline()?->format("Y-m-d H:i:s"),
+            "hardDeadline" => $this->getHardDeadline()?->format("Y-m-d H:i:s"),
+            "owner" => $this->getOwner()->getManifest(),
+            "submissionMode" => $this->getSubmissionMode()->value,
+            "public" => $this->isPublic(),
+            "backedUp" => $this->isBackedUp(),
+            "createdAt" => $this->getCreatedAt()?->format("Y-m-d H:i:s"),
+            "activatedAt" => $this->getActivatedAt()?->format("Y-m-d H:i:s"),
+        ];
+    }
 }

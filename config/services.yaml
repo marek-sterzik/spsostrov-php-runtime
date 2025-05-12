@@ -55,3 +55,6 @@ services:
     App\FileManager\FileManager:
         arguments:
             $storageDir: '%kernel.project_dir%/var/storage'
+    App\Job\JobManager:
+        arguments:
+            $jobDir: '%kernel.project_dir%/var/jobs'

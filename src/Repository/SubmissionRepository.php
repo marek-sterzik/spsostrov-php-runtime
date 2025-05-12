@@ -31,6 +31,8 @@ class SubmissionRepository extends ServiceEntityRepository
             ->setParameter(':assignment', $assignment->getId())
             ->andWhere('s.state != :draft')
             ->setParameter(':draft', SubmissionState::Draft)
+            ->andWhere('s.state != :trash')
+            ->setParameter(':trash', SubmissionState::Trash)
             ->getQuery()
             ->getSingleScalarResult()
         ;
@@ -47,6 +49,8 @@ class SubmissionRepository extends ServiceEntityRepository
             ->andWhere('s.submitter = :submitter')
             ->setParameter(':submitter', $submitter->getId())
             ->addOrderBy('s.id', 'DESC')
+            ->andWhere('s.state != :trash')
+            ->setParameter(':trash', SubmissionState::Trash)
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult()
