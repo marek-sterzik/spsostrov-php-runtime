@@ -53,6 +53,7 @@ const doSelect = (input, from, to) => {
 		input.focus();
 		input.setSelectionRange(from, to);
 	}
+    input.scrollLeft = input.scrollWidth
 }
 
 const createFileSelection = (input) => {
@@ -65,31 +66,40 @@ const createFileSelection = (input) => {
 const finishRename = (input) => {
     const nameFrom = input.attr("data-original-value")
     const nameTo = input.val()
-    alert("mv \"" + nameFrom + "\" \"" + nameTo + "\"")
+    if (nameFrom !== nameTo) {
+        alert("mv \"" + nameFrom + "\" \"" + nameTo + "\"")
+    }
 }
 
-const setupEdit = (cell, enabled) => {
+const setupEdit = (row, enabled) => {
+    const cell = row.find("td.submitted-file-item")
+    const actionCell = row.find("td.submitted-file-actions")
     const showWidget = cell.find(".submitted-file-show")
     const editWidget = cell.find(".submitted-file-edit")
+    const showActionWidget = actionCell.find(".submitted-file-show")
+    const editActionWidget = actionCell.find(".submitted-file-edit")
     const table = cell.selectParent("table")
     const prevEnabled = !editWidget.is(":hidden")
+    const inputWidget = editWidget.find("input")
     if (enabled === "toggle") {
         enabled = !prevEnabled
     }
     if (enabled) {
+        inputWidget.val(inputWidget.attr("data-original-value"))
         showWidget.hide()
+        showActionWidget.hide()
         editWidget.show()
+        editActionWidget.show()
         if (!prevEnabled) {
-            const inputWidget = editWidget.find("input")
             createFileSelection(inputWidget)
             inputWidget.focus()
         }
         table.find(".submitted-file-actions-button").addClass("disabled")
     } else {
-        const inputWidget = editWidget.find("input")
-        inputWidget.val(inputWidget.attr("data-original-value"))
         showWidget.show()
+        showActionWidget.show()
         editWidget.hide()
+        editActionWidget.hide()
         table.find(".submitted-file-actions-button").removeClass("disabled")
     }
 }
@@ -103,20 +113,30 @@ $(() => {
         enableScrollFeature(scrollElement, leftArrow, rightArrow)
     })
     $(".submitted-file-do-edit").bind("click", function (ev) {
-        setupEdit($(this).selectParent("tr").find("td.submitted-file-item"), true)
+        setupEdit($(this).selectParent("tr"), true)
         $(this).selectParent("div.btn-group").find(".show").removeClass("show")
         ev.preventDefault()
         return false
     })
 
+    $("button.finish-rename").bind("click", function () {
+        const row = $(this).selectParent("tr")
+        setupEdit(row, false)
+        finishRename(row.find(".submitted-file-edit input"))
+    })
+
+    $("button.cancel-rename").bind("click", function () {
+        setupEdit($(this).selectParent("tr"), false)
+    })
+
     $(".submitted-file-edit input").bind("keydown", function (ev) {
         const keycode = (ev.keyCode ? ev.keyCode : ev.which)
         if (ev.key == "Escape") {
-            setupEdit($(this).selectParent("tr").find("td.submitted-file-item"), false)
+            setupEdit($(this).selectParent("tr"), false)
             ev.preventDefault()
             return false
         } else if (keycode == 13) {
-            setupEdit($(this).selectParent("tr").find("td.submitted-file-item"), false)
+            setupEdit($(this).selectParent("tr"), false)
             finishRename($(this))
             ev.preventDefault()
             return false

@@ -30,7 +30,7 @@ div.foot {height: 2em;}
 .submitted-files {table-layout: fixed; width: 100%;}
 .submitted-file-item {vertical-align: middle; position: relative;}
 .submitted-file-size {width: 5em;}
-.submitted-file-actions {width: 5em;}
+.submitted-file-actions {width: 5.5em; vertical-align: middle;}
 .submitted-file {scrollbar-width: none; margin-left: .5em;}
 .submitted-file-left {position: absolute; display: block; left: 0}
 .submitted-file-right {position: absolute; display: block; right: 0}
