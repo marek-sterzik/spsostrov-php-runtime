@@ -5,7 +5,7 @@ module.exports = {
   mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
   output: {
     path: path.resolve(__dirname, 'public/js'),
-    filename: 'bundle.js'
+    filename: 'main.js'
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx']
