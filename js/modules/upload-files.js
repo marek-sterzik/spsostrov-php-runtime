@@ -62,6 +62,12 @@ const createFileSelection = (input) => {
     doSelect(input, 0, len)
 }
 
+const finishRename = (input) => {
+    const nameFrom = input.attr("data-original-value")
+    const nameTo = input.val()
+    alert("mv \"" + nameFrom + "\" \"" + nameTo + "\"")
+}
+
 const setupEdit = (cell, enabled) => {
     const showWidget = cell.find(".submitted-file-show")
     const editWidget = cell.find(".submitted-file-edit")
@@ -75,8 +81,8 @@ const setupEdit = (cell, enabled) => {
         editWidget.show()
         if (!prevEnabled) {
             const inputWidget = editWidget.find("input")
-            inputWidget.focus()
             createFileSelection(inputWidget)
+            inputWidget.focus()
         }
         table.find(".submitted-file-actions-button").addClass("disabled")
     } else {
@@ -104,8 +110,14 @@ $(() => {
     })
 
     $(".submitted-file-edit input").bind("keydown", function (ev) {
+        const keycode = (ev.keyCode ? ev.keyCode : ev.which)
         if (ev.key == "Escape") {
             setupEdit($(this).selectParent("tr").find("td.submitted-file-item"), false)
+            ev.preventDefault()
+            return false
+        } else if (keycode == 13) {
+            setupEdit($(this).selectParent("tr").find("td.submitted-file-item"), false)
+            finishRename($(this))
             ev.preventDefault()
             return false
         }
