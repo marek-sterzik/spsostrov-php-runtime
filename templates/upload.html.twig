@@ -17,20 +17,26 @@
     </div>
     <table class="submitted-files table table-bordered thin-headings">
         {% for file in files %}
-            <tr><td class="submitted-file-item" style="position:relative">
-                <a href="#" class="submitted-file-left bi bi-caret-left-fill text-primary"></a>
-                <a href="#" class="submitted-file-right bi bi-caret-right-fill text-primary"></a>
-                <div class="submitted-file overflow-auto text-nowrap">
-                    <span class="badge rounded-pill bg-secondary submitted-file-size">{{ file.byteCountFormatted }}</span>
-                    <span class="font-monospace">{{ file.filename }}</span>
+            <tr><td class="submitted-file-item">
+                <div class="submitted-file-show">
+                    <a href="#" class="submitted-file-left bi bi-caret-left-fill text-primary"></a>
+                    <a href="#" class="submitted-file-right bi bi-caret-right-fill text-primary"></a>
+                    <div class="submitted-file overflow-auto text-nowrap">
+                        <span class="badge rounded-pill bg-secondary submitted-file-size">{{ file.byteCountFormatted }}</span>
+                        <span class="font-monospace">{{ file.filename }}</span>
+                    </div>
                 </div>
-            </td><td class="text-center" style="width: 5em">
+                <div class="submitted-file-edit">
+                    <input type="text" class="form-control font-monospace" value="{{ file.filename }}" data-original-value="{{ file.filename }}">
+                </div>
+            </td><td class="text-center submitted-file-actions">
                 <div class="btn-group btn-sm" role="group">
-                    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <button type="button" class="btn btn-primary dropdown-toggle submitted-file-actions-button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-file-earmark-binary"></i>
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-pencil sm-3"></i> Přejmenovat</a></li>
+                        <li><a class="dropdown-item submitted-file-do-edit" href="#"><i class="bi bi-pencil sm-3"></i> Přejmenovat</a></li>
+                        <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash sm-3"></i> Smazat</a></li>
                     </ul>
                 </div>
