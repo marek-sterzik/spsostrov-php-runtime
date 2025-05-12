@@ -2,6 +2,8 @@
   "dependencies": {
     "@babel/core": "^7.15.5",
     "@babel/preset-env": "^7.15.6",
+    "@babel/preset-react": "^7.27.1",
+    "@babel/preset-typescript": "^7.27.1",
     "babel-loader": "^8.2.2",
     "jquery": "^3.6.0",
     "webpack": "^5.57.1",
