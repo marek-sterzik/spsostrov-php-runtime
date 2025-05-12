@@ -27,7 +27,7 @@ class JobStarter
 
     private function invokeConsoleCommandForJob(Job $job)
     {
-        $command = escapeshellcmd($this->consoleCommand) . " " .
+        $command = escapeshellcmd('nohup') . " " . escapeshellarg($this->consoleCommand) . " " .
             escapeshellarg("job:run") . " "  . escapeshellarg($job->uuid());
         system($command . " > /dev/null 2>&1 &");
     }

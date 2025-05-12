@@ -2,6 +2,8 @@
 
 namespace App\FileManager;
 
+use RecursiveIteratorIterator;
+use RecursiveDirectoryIterator;
 use Exception;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -141,6 +143,37 @@ class FileManager
         return $ret;
     }
 
+    public function cleanup(Submission $submission): self
+    {
+        $this->locked($submission, function () use ($submission) {
+            $submissionDirectory = $this->getSubmissionDirectory($submission);
+            $this->rmRf($submissionDirectory);
+            foreach ($this->getParentDirectories($submission) as $dir) {
+                @rmdir($dir);
+            }
+        });
+        return $this;
+    }
+
+    private function rmRf(string $directory): self
+    {
+        $files = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($directory, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::CHILD_FIRST
+        );
+
+        foreach ($files as $fileinfo) {
+            if ($fileinfo->isDir()) {
+                @rmdir($fileinfo->getRealPath());
+            } else {
+                @unlink($fileinfo->getRealPath());
+            }
+        }
+        @rmdir($directory);
+
+        return $this;
+    }
+
     private function canonizeFilename(string $filename): ?string
     {
         $filename = basename($filename);
@@ -209,10 +242,28 @@ class FileManager
 
     private function getSubmissionDirectory(Submission $submission): string
     {
-        $assignmentId = $submission->getAssignment()->getId();
-        $userId = $submission->getSubmitter()->getId();
         $submissionId = $submission->getUuid();
-        return sprintf("%s/%d/%d/%s", $this->storageDir, $assignmentId, $userId, $submissionId);
+        return sprintf("%s/%s", $this->getSubmissionUserDirectory($submission), $submissionId);
+    }
+
+    private function getSubmissionUserDirectory(Submission $submission): string
+    {
+        $userId = $submission->getSubmitter()->getId();
+        return sprintf("%s/%d", $this->getAssignmentDirectory($submission), $userId);
+    }
+
+    private function getAssignmentDirectory(Submission $submission): string
+    {
+        $assignmentId = $submission->getAssignment()->getId();
+        return sprintf("%s/%d", $this->storageDir, $assignmentId);
+    }
+
+    private function getParentDirectories(Submission $submission): array
+    {
+        return [
+            $this->getSubmissionUserDirectory($submission),
+            $this->getAssignmentDirectory($submission),
+        ];
     }
 
     private function ensureDirectoryExists(string $directory): void
