@@ -57,9 +57,36 @@ class FileManager
         return $this;
     }
 
+    public function deleteFile(Submission $submission, string $filename): self
+    {
+        if ($submission->getState() !== SubmissionState::Draft) {
+            throw new Exception("Files can be uploaded only to submission drafts");
+        }
+        $filename = $this->canonizeFilename($filename);
+        if ($filename !== null) {
+            $this->locked($submission, function () use ($submission, $filename) {
+                $submissionDirectory = $this->getSubmissionDirectory($submission);
+                $file = $submissionDirectory . "/" . $filename;
+                @unlink($file);
+            });
+        }
+        return $this;
+    }
+
+    private function canonizeFilename(string $filename): ?string
+    {
+        $filename = basename($filename);
+        $filename = preg_replace('/[[:cntrl:]]/', '', $filename);
+        if ($filename === "" || $filename === "." || $filename === "..") {
+            return null;
+        }
+        return $filename;
+    }
+
     private function uploadFile(string $dir, UploadedFile $uploadedFile): void
     {
-        $uploadedFile->move($dir, $uploadedFile->getClientOriginalName());
+        $filename = $this->canonizeFilename($uploadedFile->getClientOriginalName()) ?? "uploaded_file";
+        $uploadedFile->move($dir, $filename);
     }
 
     private function locked(Submission $submission, callable $innerFunction): mixed

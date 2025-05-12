@@ -50,13 +50,29 @@ class SubmissionController extends AbstractController
             })
             ->caption("Nahrát soubory")
             ->useTemplate("upload.html.twig", [
-                "files" => $this->fileManager->listFiles($submission)
+                "files" => $this->fileManager->listFiles($submission),
+                "assignment" => $assignment,
             ])
             ->handle()
             ;
         } finally {
             $this->lockManager->unlock($lock);
         }
+    }
+
+    #[IsGranted('ROLE_STUDENT')]
+    #[Route("/submission/{assignment}/files", name: 'submission-file-action')]
+    public function fileAction(Assignment $assignment, Request $request): Response
+    {
+        $user = $this->getUserEntity();
+        $submission = $this->ensureSubmissionExists($assignment, $user);
+        if ($submission->getId() !== null) {
+            $deleteFile = $request->query->get("delete");
+            if (is_string($deleteFile)) {
+                $this->fileManager->deleteFile($submission, $deleteFile);
+            }
+        }
+        return $this->redirectToRoute('create-submission', ["assignment" => $assignment->getId(), "_back" => false]);
     }
 
     private function submitFiles(array $files, Submission $submission): void
