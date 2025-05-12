@@ -73,6 +73,26 @@ class FileManager
         return $this;
     }
 
+    public function moveFile(Submission $submission, string $fileFrom, string $fileTo): self
+    {
+        if ($submission->getState() !== SubmissionState::Draft) {
+            throw new Exception("Files can be uploaded only to submission drafts");
+        }
+        $fileFrom = $this->canonizeFilename($fileFrom);
+        $fileTo = $this->canonizeFilename($fileTo);
+        if ($fileFrom !== null && $fileTo !== null) {
+            $this->locked($submission, function () use ($submission, $fileFrom, $fileTo) {
+                $submissionDirectory = $this->getSubmissionDirectory($submission);
+                $fileFrom = $submissionDirectory . "/" . $fileFrom;
+                $fileTo = $submissionDirectory . "/" . $fileTo;
+                if (is_file($fileFrom) && !is_file($fileTo)) {
+                    @rename($fileFrom, $fileTo);
+                }
+            });
+        }
+        return $this;
+    }
+
     private function canonizeFilename(string $filename): ?string
     {
         $filename = basename($filename);

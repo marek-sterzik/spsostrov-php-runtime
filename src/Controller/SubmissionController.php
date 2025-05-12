@@ -71,6 +71,11 @@ class SubmissionController extends AbstractController
             if (is_string($deleteFile)) {
                 $this->fileManager->deleteFile($submission, $deleteFile);
             }
+            $mvFrom = $request->query->get("mvfrom");
+            $mvTo = $request->query->get("mvto");
+            if (is_string($mvFrom) && is_string($mvTo)) {
+                $this->fileManager->moveFile($submission, $mvFrom, $mvTo);
+            }
         }
         return $this->redirectToRoute('create-submission', ["assignment" => $assignment->getId(), "_back" => false]);
     }

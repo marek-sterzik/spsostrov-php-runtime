@@ -66,8 +66,11 @@ const createFileSelection = (input) => {
 const finishRename = (input) => {
     const nameFrom = input.attr("data-original-value")
     const nameTo = input.val()
+    const fileActionUrl = $("table.submitted-files").attr("data-file-action-url")
     if (nameFrom !== nameTo) {
-        alert("mv \"" + nameFrom + "\" \"" + nameTo + "\"")
+        const params = "mvfrom=" + encodeURIComponent(nameFrom) + "&mvto=" + encodeURIComponent(nameTo)
+        const url = fileActionUrl + (fileActionUrl.includes("?") ? "&" : "?") + params
+        window.location = url
     }
 }
 
