@@ -85,7 +85,7 @@ class FileManager
     private function ensureDirectoryExists(string $directory): void
     {
         if (!is_dir($directory)) {
-            @mkdir($directory, 0777, true);
+            @mkdir($directory, 0755, true);
             if (!is_dir($directory)) {
                 throw new Exception("Cannot create directory: $directory");
             }
