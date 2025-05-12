@@ -288,7 +288,7 @@ class Assignment
     public function isStudentDeadlineNear(): bool
     {
         $studentDeadline = $this->getStudentDeadline();
-        return ($studentDeadline !== null) ? ($studentDeadline >= new DateTimeImmutable("-10 minutes")) : false;
+        return ($studentDeadline !== null) ? ($studentDeadline <= new DateTimeImmutable("+10 minutes")) : false;
     }
 
     public function getCreatedAt(): DateTimeImmutable
