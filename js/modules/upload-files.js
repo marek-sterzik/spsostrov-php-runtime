@@ -80,6 +80,8 @@ const setupEdit = (cell, enabled) => {
         }
         table.find(".submitted-file-actions-button").addClass("disabled")
     } else {
+        const inputWidget = editWidget.find("input")
+        inputWidget.val(inputWidget.attr("data-original-value"))
         showWidget.show()
         editWidget.hide()
         table.find(".submitted-file-actions-button").removeClass("disabled")
