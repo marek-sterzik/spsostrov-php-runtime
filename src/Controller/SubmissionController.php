@@ -20,6 +20,14 @@ use App\FileManager\FileManager;
 
 class SubmissionController extends AbstractController
 {
+    const ERRORS = [
+        "submission_is_closed" => "Odevzdání už je uzavřeno a nelze jej měnit.",
+        "delete_file_failed" => "Nelze smazat soubor.",
+        "invlid_file_name" => "Neplatný název souboru.",
+        "moved_file_does_not_exist" => "Přejmenovávaný soubor neexistuje.",
+        "destination_file_already_exist" => "Cílovy soubor už existuje.",
+        "move_file_failed" => "Nelze přejmenovat soubor.",
+    ];
     public function __construct(
         private SubmissionRepository $submissionRepository,
         private LockManager $lockManager,
@@ -29,8 +37,16 @@ class SubmissionController extends AbstractController
 
     #[IsGranted('ROLE_STUDENT')]
     #[Route("/submission/{assignment}", name: 'create-submission')]
-    public function index(Assignment $assignment): Response
+    public function index(Assignment $assignment, Request $request): Response
     {
+        $error = $request->query->get('err');
+        if (!is_string($error)) {
+            $error = null;
+        }
+        $errorMessage = null;
+        if ($error !== null) {
+            $errorMessage = self::ERRORS[$error] ?? sprintf("Nastala neznámá chyba: %s.",  $error);
+        }
         $this->enableModule("upload-files");
         $user = $this->getUserEntity();
         if ($user === null) {
@@ -52,6 +68,8 @@ class SubmissionController extends AbstractController
             ->useTemplate("upload.html.twig", [
                 "files" => $this->fileManager->listFiles($submission),
                 "assignment" => $assignment,
+                "errorCode" => $error,
+                "errorMessage" => $errorMessage,
             ])
             ->handle()
             ;
@@ -66,18 +84,26 @@ class SubmissionController extends AbstractController
     {
         $user = $this->getUserEntity();
         $submission = $this->ensureSubmissionExists($assignment, $user);
+        $error = null;
         if ($submission->getId() !== null) {
             $deleteFile = $request->query->get("delete");
             if (is_string($deleteFile)) {
-                $this->fileManager->deleteFile($submission, $deleteFile);
+                $error = $this->fileManager->deleteFile($submission, $deleteFile);
             }
             $mvFrom = $request->query->get("mvfrom");
             $mvTo = $request->query->get("mvto");
             if (is_string($mvFrom) && is_string($mvTo)) {
-                $this->fileManager->moveFile($submission, $mvFrom, $mvTo);
+                $error = $this->fileManager->moveFile($submission, $mvFrom, $mvTo);
             }
         }
-        return $this->redirectToRoute('create-submission', ["assignment" => $assignment->getId(), "_back" => false]);
+        $routeParams = [
+            "assignment" => $assignment->getId(),
+            "_back" => false,
+        ];
+        if ($error) {
+            $routeParams['err'] = $error;
+        }
+        return $this->redirectToRoute('create-submission', $routeParams);
     }
 
     private function submitFiles(array $files, Submission $submission): void

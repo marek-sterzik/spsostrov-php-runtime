@@ -57,40 +57,53 @@ class FileManager
         return $this;
     }
 
-    public function deleteFile(Submission $submission, string $filename): self
+    public function deleteFile(Submission $submission, string $filename): ?string
     {
         if ($submission->getState() !== SubmissionState::Draft) {
-            throw new Exception("Files can be uploaded only to submission drafts");
+            return 'submission_is_closed';
         }
         $filename = $this->canonizeFilename($filename);
         if ($filename !== null) {
-            $this->locked($submission, function () use ($submission, $filename) {
+            $ret = $this->locked($submission, function () use ($submission, $filename) {
                 $submissionDirectory = $this->getSubmissionDirectory($submission);
                 $file = $submissionDirectory . "/" . $filename;
-                @unlink($file);
+                if (!@unlink($file)) {
+                    return 'delete_file_failed';
+                }
             });
+        } else {
+            $ret = 'invalid_file_name';
         }
-        return $this;
+        return $ret;
     }
 
-    public function moveFile(Submission $submission, string $fileFrom, string $fileTo): self
+    public function moveFile(Submission $submission, string $fileFrom, string $fileTo): ?string
     {
         if ($submission->getState() !== SubmissionState::Draft) {
-            throw new Exception("Files can be uploaded only to submission drafts");
+            return 'submission_is_closed';
         }
         $fileFrom = $this->canonizeFilename($fileFrom);
         $fileTo = $this->canonizeFilename($fileTo);
         if ($fileFrom !== null && $fileTo !== null) {
-            $this->locked($submission, function () use ($submission, $fileFrom, $fileTo) {
+            $ret = $this->locked($submission, function () use ($submission, $fileFrom, $fileTo) {
                 $submissionDirectory = $this->getSubmissionDirectory($submission);
-                $fileFrom = $submissionDirectory . "/" . $fileFrom;
-                $fileTo = $submissionDirectory . "/" . $fileTo;
-                if (is_file($fileFrom) && !is_file($fileTo)) {
-                    @rename($fileFrom, $fileTo);
+                $fullFileFrom = $submissionDirectory . "/" . $fileFrom;
+                $fullFileTo = $submissionDirectory . "/" . $fileTo;
+                if (!is_file($fullFileFrom)) {
+                    return 'moved_file_does_not_exist';
                 }
+                if (!$this->filenameIsFree($submissionDirectory, $fileTo)) {
+                    return 'destination_file_already_exist';
+                }
+                if (!@rename($fullFileFrom, $fullFileTo)) {
+                    return 'move_file_failed';
+                }
+                return null;
             });
+        } else {
+            $ret = 'invalid_file_name';
         }
-        return $this;
+        return $ret;
     }
 
     private function canonizeFilename(string $filename): ?string
@@ -106,7 +119,45 @@ class FileManager
     private function uploadFile(string $dir, UploadedFile $uploadedFile): void
     {
         $filename = $this->canonizeFilename($uploadedFile->getClientOriginalName()) ?? "uploaded_file";
+        $filename = $this->findFreeFilename($dir, $filename);
         $uploadedFile->move($dir, $filename);
+    }
+
+    private function findFreeFilename(string $dir, string $filename): string
+    {
+        $extension = '';
+        if (preg_match('/(\.[a-zA-Z0-9]{1,6})+$/', $filename, $matches)) {
+            $extension = $matches[0];
+            $filename = substr($filename, 0, strlen($filename) - strlen($extension));
+        }
+        $num = 0;
+        if (preg_match('/-([1-9][0-9]*)$/', $filename, $matches)) {
+            $num = (int)$matches[1];
+            if (((string)$num) === $matches[1]) {
+                $filename = substr($filename, strlen($filename) - strlen($matches[0]));
+            } else {
+                $num = 0;
+            }
+        }
+        do {
+            $finalFilename = sprintf("%s%s%s", $filename, ($num === 0) ? '' : ("-" . $num), $extension);
+            $num++;
+        } while (!$this->filenameIsFree($dir, $finalFilename));
+        return $finalFilename;
+    }
+
+    private function filenameIsFree(string $dir, string $filename): bool
+    {
+        if ($filename === "." || $filename === ".." || $filename === "") {
+            return false;
+        }
+        if ($filename === "_manifest.yaml") {
+            return false;
+        }
+        if (is_file($dir . "/" . $filename)) {
+            return false;
+        }
+        return true;
     }
 
     private function locked(Submission $submission, callable $innerFunction): mixed

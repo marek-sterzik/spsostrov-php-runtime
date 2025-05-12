@@ -78,8 +78,8 @@ class AssignmentsController extends AbstractDbTableController
         return [
             "caption" => "název",
             "studentClass" => "třídy",
-            "type" => "typ",
             "state" => "stav",
+            "type" => "typ",
             "owner" => "vlastník",
             "createdAt" => "vytvořeno",
             "submitted" => "odevzdáno",

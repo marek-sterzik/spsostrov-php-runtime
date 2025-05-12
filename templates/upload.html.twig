@@ -18,7 +18,10 @@
     <table class="submitted-files table table-bordered thin-headings" data-file-action-url="{{ path("submission-file-action", {
         "_back": false,
         "assignment": assignment.id
-    }) }}">
+    }) }}" data-reload-url="{{ path("create-submission", {
+        "_back": false,
+        "assignment": assignment.id 
+    })}}"{% if errorMessage is not null %} data-file-error-message="{{ errorMessage }}"{% endif %}>
         {% for file in files %}
             <tr><td class="submitted-file-item">
                 <div class="submitted-file-show">

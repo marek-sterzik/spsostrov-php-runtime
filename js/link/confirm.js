@@ -7,7 +7,7 @@ const modal = `
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title"></h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <p></p>
@@ -24,20 +24,30 @@ const modal = `
 
 var modalElement = null
 
+const triggerAction = (action) => {
+    if (typeof action === "function") {
+        action()
+    } else {
+        window.location = action
+    }
+}
+
 const getModal = () => {
     if (modalElement === null) {
         modalElement = $(modal)
         const modalElementConst = modalElement
         $('body').append(modalElement)
-        const actionHandler = function () {
-            const action = $(this).attr("data-action")
+        const actionHandler = (actionField) => function () {
+            const action = modalElement.data("config")[actionField]
             if (action !== null && action !== undefined) {
-                window.location = action
+                triggerAction(action)
             }
             modalElementConst.modal("hide")
         }
-        modalElement.find("button.confirm").bind("click", actionHandler)
-        modalElement.find("button.third").bind("click", actionHandler)
+        modalElement.find("button.confirm").bind("click", actionHandler("action"))
+        modalElement.find("button.third").bind("click", actionHandler("thirdAction"))
+        modalElement.find("button.cancel").bind("click", actionHandler("cancelAction"))
+        modalElement.find("button.btn-close").bind("click", actionHandler("cancelAction"))
     }
     return modalElement
 }
@@ -68,6 +78,7 @@ const setButtonType = (button, type) => {
 
 const showModalConfirm = (config) => {
     const modal = getModal()
+    modal.data("config", config)
     const body = modal.find("div.modal-body")
     body.html("")
     for (var message of config.message.split(/\n/)) {
@@ -84,12 +95,15 @@ const showModalConfirm = (config) => {
     const thirdButton = modal.find("button.third")
     setButtonType(confirmButton, config.confirmType)
     confirmButton.text(config.confirmText)
-    cancelButton.text(config.cancelText)
-    confirmButton.attr("data-action", config.action)
+    if (config.cancelText) {
+        cancelButton.text(config.cancelText)
+        cancelButton.show()
+    } else {
+        cancelButton.hide()
+    }
     if (config.thirdText && config.thirdAction) {
         thirdButton.show()
         thirdButton.text(config.thirdText)
-        thirdButton.attr("data-action", config.thirdAction)
         setButtonType(thirdButton, config.thirdType)
     } else {
         thirdButton.hide()
@@ -107,9 +121,29 @@ const getConfigFromElement = (element) => {
     const action = element.attr("href")
     const confirmText = element.attr("data-confirm-confirm-label") || "potvrdit"
     const cancelText = element.attr("data-confirm-cancel-label") || "zrušit"
+    const cancelAction = null
     const thirdText = element.attr("data-confirm-third-label")
     const thirdAction = element.attr("data-confirm-third-action")
-    return {message, title, danger, action, confirmText, cancelText, thirdText, thirdAction, confirmType, thirdType}
+    return {message, title, danger, action, confirmText, cancelText, cancelAction, thirdText, thirdAction, confirmType, thirdType}
+}
+
+const alertBox = (message, title = undefined) => {
+    return new Promise((resolve) => {
+        const config = {
+            message: message,
+            title: title || "",
+            danger: false,
+            thirtType: "primary",
+            confirmType: "primary",
+            action: () => resolve(),
+            cancelAction: () => resolve(),
+            confirmText: "ok",
+            cancelText: undefined,
+            thirdText: undefined,
+            thirdAction: undefined,
+        }
+        showModalConfirm(config)
+    })
 }
 
 $(() => {
@@ -122,3 +156,4 @@ $(() => {
     })
 })
 
+export {alertBox}

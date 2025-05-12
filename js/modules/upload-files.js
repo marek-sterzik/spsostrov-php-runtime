@@ -1,4 +1,5 @@
 import $ from "jquery"
+import {alertBox} from "../link/confirm.js"
 
 const getMaxScroll = (scroll) => Math.max(scroll[0].scrollWidth - scroll.outerWidth(), 0)
 
@@ -145,4 +146,12 @@ $(() => {
             return false
         }
     })
+
+    const errorMessage = $("table.submitted-files").attr("data-file-error-message")
+    if (errorMessage) {
+        const reloadUrl = $("table.submitted-files").attr("data-reload-url")
+        alertBox(errorMessage, "Chyba").then(() => {
+            window.location = reloadUrl
+        })
+    }
 })
