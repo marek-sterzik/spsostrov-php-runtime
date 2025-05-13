@@ -13,7 +13,7 @@ class ZipOperations
     {
     }
 
-    public function pack(Submission $submission)
+    public function pack(Submission $submission): self
     {
         $tmpZip = $this->fileOperations->getSubmissionZipArchive($submission, true);
         $finalZip = $this->fileOperations->getSubmissionZipArchive($submission, false);
@@ -37,6 +37,7 @@ class ZipOperations
         }
 
         $this->fileOperations->cleanup($submission);
+        return $this;
     }
 
     public function listFiles(Submission $submission): ?array
