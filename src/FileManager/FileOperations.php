@@ -27,9 +27,12 @@ class FileOperations
         return $this;
     }
 
-    public function getSubmissionZipArchive(Submission $submission, bool $temporary = false): string
-    {
-        $dir = $this->getSubmissionDirectory($submission);
+    public function getSubmissionZipArchive(
+        Submission $submission,
+        bool $temporary = false,
+        bool $relative = false
+    ): string {
+        $dir = $this->getSubmissionDirectory($submission, $relative);
         return sprintf("%s%s", $dir, $temporary ? '.tmp.zip' : '.zip');
     }
 
@@ -224,30 +227,30 @@ class FileOperations
         return true;
     }
 
-    private function getSubmissionUserDirectory(Submission $submission): string
+    private function getSubmissionUserDirectory(Submission $submission, bool $relative = false): string
     {
         $userId = $submission->getSubmitter()->getId();
-        return sprintf("%s/%d", $this->getAssignmentDirectory($submission), $userId);
+        return sprintf("%s/%d", $this->getAssignmentDirectory($submission, $relative), $userId);
     }
 
-    private function getAssignmentDirectory(Submission $submission): string
+    private function getAssignmentDirectory(Submission $submission, bool $relative = false): string
     {
         $assignmentId = $submission->getAssignment()->getId();
-        return sprintf("%s/%d", $this->storageDir, $assignmentId);
+        return $relative ? ((string)$assignmentId) : sprintf("%s/%d", $this->storageDir, $assignmentId);
     }
 
-    private function getParentDirectories(Submission $submission): array
+    private function getParentDirectories(Submission $submission, bool $relative = false): array
     {
         return [
-            $this->getSubmissionUserDirectory($submission),
-            $this->getAssignmentDirectory($submission),
+            $this->getSubmissionUserDirectory($submission, $relative),
+            $this->getAssignmentDirectory($submission, $relative),
         ];
     }
 
-    private function getSubmissionDirectory(Submission $submission): string
+    private function getSubmissionDirectory(Submission $submission, bool $relative = false): string
     {
         $submissionId = $submission->getUuid();
-        return sprintf("%s/%s", $this->getSubmissionUserDirectory($submission), $submissionId);
+        return sprintf("%s/%s", $this->getSubmissionUserDirectory($submission, $relative), $submissionId);
     }
 
     private function ensureDirectoryExists(string $directory): void

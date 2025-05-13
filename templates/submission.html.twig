@@ -3,19 +3,31 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-6 col-12">
-                <h3>Odevzdání</h3>
-                <table class="submitted-files table table-bordered thin-headings">
-                    {% for file in files %}
-                        <tr><td class="submitted-file-item hscroll">
-                            <div class="submitted-file-show">
-                                <div class="submitted-file text-nowrap">
-                                    <span class="badge rounded-pill bg-secondary submitted-file-size">{{ file.byteCountFormatted }}</span>
-                                    <span class="font-monospace">{{ file.filename }}</span>
+                <h3>{{ heading }}</h3>
+                {% if files is not empty %}
+                    <table class="submitted-files table table-bordered thin-headings">
+                        {% for file in files %}
+                            <tr><td class="submitted-file-item hscroll">
+                                <div class="submitted-file-show">
+                                    <div class="submitted-file text-nowrap">
+                                        <span class="badge rounded-pill bg-secondary submitted-file-size">{{ file.byteCountFormatted }}</span>
+                                        <span class="font-monospace">{{ file.filename }}</span>
+                                    </div>
                                 </div>
-                            </div>
-                        </td></tr>
-                    {% endfor %}
-                </table>
+                            </td></tr>
+                        {% endfor %}
+                    </table>
+                {% else %}
+                    <div class="alert alert-warning" role="alert">
+                        <strong>Varování:</strong> Soubory z tohoto odevzdání chybí. Patrně byly vymazány z hlavního uložiště.
+                        {% if submission.state.isSynced() %}
+                            Data ale mohou být uložena na záložním uložišti. Kontaktujte prosím správce aplikace, pokud potřebujete data
+                            přesto získat.
+                        {% else %}
+                            Data přitom nejsou uložena na záložním uložišti, proto již není možné je získat skrze tuto aplikaci.
+                        {% endif %}
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>

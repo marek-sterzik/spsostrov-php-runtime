@@ -24,4 +24,15 @@ enum SubmissionState: string
     
     #[Description("synchronizováno")]
     case Synced = "synced";
+    
+    #[Description("nesynchronizováno")]
+    case NotSynced = "not_synced";
+    
+    public function isSynced(): bool
+    {
+        return match ($this) {
+            self::Synced => true,
+            default => false
+        };
+    }
 }

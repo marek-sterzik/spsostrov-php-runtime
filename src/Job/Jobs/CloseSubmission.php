@@ -24,10 +24,22 @@ class CloseSubmission extends AbstractJob
     public function run(array $arguments): void
     {
         $submission = $this->submissionRepository->find($arguments['id']);
-        if ($submission !== null && $submission->getState() === SubmissionState::Submitted) {
-            $this->fileManager->pack($submission);
-            $submission->setState(SubmissionState::Packed);
-            $this->entityManager->flush();
+        if ($submission !== null) {
+            if ($submission->getState() === SubmissionState::Submitted) {
+                $this->fileManager->pack($submission);
+                $submission->setState(SubmissionState::Packed);
+                $this->entityManager->flush();
+            }
+            if ($submission->getState() === SubmissionState::Packed) {
+                if ($submission->getAssignment()->isBackedUp()) {
+                    $newState = SubmissionState::Synced;
+                    $this->fileManager->backUpSubmission($submission);
+                } else {
+                    $newState = SubmissionState::NotSynced;
+                }
+                $submission->setState($newState);
+                $this->entityManager->flush();
+            }
         }
     }
 }

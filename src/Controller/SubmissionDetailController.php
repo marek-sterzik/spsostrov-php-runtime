@@ -27,6 +27,7 @@ class SubmissionDetailController extends AbstractController
         return $this->render("submission.html.twig", [
             "submission" => $submission,
             "files" => $this->fileManager->listFiles($submission),
+            "heading" => "Odevzdání dokončeno"
         ]);
     }
 }

@@ -15,7 +15,8 @@ class FileManager
         private EntityManager $entityManager,
         private JobManager $jobManager,
         private FileOperations $fileOperations,
-        private ZipOperations $zipOperations
+        private ZipOperations $zipOperations,
+        private BackupOperations $backupOperations
     ) {
     }
 
@@ -32,6 +33,14 @@ class FileManager
         return $this->locked($submission, function () use ($submission) {
             return $this->zipOperations->listFiles($submission) ?? $this->fileOperations->listFiles($submission);
         }, false);
+    }
+
+    public function backupSubmission(Submission $submission): self
+    {
+        return $this->locked($submission, function () use ($submission) {
+            $this->backupOperations->backupSubmission($submission);
+        }, false);
+        return $this;
     }
 
     public function addFiles(Submission $submission, array $uploadedFiles): self
