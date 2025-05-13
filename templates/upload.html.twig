@@ -24,9 +24,7 @@
     })}}"{% if errorMessage is not null %} data-file-error-message="{{ errorMessage }}"{% endif %}>
         {% for file in files %}
             <tr><td class="submitted-file-item">
-                <div class="submitted-file-show">
-                    <a href="#" class="submitted-file-left bi bi-caret-left-fill text-primary"></a>
-                    <a href="#" class="submitted-file-right bi bi-caret-right-fill text-primary"></a>
+                <div class="submitted-file-show hscroll">
                     <div class="submitted-file overflow-auto text-nowrap">
                         <span class="badge rounded-pill bg-secondary submitted-file-size">{{ file.byteCountFormatted }}</span>
                         <span class="font-monospace">{{ file.filename }}</span>

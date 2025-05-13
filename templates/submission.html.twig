@@ -6,11 +6,9 @@
                 <h3>Odevzdání</h3>
                 <table class="submitted-files table table-bordered thin-headings">
                     {% for file in files %}
-                        <tr><td class="submitted-file-item">
+                        <tr><td class="submitted-file-item hscroll">
                             <div class="submitted-file-show">
-                                <a href="#" class="submitted-file-left bi bi-caret-left-fill text-primary"></a>
-                                <a href="#" class="submitted-file-right bi bi-caret-right-fill text-primary"></a>
-                                <div class="submitted-file overflow-auto text-nowrap">
+                                <div class="submitted-file text-nowrap">
                                     <span class="badge rounded-pill bg-secondary submitted-file-size">{{ file.byteCountFormatted }}</span>
                                     <span class="font-monospace">{{ file.filename }}</span>
                                 </div>

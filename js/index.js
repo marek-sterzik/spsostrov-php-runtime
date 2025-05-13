@@ -8,5 +8,6 @@ import "./bootstrap/bootstrap.bundle.min.js"
 import "./form.js"
 import "./module_loader.js"
 import "./link/link.js"
+import "./scroll.js"
 
 console.log("loaded")
