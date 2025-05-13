@@ -37,7 +37,7 @@ class FileManager
 
     public function backupSubmission(Submission $submission): self
     {
-        return $this->locked($submission, function () use ($submission) {
+        $this->locked($submission, function () use ($submission) {
             $this->backupOperations->backupSubmission($submission);
         }, false);
         return $this;
