@@ -54,7 +54,7 @@ class ZipOperations
 
         $archiveUri = sprintf("zip://%s", $zipFile);
 
-        for( $i = 0; $i < $zip->numFiles; $i++ ){
+        for ($i = 0; $i < $zip->numFiles; $i++) {
             $stat = $zip->statIndex($i);
             $files[] = new FileDescriptor(basename($stat['name']), $archiveUri . $stat['name'], $stat['size']);
         }
