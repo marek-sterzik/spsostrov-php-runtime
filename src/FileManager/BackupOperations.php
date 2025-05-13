@@ -14,6 +14,8 @@ class BackupOperations
 
     public function backupSubmission(Submission $submission): self
     {
+        $zipArchive = $this->fileOperations->getSubmissionZipArchive($submission, false, false);
+        $zipArchiveRelative = $this->fileOperations->getSubmissionZipArchive($submission, false, true);
         sleep(20);
         return $this;
     }

@@ -49,6 +49,5 @@ enum SubmissionState: string
             self::NotSynced => true,
             default => false
         };
-
     }
 }
