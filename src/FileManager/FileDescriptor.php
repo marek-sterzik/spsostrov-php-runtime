@@ -6,7 +6,7 @@ use App\Utility\ByteCountFormatter;
 
 class FileDescriptor
 {
-    public function __construct(private string $directory, private string $filename)
+    public function __construct(private string $filename, private string $path, private ?int $byteCount = null)
     {
     }
 
@@ -17,13 +17,12 @@ class FileDescriptor
 
     public function getPath(): string
     {
-        return $this->directory . "/" . $this->filename;
+        return $this->path;
     }
 
     public function getByteCount(): ?int
     {
-        $size = filesize($this->getPath());
-        return ($size === false) ? null : $size;
+        return $this->byteCount;
     }
 
     public function getByteCountFormatted(): ?string

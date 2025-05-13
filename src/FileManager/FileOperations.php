@@ -41,7 +41,15 @@ class FileOperations
         $submissionDirectory = $this->getSubmissionDirectory($submission);
         $files = $this->listFilesRaw($submissionDirectory);
         sort($files);
-        return array_map(fn ($file) => new FileDescriptor($submissionDirectory, $file), $files);
+        return array_map(fn ($file) => $this->createFileDescriptor($file, $submissionDirectory), $files);
+    }
+
+    private function createFileDescriptor(string $filename, string $directory): FileDescriptor
+    {
+        $path = $directory . "/" . $filename;
+        $size = filesize($path);
+        $size = ($size === false) ? null : $size;
+        return new FileDescriptor($filename, $path, $size);
     }
 
     public function addFiles(Submission $submission, array $uploadedFiles): self
