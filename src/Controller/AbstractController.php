@@ -65,6 +65,7 @@ class AbstractController extends AbstractControllerBase
             "jsLoadModules" => empty($this->modulesEnabled) ? null : implode(" ", array_keys($this->modulesEnabled)),
             "menu" => $this->getMenu(),
             "user" => $this->getUser(),
+            "userEntity" => $this->getUserEntity(),
         ];
     }
 

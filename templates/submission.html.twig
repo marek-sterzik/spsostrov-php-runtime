@@ -4,7 +4,39 @@
         <div class="row justify-content-center">
             <div class="col-lg-6 col-12">
                 <h3>{{ heading }}</h3>
+                {% if not submission.state.isFinal() %}
+                    <div class="alert alert-warning" role="alert">
+                        <div class="text-center">
+                            <div class="spinner-border text-primary" role="status"></div>
+                        </div>
+                        <div class="mt-3 text-center">
+                            {% if submission.assignment.backedUp %}
+                                Vyčkejte prosím, až se odevzdání zpracuje a zálohuje.
+                            {% else %}
+                                Vyčkejte prosím, až se odevzdání zpracuje.
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+                <h4>Informace o odevzdání</h4>
+                <table class="table table-bordered thin-headings">
+                    <tr><th>stav:</th><td>{% include "snippets/submission-state.html.twig" with {"state": submission.state} %}</td></tr>
+                    <tr><th>odevzdal:</th><td>{{ submission.submitter.name }}{% if submission.submitter == userEntity %} {% include "snippets/me.html.twig" %}{% endif %}</td></tr>
+                    {% if submission.submittedAt is not null %}
+                        <tr><th>čas&nbsp;odevzdání:</th><td>
+                                {% include "snippets/datetime.html.twig" with {"date": submission.submittedAt} %}
+                                {% if submission.isSubmittedLate() is not null %}
+                                    {% if submission.isSubmittedLate() %}
+                                        <span class="badge bg-danger">odevzdáno pozdě</span>
+                                    {% else %}
+                                        <span class="badge bg-success">odevzdáno včas</span>
+                                    {% endif %}
+                                {% endif %}
+                        </td></tr>
+                    {% endif %}
+                </table>
                 {% if files is not empty %}
+                    <h4>Soubory</h4>
                     <table class="submitted-files table table-bordered thin-headings">
                         {% for file in files %}
                             <tr><td class="submitted-file-item hscroll">

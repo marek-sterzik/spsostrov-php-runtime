@@ -147,4 +147,13 @@ class Submission
         }
         return false;
     }
+
+    public function isSubmittedLate(): ?bool
+    {
+        $softDeadline = $this->getAssignment()->getSoftDeadline();
+        if ($softDeadline === null || $this->submittedAt === null) {
+            return null;
+        }
+        return ($this->submittedAt <= $softDeadline) ? true : false;
+    }
 }

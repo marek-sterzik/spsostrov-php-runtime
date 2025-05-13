@@ -11,21 +11,27 @@ enum SubmissionState: string
     use EnumTrait;
 
     #[Description("rozpracované")]
+    #[Parameter("icon", "bi-pencil")]
     case Draft = "draft";
 
     #[Description("zahozeno")]
+    #[Parameter("icon", "bi-trash")]
     case Trash = "trash";
     
-    #[Description("odevzdáno")]
+    #[Description("zpracovává se")]
+    #[Parameter("icon", "bi-arrow-repeat")]
     case Submitted = "submitted";
     
-    #[Description("zkomprimováno")]
+    #[Description("synchronizuje se")]
+    #[Parameter("icon", "bi-arrow-down-up")]
     case Packed = "packed";
     
-    #[Description("synchronizováno")]
+    #[Description("hotovo")]
+    #[Parameter("icon", "bi-file-earmark-check")]
     case Synced = "synced";
     
-    #[Description("nesynchronizováno")]
+    #[Description("hotovo")]
+    #[Parameter("icon", "bi-file-earmark")]
     case NotSynced = "not_synced";
     
     public function isSynced(): bool
@@ -34,5 +40,15 @@ enum SubmissionState: string
             self::Synced => true,
             default => false
         };
+    }
+
+    public function isFinal(): bool
+    {
+        return match ($this) {
+            self::Synced => true,
+            self::NotSynced => true,
+            default => false
+        };
+
     }
 }
