@@ -2,11 +2,6 @@
 
 namespace App\FileManager;
 
-use RecursiveIteratorIterator;
-use RecursiveDirectoryIterator;
-use Exception;
-use Symfony\Component\Yaml\Yaml;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Doctrine\ORM\EntityManagerInterface as EntityManager;
 use App\Submission\SubmissionState;
 use App\Entity\Submission;
@@ -15,13 +10,12 @@ use App\Job\JobManager;
 
 class FileManager
 {
-    const MANIFEST_NAME = "_manifest.yaml";
-
     public function __construct(
         private LockManager $lockManager,
         private EntityManager $entityManager,
         private JobManager $jobManager,
-        private FileOperations $fileOperations
+        private FileOperations $fileOperations,
+        private ZipOperations $zipOperations
     ) {
     }
 
@@ -36,7 +30,7 @@ class FileManager
     public function listFiles(Submission $submission): array
     {
         return $this->locked($submission, function () use ($submission) {
-            return $this->fileOperations->listFiles($submission);
+            return $this->zipOperations->listFiles($submission) ?? $this->fileOperations->listFiles($submission);
         }, false);
     }
 
@@ -73,6 +67,14 @@ class FileManager
     {
         $this->locked($submission, function () use ($submission) {
             $this->fileOperations->cleanup($submission);
+        });
+        return $this;
+    }
+
+    public function pack(Submission $submission): self
+    {
+        $this->locked($submission, function () use ($submission) {
+            $this->zipOperations->pack($submission);
         });
         return $this;
     }

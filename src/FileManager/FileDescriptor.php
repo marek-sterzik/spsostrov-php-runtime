@@ -15,9 +15,14 @@ class FileDescriptor
         return $this->filename;
     }
 
+    public function getPath(): string
+    {
+        return $this->directory . "/" . $this->filename;
+    }
+
     public function getByteCount(): ?int
     {
-        $size = filesize($this->directory . "/" . $this->filename);
+        $size = filesize($this->getPath());
         return ($size === false) ? null : $size;
     }
 

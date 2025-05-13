@@ -7,11 +7,8 @@ use RecursiveDirectoryIterator;
 use Exception;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Doctrine\ORM\EntityManagerInterface as EntityManager;
 use App\Submission\SubmissionState;
 use App\Entity\Submission;
-use App\Lock\LockManager;
-use App\Job\JobManager;
 
 class FileOperations
 {
@@ -28,6 +25,12 @@ class FileOperations
         $manifest = Yaml::dump($submission->getManifest(), 3) . "\n";
         file_put_contents($directory . "/" . self::MANIFEST_NAME, $manifest);
         return $this;
+    }
+
+    public function getSubmissionZipArchive(Submission $submission, bool $temporary = false): string
+    {
+        $dir = $this->getSubmissionDirectory($submission);
+        return sprintf("%s%s", $dir, $temporary ? '.tmp.zip' : '.zip');
     }
 
     public function listFiles(Submission $submission): array
@@ -145,19 +148,23 @@ class FileOperations
 
     private function rmRf(string $directory): self
     {
-        $files = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($directory, RecursiveDirectoryIterator::SKIP_DOTS),
-            RecursiveIteratorIterator::CHILD_FIRST
-        );
+        if (is_dir($directory)) {
+            $files = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($directory, RecursiveDirectoryIterator::SKIP_DOTS),
+                RecursiveIteratorIterator::CHILD_FIRST
+            );
 
-        foreach ($files as $fileinfo) {
-            if ($fileinfo->isDir()) {
-                @rmdir($fileinfo->getRealPath());
-            } else {
-                @unlink($fileinfo->getRealPath());
+            foreach ($files as $fileinfo) {
+                if ($fileinfo->isDir()) {
+                    @rmdir($fileinfo->getRealPath());
+                } else {
+                    @unlink($fileinfo->getRealPath());
+                }
             }
+            @rmdir($directory);
+        } else {
+            @unlink($directory);
         }
-        @rmdir($directory);
 
         return $this;
     }

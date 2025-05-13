@@ -11,12 +11,21 @@ use App\Job\Jobs\AbstractJob;
 class JobStarter
 {
     const COMMAND = "job:run";
+    const ASYNC_COMMAND = "jobs:run";
 
     /**
      * @param ServiceLocator<AbstractJob> $jobs
      */
     public function __construct(private JobDir $jobDir, private ServiceLocator $jobs, private string $consoleCommand)
     {
+    }
+
+    public function runAllJobsAsync(): self
+    {
+        $command = escapeshellcmd('nohup') . " " . escapeshellarg($this->consoleCommand) . " " .
+            escapeshellarg(self::ASYNC_COMMAND);
+        system($command . " > /dev/null 2>&1 &");
+        return $this;
     }
 
     public function runAllJobs(): self
@@ -32,7 +41,7 @@ class JobStarter
     private function invokeConsoleCommandForJob(Job $job): void
     {
         $command = escapeshellcmd('nohup') . " " . escapeshellarg($this->consoleCommand) . " " .
-            escapeshellarg("job:run") . " "  . escapeshellarg($job->uuid());
+            escapeshellarg(self::COMMAND) . " "  . escapeshellarg($job->uuid());
         system($command . " > /dev/null 2>&1 &");
     }
 

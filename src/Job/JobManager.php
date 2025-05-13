@@ -7,7 +7,7 @@ use App\Utility\Uuid;
 
 class JobManager
 {
-    public function __construct(private JobDir $jobDir)
+    public function __construct(private JobDir $jobDir, private JobStarter $jobStarter)
     {
     }
 
@@ -19,6 +19,7 @@ class JobManager
             "arguments" => $arguments,
         ];
         $this->jobDir->job($uuid)->create($data);
+        $this->jobStarter->runAllJobsAsync();
         return $uuid;
     }
 }
