@@ -19,15 +19,26 @@ class SubmissionDetailController extends AbstractController
 
     #[IsGranted('ROLE_STUDENT')]
     #[Route("/submission/show/{submission}", name: 'submission-detail')]
-    public function index(Submission $submission): Response
+    public function index(Submission $submission, Request $request): Response
     {
+        $this->enableModule("submission-detail");
         if (!$submission->canBeViewedBy($this->getUserEntity())) {
             return $this->redirectBack(true);
         }
-        return $this->render("submission.html.twig", [
-            "submission" => $submission,
-            "files" => $this->fileManager->listFiles($submission),
-            "heading" => "Odevzdání dokončeno"
-        ]);
+        if ($request->query->get("state")) {
+            return $this->json([
+                "state" => $this->renderView(
+                    "snippets/submission-state.html.twig",
+                    ["state" => $submission->getState()]
+                ),
+                "stateIsFinal" => $submission->getState()->isFinal(),
+            ]);
+        } else {
+            return $this->render("submission.html.twig", [
+                "submission" => $submission,
+                "files" => $this->fileManager->listFiles($submission),
+                "heading" => "Odevzdání dokončeno"
+            ]);
+        }
     }
 }
