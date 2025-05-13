@@ -1,32 +1,30 @@
 import $ from "jquery"
 
-const scheduleTimeout = () => 5000
-
-var x = false
-
 const doUpdate = async (updateUrl) => {
     var result
     try {
         result = await $.get(updateUrl)
     } catch(e) {
-        return false
+        return 5
     }
     $(".submission-state").html(result.state)
     if (result.stateIsFinal) {
         $(".submission-not-final").remove()
     }
-    return result.stateIsFinal
+    return result.stateIsFinal ? null : result.timeout
 }
 
 const tick = (updateUrl) => async () => {
-    if (!await doUpdate(updateUrl)) {
-        setTimeout(tick(updateUrl), scheduleTimeout())
+    const timeout = await doUpdate(updateUrl)
+    if (timeout !== null) {
+        setTimeout(tick(updateUrl), timeout * 1000)
     }
 }
 
 $(() => {
     const updateUrl = $(".submission-not-final").attr("data-submission-state-update")
     if (updateUrl) {
-        setTimeout(tick(updateUrl), scheduleTimeout())
+        const timeout = parseInt($(".submission-not-final").attr("data-submission-state-update-timeout") || "5")
+        setTimeout(tick(updateUrl), timeout * 1000)
     }
 });

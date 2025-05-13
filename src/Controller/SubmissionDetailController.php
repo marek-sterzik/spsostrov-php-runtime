@@ -25,6 +25,7 @@ class SubmissionDetailController extends AbstractController
         if (!$submission->canBeViewedBy($this->getUserEntity())) {
             return $this->redirectBack(true);
         }
+        $timeout = $this->calcTimeout($submission);
         if ($request->query->get("state")) {
             return $this->json([
                 "state" => $this->renderView(
@@ -32,13 +33,46 @@ class SubmissionDetailController extends AbstractController
                     ["state" => $submission->getState()]
                 ),
                 "stateIsFinal" => $submission->getState()->isFinal(),
+                "timeout" => $timeout,
             ]);
         } else {
             return $this->render("submission.html.twig", [
                 "submission" => $submission,
                 "files" => $this->fileManager->listFiles($submission),
-                "heading" => "Odevzdání dokončeno"
+                "timeout" => $timeout,
+                "heading" => "Odevzdání dokončeno",
             ]);
         }
+    }
+
+    private function calcTimeout(Submission $submission): int
+    {
+        $submittedAt = $submission->getSubmittedAt();
+        if ($submittedAt === null) {
+            return 10;
+        }
+        $diff = time() - $submittedAt->getTimestamp();
+        if ($diff <= 0) {
+            return 10;
+        }
+        if ($diff <= 3) {
+            return 1;
+        }
+        if ($diff <= 10) {
+            return 3;
+        }
+        if ($diff <= 30) {
+            return 5;
+        }
+        if ($diff <= 60) {
+            return 10;
+        }
+        if ($diff <= 300) {
+            return 20;
+        }
+        if ($diff <= 600) {
+            return 30;
+        }
+        return 60;
     }
 }
