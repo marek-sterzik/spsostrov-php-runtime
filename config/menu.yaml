@@ -5,7 +5,7 @@ menu:
     roles: ['ROLE_TEACHER']
   - name: odevzdat
     route: submit
-    routes: ['create-submission']
+    routes: ['create-submission', 'submission-detail']
     roles: ['ROLE_STUDENT']
   - name: uživatelé
     route: users
