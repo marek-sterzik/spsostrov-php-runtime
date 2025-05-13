@@ -1,0 +1,25 @@
+{% extends "base.html.twig" %}
+{% block body %}
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-12">
+                <h3>Odevzdání</h3>
+                <table class="submitted-files table table-bordered thin-headings">
+                    {% for file in files %}
+                        <tr><td class="submitted-file-item">
+                            <div class="submitted-file-show">
+                                <a href="#" class="submitted-file-left bi bi-caret-left-fill text-primary"></a>
+                                <a href="#" class="submitted-file-right bi bi-caret-right-fill text-primary"></a>
+                                <div class="submitted-file overflow-auto text-nowrap">
+                                    <span class="badge rounded-pill bg-secondary submitted-file-size">{{ file.byteCountFormatted }}</span>
+                                    <span class="font-monospace">{{ file.filename }}</span>
+                                </div>
+                            </div>
+                        </td></tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

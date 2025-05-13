@@ -133,4 +133,18 @@ class Submission
             "submittedAt" => $this->getSubmittedAt()?->format("Y-m-d H:i:s"),
         ];
     }
+
+    public function canBeViewedBy(?User $user): bool
+    {
+        if ($user === null) {
+            return false;
+        }
+        if ($this->submitter === $user) {
+            return true;
+        }
+        if ($this->assignment->canBeViewedBy($user)) {
+            return true;
+        }
+        return false;
+    }
 }
