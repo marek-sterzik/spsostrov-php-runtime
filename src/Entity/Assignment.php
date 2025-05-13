@@ -296,7 +296,7 @@ class Assignment
         return $this->createdAt;
     }
 
-    public function getActivatedAt(): DateTimeImmutable
+    public function getActivatedAt(): ?DateTimeImmutable
     {
         return $this->activatedAt;
     }
@@ -410,7 +410,7 @@ class Assignment
             "submissionMode" => $this->getSubmissionMode()->value,
             "public" => $this->isPublic(),
             "backedUp" => $this->isBackedUp(),
-            "createdAt" => $this->getCreatedAt()?->format("Y-m-d H:i:s"),
+            "createdAt" => $this->getCreatedAt()->format("Y-m-d H:i:s"),
             "activatedAt" => $this->getActivatedAt()?->format("Y-m-d H:i:s"),
         ];
     }

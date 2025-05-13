@@ -3,14 +3,18 @@
 namespace App\Job;
 
 use Exception;
-use App\Utility\Uuid;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use App\Utility\Uuid;
+use App\Job\Jobs\AbstractJob;
 
 class JobStarter
 {
     const COMMAND = "job:run";
 
+    /**
+     * @param ServiceLocator<AbstractJob> $jobs
+     */
     public function __construct(private JobDir $jobDir, private ServiceLocator $jobs, private string $consoleCommand)
     {
     }
@@ -25,7 +29,7 @@ class JobStarter
         return $this;
     }
 
-    private function invokeConsoleCommandForJob(Job $job)
+    private function invokeConsoleCommandForJob(Job $job): void
     {
         $command = escapeshellcmd('nohup') . " " . escapeshellarg($this->consoleCommand) . " " .
             escapeshellarg("job:run") . " "  . escapeshellarg($job->uuid());

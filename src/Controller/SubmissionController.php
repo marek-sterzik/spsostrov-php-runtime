@@ -48,7 +48,7 @@ class SubmissionController extends AbstractController
         }
         $errorMessage = null;
         if ($error !== null) {
-            $errorMessage = self::ERRORS[$error] ?? sprintf("Nastala neznámá chyba: %s.",  $error);
+            $errorMessage = self::ERRORS[$error] ?? sprintf("Nastala neznámá chyba: %s.", $error);
         }
         $this->enableModule("upload-files");
         $user = $this->getUserEntity();
