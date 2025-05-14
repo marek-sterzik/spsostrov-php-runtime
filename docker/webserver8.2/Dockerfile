@@ -8,7 +8,7 @@ ADD fix-www-data-user /usr/local/sbin/fix-www-data-user
 RUN perl /usr/local/sbin/fix-www-data-user "${WWW_DATA_UID}" "${WWW_DATA_GID}"
 RUN chown -R www-data:www-data /var/www
 
-RUN apt-get update && apt-get -y install git libzip-dev zip libicu-dev
+RUN apt-get update && apt-get -y install git libzip-dev zip libicu-dev openssh-client sshpass
 
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 
