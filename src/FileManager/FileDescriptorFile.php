@@ -13,7 +13,7 @@ class FileDescriptorFile extends FileDescriptor
 
     public function __construct(private string $filename, private string $path)
     {
-        $size = filesize($this->path);
+        $size = @filesize($this->path);
         if ($size !== false) {
             $this->byteCount = $size;
         }

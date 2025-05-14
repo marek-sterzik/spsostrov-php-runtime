@@ -23,7 +23,7 @@ class ZipOperations
             throw new Exception("Cannot open zip archive");
         }
         $found = false;
-        foreach ($this->fileOperations->listFiles($submission) as $file) {
+        foreach ($this->fileOperations->listFiles($submission, true) as $file) {
             $found = true;
             $zip->addFile($file->getPath(), "/" . $file->getFilename());
         }
@@ -54,7 +54,9 @@ class ZipOperations
 
         for ($i = 0; $i < $zip->numFiles; $i++) {
             $stat = $zip->statIndex($i);
-            $files[] = new FileDescriptorZip($zipFile, $stat);
+            if ($stat['name'] !== '/' . FileOperations::MANIFEST_NAME) {
+                $files[] = new FileDescriptorZip($zipFile, $stat);
+            }
         }
         $zip->close();
         return $files;

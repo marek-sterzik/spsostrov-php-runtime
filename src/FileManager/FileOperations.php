@@ -41,13 +41,13 @@ class FileOperations
         return $this->storageDir;
     }
 
-    public function listFiles(Submission $submission): array
+    public function listFiles(Submission $submission, bool $includingManifest = false): array
     {
         if ($submission->getId() === null) {
             return [];
         }
         $submissionDirectory = $this->getSubmissionDirectory($submission);
-        $files = $this->listFilesRaw($submissionDirectory);
+        $files = $this->listFilesRaw($submissionDirectory, $includingManifest);
         sort($files);
         return array_map(fn ($file) => $this->createFileDescriptor($file, $submissionDirectory), $files);
     }
@@ -74,6 +74,9 @@ class FileOperations
             return null;
         }
         $zipFile = $this->getSubmissionZipArchive($submission, false);
+        if (!is_file($zipFile)) {
+            return null;
+        }
         return new FileDescriptorFile($submission->getZipFileName(), $zipFile);
     }
 
@@ -171,7 +174,7 @@ class FileOperations
         $uploadedFile->move($dir, $filename);
     }
 
-    private function listFilesRaw(string $submissionDirectory): array
+    private function listFilesRaw(string $submissionDirectory, bool $includingManifest = false): array
     {
         if (!is_dir($submissionDirectory)) {
             return [];
@@ -182,7 +185,10 @@ class FileOperations
         }
         $files = [];
         while (($file = readdir($dd)) !== false) {
-            if ($file === "." || $file === ".." || $file === self::MANIFEST_NAME) {
+            if ($file === "." || $file === "..") {
+                continue;
+            }
+            if (!$includingManifest && $file === self::MANIFEST_NAME) {
                 continue;
             }
             if (!is_file($submissionDirectory . "/" . $file)) {
