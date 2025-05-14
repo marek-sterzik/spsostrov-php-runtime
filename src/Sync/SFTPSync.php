@@ -98,6 +98,7 @@ class SFTPSync extends AbstractSyncService
             return;
         }
         if (!$sftp->chdir($dir)) {
+            /** @phpstan-ignore-next-line */
             if (!$this->fixDir($sftp, $dir) || !$sftp->chdir($dir)) {
                 throw new Exception(sprintf("cannot create directory: %s", $dir));
             }
@@ -112,6 +113,7 @@ class SFTPSync extends AbstractSyncService
         if ($sftp->mkdir($dir)) {
             return true;
         }
+        /** @phpstan-ignore-next-line */
         if ($sftp->delete($dir) && $sftp->mkdir($dir)) {
             return true;
         }
