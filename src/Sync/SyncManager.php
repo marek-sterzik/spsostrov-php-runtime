@@ -48,6 +48,11 @@ class SyncManager
         }
         $uriParsed['is_uri'] = true;
         $uriParsed['uri'] = $uri;
+        if (isset($uriParsed['query'])) {
+            parse_str($uriParsed['query'], $uriParsed['params']);
+        } else {
+            $uriParsed['params'] = [];
+        }
         return $uriParsed;
     }
 

@@ -69,6 +69,24 @@ class SFTPSync extends AbstractSyncService
             }
         }
 
+        $driverData['forceEnabled'] = false;
+
+        if (isset($parsedUri['params']['force'])) {
+            $forceEnabled = $parsed['params']['force'];
+            if (is_string($forceEnabled)) {
+                $forceEnabled = strtolower($forceEnabled);
+                if (in_array($forceEnabled, ["yes", "true", "1"])) {
+                    $forceEnabled = true;
+                } elseif (in_array($forceEnabled, ["no", "false", "0"])) {
+                    $forceEnabled = false;
+                }
+            }
+            if (!is_bool($forceEnabled)) {
+                throw new Exception("Invalid force parameter");
+            }
+            $driverData['forceEnabled'] = $forceEnabled;
+        }
+
         return $driverData;
     }
 
@@ -127,7 +145,7 @@ class SFTPSync extends AbstractSyncService
 
     public function isForceEnabled(array $driverData): bool
     {
-        return false;
+        return $driverData['forceEnabled'];
     }
 
     public function testConnection(array $driverData): bool
