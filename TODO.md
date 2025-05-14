@@ -10,6 +10,9 @@
 * nice custom 404 and 500 templates
 * automatically appear whole zip file when available
 * limitation of submission size
+* display "my submissions"
+* display submissions of a particular assignment (possiblity to rotate between submissions)
+* deal with functionality "delete outdated submission"
 
 ## Nice to have
 
