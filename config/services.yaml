@@ -19,6 +19,9 @@ services:
         App\Job\Jobs\AbstractJob:
             tags:
                 - submitter_job
+        App\Sync\SyncServiceInterface:
+            tags:
+                - sync_service
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     App\:
@@ -65,3 +68,6 @@ services:
         arguments:
             $jobs: !tagged_locator { tag: 'submitter_job', default_index_method: 'getName' }
             $consoleCommand: '%kernel.project_dir%/lib/console'
+    App\Sync\SyncManager:
+        arguments:
+            $syncServices: !tagged_locator { tag: 'sync_service' }
