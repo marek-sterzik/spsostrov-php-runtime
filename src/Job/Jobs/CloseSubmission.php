@@ -32,8 +32,11 @@ class CloseSubmission extends AbstractJob
             }
             if ($submission->getState() === SubmissionState::Packed) {
                 if ($submission->getAssignment()->isBackedUp()) {
-                    $newState = SubmissionState::Synced;
-                    $this->fileManager->backUpSubmission($submission);
+                    if ($this->fileManager->backUpSubmission($submission)) {
+                        $newState = SubmissionState::Synced;
+                    } else {
+                        $newState = SubmissionState::NotSynced;
+                    }
                 } else {
                     $newState = SubmissionState::NotSynced;
                 }

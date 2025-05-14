@@ -36,6 +36,11 @@ class FileOperations
         return sprintf("%s%s", $dir, $temporary ? '.tmp.zip' : '.zip');
     }
 
+    public function getStorageDir(): string
+    {
+        return $this->storageDir;
+    }
+
     public function listFiles(Submission $submission): array
     {
         if ($submission->getId() === null) {

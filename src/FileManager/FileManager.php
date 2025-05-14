@@ -35,12 +35,11 @@ class FileManager
         }, false);
     }
 
-    public function backupSubmission(Submission $submission): self
+    public function backupSubmission(Submission $submission): bool
     {
-        $this->locked($submission, function () use ($submission) {
+        return $this->locked($submission, function () use ($submission) {
             $this->backupOperations->backupSubmission($submission);
         }, false);
-        return $this;
     }
 
     public function addFiles(Submission $submission, array $uploadedFiles): self

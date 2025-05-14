@@ -30,6 +30,11 @@ class DummySync extends AbstractSyncService
         return $driverData['enabled'];
     }
 
+    public function isForceEnabled(array $driverData): bool
+    {
+        return false;
+    }
+
     public function testConnection(array $driverData): bool
     {
         return true;

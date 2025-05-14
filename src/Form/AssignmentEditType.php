@@ -66,7 +66,9 @@ class AssignmentEditType extends AbstractType
                 "label" => "školní rok:",
                 "choices" => $this->getSchoolYearChoices(),
             ])
-            ->add('backedUp', ChoiceType::class, [
+        ;
+        if ($options['backup_enabled']) {
+            $builder->add('backedUp', ChoiceType::class, [
                 'label' => "zálohování:",
                 'choices' => [
                     "vypnuto (standardní režim)" => false,
@@ -77,8 +79,8 @@ class AssignmentEditType extends AbstractType
                     "Odevzdaná díla tak budou dohledatelná i v případě havárie uložiště na serveru. " .
                     "Zapněte zálohování pro důležité práce jako je maturitní práce a podobné, " .
                     "kde je potřeba auditovatelné odevzdání."
-            ])
-        ;
+            ]);
+        }
     }
 
     private function getSchoolYearChoices(): array
@@ -104,6 +106,7 @@ class AssignmentEditType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Assignment::class,
+            'backup_enabled' => true,
         ]);
     }
 }

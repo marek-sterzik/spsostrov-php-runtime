@@ -13,11 +13,15 @@ use App\StudentClass\StudentClass;
 use App\Assignment\AssignmentState;
 use App\Utility\CurrentSchoolYear;
 use App\Markdown\Markdown;
+use App\Sync\Sync;
 
 class AssignmentEditController extends AbstractController
 {
-    public function __construct(private StudentClass $studentClass, private Markdown $markdown)
-    {
+    public function __construct(
+        private StudentClass $studentClass,
+        private Markdown $markdown,
+        private Sync $sync,
+    ) {
     }
 
     #[IsGranted('ROLE_TEACHER')]
@@ -93,11 +97,21 @@ class AssignmentEditController extends AbstractController
             $caption = "Upravit zadání";
         }
 
-        return $this->form(AssignmentEditType::class, $assignment)
-            ->action($new ? "Vytvořit" : "Uložit", function (Assignment $assignment) {
+        $forceBackup = null;
+        if (!$this->sync->isEnabled()) {
+            $forceBackup = false;
+        } elseif ($this->sync->isForceEnabled()) {
+            $forceBackup = true;
+        }
+
+        return $this->form(AssignmentEditType::class, $assignment, ["backup_enabled" => ($forceBackup === null)])
+            ->action($new ? "Vytvořit" : "Uložit", function (Assignment $assignment) use ($forceBackup) {
                 $parsed = $this->studentClass->parseStudentClassPattern($assignment->getClasses());
                 $assignment->setClasses($parsed['normalized'] ?? $assignment->getClasses());
                 $assignment->setClassesRegexp($parsed['regexp']);
+                if ($forceBackup !== null) {
+                    $assignment->setBackedUp($forceBackup);
+                }
                 $this->getEntityManager()->flush();
                 $this->markdown->refresh($assignment);
                 return $this->redirectBack(true);

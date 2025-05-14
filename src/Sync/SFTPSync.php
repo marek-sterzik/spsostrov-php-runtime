@@ -74,6 +74,45 @@ class SFTPSync extends AbstractSyncService
 
     public function syncFile(array $driverData, string $basePath, string $subdir, string $file): void
     {
+        if ($subdir === "." || $subdir === "") {
+            $subdir = [];
+        } else {
+            $subdir = explode("/", $subdir);
+        }
+        $sftp = $this->connect($driverData);
+        foreach ($subdir as $dir) {
+            $this->forceChdir($sftp, $dir);
+        }
+        $localFile = sprintf("%s/%s/%s", $basePath, $subir, $file);
+        $remoteFile = $file;
+        $sftp->delete($remoteFile);
+        $sftp->put($remoteFile, $localFile);
+    }
+
+    private function forceChdir(SFTP $sftp, string $dir): void
+    {
+        if ($dir === ".") {
+            return;
+        }
+        if (!$sftp->chdir($dir)) {
+            if (!$this->fixDir($sftp, $dir) || !$sftp->chdir($dir)) {
+                throw new Exception(sprintf("cannot create directory: %s", $dir));
+            }
+        }
+    }
+
+    private function fixDir(SFTP $sftp, string $dir): bool
+    {
+        if ($dir === "..") {
+            return false;
+        }
+        if ($sftp->mkdir($dir)) {
+            return true;
+        }
+        if ($sftp->delete($dir) && $sftp->mkdir($dir)) {
+            return true;
+        }
+        return false;
     }
 
     public function isEnabled(array $driverData): bool
@@ -81,11 +120,15 @@ class SFTPSync extends AbstractSyncService
         return true;
     }
 
+    public function isForceEnabled(array $driverData): bool
+    {
+        return false;
+    }
+
     public function testConnection(array $driverData): bool
     {
         $sftp = $this->connect($driverData);
-        var_dump($sftp->rawList());
-        return true;
+        return is_array($sftp->rawList());
     }
 
     private function connect(array $driverData): SFTP

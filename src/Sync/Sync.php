@@ -20,6 +20,11 @@ class Sync
         return $this->driver->isEnabled($this->driverData);
     }
 
+    public function isForceEnabled(): bool
+    {
+        return $this->isEnabled() && $this->driver->isForceEnabled($this->driverData);
+    }
+
     public function testConnection(): bool
     {
         try {
