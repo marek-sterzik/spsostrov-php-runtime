@@ -22,7 +22,7 @@
         "phpdocumentor/reflection-docblock": ">=5.2",
         "phpseclib/phpseclib": "^3.0",
         "ramsey/uuid": "^4.7",
-        "spsostrov/libsso-symfony": "^0.3.2",
+        "spsostrov/libsso-symfony": "^0.3.3",
         "symfony/asset": "7.2.*",
         "symfony/console": "7.2.*",
         "symfony/dotenv": "7.2.*",

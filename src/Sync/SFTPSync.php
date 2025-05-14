@@ -74,19 +74,22 @@ class SFTPSync extends AbstractSyncService
 
     public function syncFile(array $driverData, string $basePath, string $subdir, string $file): void
     {
+        $localFile = sprintf("%s/%s/%s", $basePath, $subdir, $file);
+        $remoteFile = $file;
+        
         if ($subdir === "." || $subdir === "") {
             $subdir = [];
         } else {
             $subdir = explode("/", $subdir);
         }
+        
         $sftp = $this->connect($driverData);
         foreach ($subdir as $dir) {
             $this->forceChdir($sftp, $dir);
         }
-        $localFile = sprintf("%s/%s/%s", $basePath, $subir, $file);
-        $remoteFile = $file;
+        
         $sftp->delete($remoteFile);
-        $sftp->put($remoteFile, $localFile);
+        $sftp->put($remoteFile, $localFile, SFTP::SOURCE_LOCAL_FILE);
     }
 
     private function forceChdir(SFTP $sftp, string $dir): void

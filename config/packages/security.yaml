@@ -13,7 +13,7 @@ security:
             provider: spsostrov_sso
             spsostrov_sso:
               login_path: login
-              sso_variant: testing
+              sso_variant: '%env(string:SSO_VARIANT)%'
             logout:
               path: logout
     access_control:
