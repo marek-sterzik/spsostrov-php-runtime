@@ -45,7 +45,7 @@ class FileDescriptorZip extends FileDescriptor
         $response->headers->set('Content-Disposition', $disposition);
         $size = $this->getByteCount();
         if ($size !== null) {
-            $response->headers->set('Content-Length', $size);
+            $response->headers->set('Content-Length', (string)$size);
         }
 
         return $response;

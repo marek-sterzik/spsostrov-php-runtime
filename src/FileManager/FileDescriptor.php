@@ -33,5 +33,4 @@ abstract class FileDescriptor
     {
         return $this->submissionId;
     }
-
 }

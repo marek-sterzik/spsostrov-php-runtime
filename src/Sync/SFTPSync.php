@@ -72,7 +72,7 @@ class SFTPSync extends AbstractSyncService
         $driverData['forceEnabled'] = false;
 
         if (isset($parsedUri['params']['force'])) {
-            $forceEnabled = $parsed['params']['force'];
+            $forceEnabled = $parsedUri['params']['force'];
             if (is_string($forceEnabled)) {
                 $forceEnabled = strtolower($forceEnabled);
                 if (in_array($forceEnabled, ["yes", "true", "1"])) {
