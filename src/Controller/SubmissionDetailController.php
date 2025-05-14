@@ -63,8 +63,7 @@ class SubmissionDetailController extends AbstractController
         if ($fileDescriptor === null) {
             throw $this->createNotFoundException();
         }
-
-        return new Response($fileDescriptor->getPath());
+        return $fileDescriptor->getDownloadResponse();
     }
 
     private function calcTimeout(Submission $submission): int

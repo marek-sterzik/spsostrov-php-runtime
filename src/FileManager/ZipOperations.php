@@ -48,15 +48,13 @@ class ZipOperations
         }
         $zip = new ZipArchive();
 
-        $zip->open($zipFile);
+        $zip->open($zipFile, ZipArchive::RDONLY);
 
         $files = [];
 
-        $archiveUri = sprintf("zip://%s", $zipFile);
-
         for ($i = 0; $i < $zip->numFiles; $i++) {
             $stat = $zip->statIndex($i);
-            $files[] = new FileDescriptor(basename($stat['name']), $archiveUri . $stat['name'], $stat['size']);
+            $files[] = new FileDescriptorZip($zipArchive, $stat);
         }
         $zip->close();
         return $files;
@@ -64,10 +62,28 @@ class ZipOperations
 
     public function getSingleFile(Submission $submission, string $filename): ?FileDescriptor
     {
+        $filename = $this->fileOperations->canonizeFilename($filename);
+        if ($filename === null) {
+            return null;
+        }
+
         $zipFile = $this->fileOperations->getSubmissionZipArchive($submission, false);
         if (!is_file($zipFile)) {
             return null;
         }
-        return null;
+
+        $zip = new ZipArchive();
+
+        $zip->open($zipFile, ZipArchive::RDONLY);
+
+        $stat = $zip->statName("/" . $filename);
+
+        $zip->close();
+
+        if ($stat === false) {
+            return null;
+        }
+
+        return new FileDescriptorZip($zipFile, $stat);
     }
 }

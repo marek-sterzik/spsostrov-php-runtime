@@ -70,10 +70,7 @@ class FileOperations
 
     private function createFileDescriptor(string $filename, string $directory): FileDescriptor
     {
-        $path = $directory . "/" . $filename;
-        $size = filesize($path);
-        $size = ($size === false) ? null : $size;
-        return new FileDescriptor($filename, $path, $size);
+        return new FileDescriptorFile($filename, $directory . "/" . $filename);
     }
 
     public function addFiles(Submission $submission, array $uploadedFiles): self
@@ -148,6 +145,16 @@ class FileOperations
         return $this;
     }
 
+    public function canonizeFilename(string $filename): ?string
+    {
+        $filename = basename($filename);
+        $filename = preg_replace('/[[:cntrl:]]/', '', $filename);
+        if ($filename === "" || $filename === "." || $filename === "..") {
+            return null;
+        }
+        return $filename;
+    }
+
     private function uploadFile(string $dir, UploadedFile $uploadedFile): void
     {
         $filename = $this->canonizeFilename($uploadedFile->getClientOriginalName()) ?? "uploaded_file";
@@ -199,16 +206,6 @@ class FileOperations
         }
 
         return $this;
-    }
-
-    private function canonizeFilename(string $filename): ?string
-    {
-        $filename = basename($filename);
-        $filename = preg_replace('/[[:cntrl:]]/', '', $filename);
-        if ($filename === "" || $filename === "." || $filename === "..") {
-            return null;
-        }
-        return $filename;
     }
 
     private function findFreeFilename(string $dir, string $filename): string
