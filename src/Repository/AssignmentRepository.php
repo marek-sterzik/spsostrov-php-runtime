@@ -26,6 +26,8 @@ class AssignmentRepository extends ServiceEntityRepository
             ->set("a.state", ":newState")
             ->setParameter(":newState", AssignmentState::Finished)
             ->andWhere("a.hardDeadline < :now")
+            ->andWhere("a.state = :active")
+            ->setParameter(":active", AssignmentState::Active)
             ->setParameter(":now", new DateTimeImmutable())
             ->getQuery()
             ->execute()
