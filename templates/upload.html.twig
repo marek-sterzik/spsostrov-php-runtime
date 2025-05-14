@@ -27,7 +27,10 @@
                 <div class="submitted-file-show hscroll">
                     <div class="submitted-file overflow-auto text-nowrap">
                         <span class="badge rounded-pill bg-secondary submitted-file-size">{{ file.byteCountFormatted }}</span>
-                        <span class="font-monospace">{{ file.filename }}</span>
+                        <a href="{{ path("submission-files", {"submission": submissionId, "file": file.filename}) }}"
+                           class="font-monospace text-black file-link"
+                           target="_blank"
+                        >{{ file.filename }}</a>
                     </div>
                 </div>
                 <div class="submitted-file-edit">

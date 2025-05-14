@@ -136,11 +136,14 @@ class Submission
 
     public function canBeViewedBy(?User $user): bool
     {
-        if ($user === null) {
+        if ($user === null || $this->getState() === SubmissionState::Trash) {
             return false;
         }
         if ($this->submitter === $user) {
             return true;
+        }
+        if ($this->getState() === SubmissionState::Draft) {
+            return false;
         }
         if ($this->assignment->canBeViewedBy($user)) {
             return true;
@@ -154,6 +157,6 @@ class Submission
         if ($softDeadline === null || $this->submittedAt === null) {
             return null;
         }
-        return ($this->submittedAt <= $softDeadline) ? true : false;
+        return ($this->submittedAt > $softDeadline) ? true : false;
     }
 }

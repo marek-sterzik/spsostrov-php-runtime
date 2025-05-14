@@ -71,6 +71,7 @@ class SubmissionController extends AbstractController
             ->useTemplate("upload.html.twig", [
                 "files" => $this->fileManager->listFiles($submission),
                 "assignment" => $assignment,
+                "submissionId" => $submission->getId(),
                 "errorCode" => $error,
                 "errorMessage" => $errorMessage,
             ])

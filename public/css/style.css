@@ -27,14 +27,14 @@ div.student-assignment-actions {text-align: center;}
 
 div.foot {height: 2em;}
 
-.submitted-files {table-layout: fixed; width: 100%;}
-.submitted-file-item {vertical-align: middle; position: relative;}
+table.submitted-files {table-layout: fixed; width: 100%;}
+table.submitted-files td {vertical-align: middle;}
 .submitted-file-size {width: 5em;}
-.submitted-file-actions {width: 5.5em; vertical-align: middle;}
-.submitted-file {scrollbar-width: none; margin-left: .5em;}
-.submitted-file-left {position: absolute; display: block; left: 0}
-.submitted-file-right {position: absolute; display: block; right: 0}
+.submitted-file-actions {width: 5.5em;}
 .submitted-file-edit {display: none;}
+.file-link {text-decoration: none;}
+.file-link:hover {text-decoration: underline;}
+a.file-link[target="_blank"]::after {content: ''}
 
 .hscroll > div {overflow: auto; scrollbar-width: none;}
 .hscroll {position: relative;}

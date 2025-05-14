@@ -23,7 +23,7 @@ class SubmissionDetailController extends AbstractController
     {
         $this->enableModule("submission-detail");
         if (!$submission->canBeViewedBy($this->getUserEntity())) {
-            return $this->redirectBack(true);
+            throw $this->createAccessDeniedException();
         }
         $timeout = $this->calcTimeout($submission);
         if ($request->query->get("state")) {
@@ -43,6 +43,22 @@ class SubmissionDetailController extends AbstractController
                 "heading" => "Odevzdání dokončeno",
             ]);
         }
+    }
+
+    #[IsGranted('ROLE_STUDENT')]
+    #[Route("/submission/show/{submission}/files", name: 'submission-files')]
+    public function files(Submission $submission, Request $request): Response
+    {
+        $this->enableModule("submission-detail");
+        if (!$submission->canBeViewedBy($this->getUserEntity())) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $file = $request->query->get("file");
+        if (!is_string($file)) {
+            throw $this->createNotFoundException();
+        }
+        throw $this->createNotFoundException();
     }
 
     private function calcTimeout(Submission $submission): int

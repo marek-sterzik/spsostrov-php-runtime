@@ -1,0 +1,9 @@
+{% include "snippets/datetime.html.twig" with {"date": submission.submittedAt} %}
+{% if submission.isSubmittedLate() is not null %}
+    {% if submission.isSubmittedLate() %}
+        <span class="badge bg-danger">odevzdáno pozdě</span>
+    {% else %}
+        <span class="badge bg-success">odevzdáno včas</span>
+    {% endif %}
+{% endif %}
+

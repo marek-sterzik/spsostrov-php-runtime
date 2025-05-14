@@ -25,30 +25,24 @@
                     <tr><th>stav:</th><td class="submission-state">{% include "snippets/submission-state.html.twig" with {"state": submission.state} %}</td></tr>
                     <tr><th>odevzdal:</th><td>{{ submission.submitter.name }}{% if submission.submitter == userEntity %} {% include "snippets/me.html.twig" %}{% endif %}</td></tr>
                     {% if submission.submittedAt is not null %}
-                        <tr><th>čas&nbsp;odevzdání:</th><td>
-                                {% include "snippets/datetime.html.twig" with {"date": submission.submittedAt} %}
-                                {% if submission.isSubmittedLate() is not null %}
-                                    {% if submission.isSubmittedLate() %}
-                                        <span class="badge bg-danger">odevzdáno pozdě</span>
-                                    {% else %}
-                                        <span class="badge bg-success">odevzdáno včas</span>
-                                    {% endif %}
-                                {% endif %}
-                        </td></tr>
+                        <tr><th>čas&nbsp;odevzdání:</th><td>{% include "snippets/submitted-at.html.twig" with {"submission": submission} %}</td></tr>
                     {% endif %}
                 </table>
                 {% if files is not empty %}
                     <h4>Soubory</h4>
-                    <table class="submitted-files table table-bordered thin-headings">
+                    <ul class="list-group">
                         {% for file in files %}
-                            <tr><td class="submitted-file-item hscroll">
+                            <li class="list-group-item hscroll">
                                 <div class="submitted-file-show">
                                     <div class="submitted-file text-nowrap">
                                         <span class="badge rounded-pill bg-secondary submitted-file-size">{{ file.byteCountFormatted }}</span>
-                                        <span class="font-monospace">{{ file.filename }}</span>
+                                        <a href="{{ path("submission-files", {"submission": submission.id, "file": file.filename}) }}"
+                                           class="font-monospace text-black file-link"
+                                           target="_blank"
+                                        >{{ file.filename }}</a>
                                     </div>
                                 </div>
-                            </td></tr>
+                            </li>
                         {% endfor %}
                     </table>
                 {% else %}
