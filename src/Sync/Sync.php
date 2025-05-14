@@ -2,6 +2,8 @@
 
 namespace App\Sync;
 
+use Exception;
+
 class Sync
 {
     public function __construct(private SyncServiceInterface $driver, private array $driverData)
@@ -16,5 +18,14 @@ class Sync
     public function isEnabled(): bool
     {
         return $this->driver->isEnabled($this->driverData);
+    }
+
+    public function testConnection(): bool
+    {
+        try {
+            return $this->driver->testConnection($this->driverData);
+        } catch (Exception $e) {
+            return false;
+        }
     }
 }

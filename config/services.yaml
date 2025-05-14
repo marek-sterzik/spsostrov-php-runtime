@@ -78,4 +78,4 @@ services:
             $syncUri: '%env(resolve:SYNC_URI)%'
     App\Sync\SFTPSync:
         arguments:
-            $sshKeyFile: '%kernle.project_dir%/var/ssh/id_rsa'
+            $sshKeyFile: '%kernel.project_dir%/var/ssh/id_rsa'

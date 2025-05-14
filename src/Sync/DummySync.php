@@ -27,4 +27,9 @@ class DummySync extends AbstractSyncService
     {
         return $driverData['enabled'];
     }
+
+    public function testConnection(array $driverData): bool
+    {
+        return true;
+    }
 }

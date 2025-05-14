@@ -3,6 +3,8 @@
 namespace App\Sync;
 
 use Exception;
+use phpseclib3\Net\SFTP;
+use phpseclib3\Crypt\PublicKeyLoader;
 
 class SFTPSync extends AbstractSyncService
 {
@@ -77,5 +79,32 @@ class SFTPSync extends AbstractSyncService
     public function isEnabled(array $driverData): bool
     {
         return true;
+    }
+
+    public function testConnection(array $driverData): bool
+    {
+        $sftp = $this->connect($driverData);
+        var_dump($sftp->rawList());
+        return true;
+    }
+
+    private function connect(array $driverData): SFTP
+    {
+        if ($driverData['use_key']) {
+            $key = PublicKeyLoader::load(file_get_contents($this->sshKeyFile));
+        } else {
+            $key = $driverData['pass'];
+        }
+
+        $sftp = new SFTP($driverData['host'], $driverData['port']);
+        if (!$sftp->login($driverData['user'], $key)) {
+            throw new \Exception('Login failed');
+        }
+
+        if(!$sftp->chdir($driverData['path'])) {
+            throw new \Exception('Cannot change the directory');
+        }
+
+        return $sftp;
     }
 }
