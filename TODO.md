@@ -7,6 +7,9 @@
 * fix searches with prefixes
 * make some help for prefixed searches
 * trash drafts after assignment state becomes inactive (maybe after other criteria)
+* nice custom 404 and 500 templates
+* automatically appear whole zip file when available
+* limitation of submission size
 
 ## Nice to have
 

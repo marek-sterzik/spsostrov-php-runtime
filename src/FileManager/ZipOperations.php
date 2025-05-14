@@ -54,7 +54,7 @@ class ZipOperations
 
         for ($i = 0; $i < $zip->numFiles; $i++) {
             $stat = $zip->statIndex($i);
-            $files[] = new FileDescriptorZip($zipArchive, $stat);
+            $files[] = new FileDescriptorZip($zipFile, $stat);
         }
         $zip->close();
         return $files;

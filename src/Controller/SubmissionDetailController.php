@@ -41,6 +41,7 @@ class SubmissionDetailController extends AbstractController
                 "files" => $this->fileManager->listFiles($submission),
                 "timeout" => $timeout,
                 "heading" => "Odevzdání dokončeno",
+                "zipFile" => $this->fileManager->getZipFile($submission),
             ]);
         }
     }
@@ -55,11 +56,12 @@ class SubmissionDetailController extends AbstractController
         }
 
         $file = $request->query->get("file");
-        if (!is_string($file)) {
-            throw $this->createNotFoundException();
+        if (is_string($file)) {
+            $fileDescriptor = $this->fileManager->getSingleFile($submission, $file);
+        } else {
+            $fileDescriptor = $this->fileManager->getZipFile($submission);
         }
 
-        $fileDescriptor = $this->fileManager->getSingleFile($submission, $file);
         if ($fileDescriptor === null) {
             throw $this->createNotFoundException();
         }

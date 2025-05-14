@@ -20,7 +20,7 @@
                         </div>
                     </div>
                 {% endif %}
-                <h4>Informace o odevzdání</h4>
+                <h4>Informace</h4>
                 <table class="table table-bordered thin-headings">
                     <tr><th>stav:</th><td class="submission-state">{% include "snippets/submission-state.html.twig" with {"state": submission.state} %}</td></tr>
                     <tr><th>odevzdal:</th><td>{{ submission.submitter.name }}{% if submission.submitter == userEntity %} {% include "snippets/me.html.twig" %}{% endif %}</td></tr>
@@ -30,7 +30,7 @@
                 </table>
                 {% if files is not empty %}
                     <h4>Soubory</h4>
-                    <ul class="list-group">
+                    <ul class="list-group mb-3">
                         {% for file in files %}
                             <li class="list-group-item hscroll">
                                 <div class="submitted-file-show">
@@ -44,7 +44,23 @@
                                 </div>
                             </li>
                         {% endfor %}
-                    </table>
+                    </ul>
+                    {% if zipFile is not null %}
+                    <h4>Zip archiv celého odevzdání</h4>
+                    <ul class="list-group">
+                        <li class="list-group-item hscroll">
+                            <div class="submitted-file-show">
+                                <div class="submitted-file text-nowrap">
+                                    <span class="badge rounded-pill bg-secondary submitted-file-size">{{ zipFile.byteCountFormatted }}</span>
+                                    <a href="{{ path("submission-files", {"submission": submission.id}) }}"
+                                       class="font-monospace text-black file-link"
+                                       target="_blank"
+                                    >{{ zipFile.filename }}</a>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    {% endif %}
                 {% else %}
                     <div class="alert alert-warning" role="alert">
                         <strong>Varování:</strong> Soubory z tohoto odevzdání chybí. Patrně byly vymazány z hlavního uložiště.

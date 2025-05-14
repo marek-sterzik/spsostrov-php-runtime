@@ -43,6 +43,13 @@ class FileManager
         }, false);
     }
 
+    public function getZipFile(Submission $submission): ?FileDescriptor
+    {
+        return $this->locked($submission, function () use ($submission) {
+            return $this->fileOperations->getZipFile($submission);
+        }, false);
+    }
+
     public function backupSubmission(Submission $submission): bool
     {
         return $this->locked($submission, function () use ($submission) {

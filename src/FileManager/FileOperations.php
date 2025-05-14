@@ -68,6 +68,15 @@ class FileOperations
         return $this->createFileDescriptor($filename, $submissionDirectory);
     }
 
+    public function getZipFile(Submission $submission): ?FileDescriptor
+    {
+        if ($submission->getId() === null) {
+            return null;
+        }
+        $zipFile = $this->getSubmissionZipArchive($submission, false);
+        return new FileDescriptorFile($submission->getZipFileName(), $zipFile);
+    }
+
     private function createFileDescriptor(string $filename, string $directory): FileDescriptor
     {
         return new FileDescriptorFile($filename, $directory . "/" . $filename);

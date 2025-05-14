@@ -8,6 +8,7 @@ use App\Repository\SubmissionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Utility\Uuid;
+use App\Utility\NameToId;
 
 #[ORM\Entity(repositoryClass: SubmissionRepository::class)]
 class Submission
@@ -158,5 +159,11 @@ class Submission
             return null;
         }
         return ($this->submittedAt > $softDeadline) ? true : false;
+    }
+
+    public function getZipFileName(): string
+    {
+        $username = NameToId::get($this->getSubmitter()->getName());
+        return sprintf("prace-%d-%s.zip", $this->getId(), $username);
     }
 }
