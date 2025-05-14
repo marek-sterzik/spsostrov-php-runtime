@@ -10,12 +10,14 @@ const doUpdate = async (updateUrl) => {
     }
     $(".submission-state").html(result.state)
     if (result.stateIsFinal) {
-        $(".submission-not-final").remove()
+        $(".submission-not-final").slideUp({duration: 300, always: () => $('.submission-not-final').remove()})
     }
     if (result.zipFile !== null) {
         if ($(".zip-file").html().match(/^\s*$/)) {
             $(".zip-file").html(result.zipFile)
             updateHscroll()
+            $(".zip-file").hide()
+            $(".zip-file").slideDown({duration: 300})
         }
     }
     return result.stateIsFinal ? null : result.timeout
