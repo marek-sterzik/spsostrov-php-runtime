@@ -71,3 +71,11 @@ services:
     App\Sync\SyncManager:
         arguments:
             $syncServices: !tagged_locator { tag: 'sync_service' }
+    App\Sync\Sync:
+        factory: ['@App\Sync\SyncFactory', 'create']
+    App\Sync\SyncFactory:
+        arguments:
+            $syncUri: '%env(resolve:SYNC_URI)%'
+    App\Sync\SFTPSync:
+        arguments:
+            $sshKeyFile: '%kernle.project_dir%/var/ssh/id_rsa'

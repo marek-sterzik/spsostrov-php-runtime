@@ -8,7 +8,7 @@ class DummySync extends AbstractSyncService
 {
     public static function getProtocols(): array
     {
-        return ['dummy', 'none'];
+        return ['dummy', 'none', 'disabled'];
     }
 
     protected function createDriverData(array $parsedUri): array
@@ -16,10 +16,15 @@ class DummySync extends AbstractSyncService
         if ($parsedUri['is_uri']) {
             throw new Exception(sprintf("Invalid driver configuration for driver %s: %s", $protocol));
         }
-        return [];
+        return ["enabled" => ($parsedUri['scheme'] === 'dummy') ? true : false];
     }
 
-    protected function syncFile(array $driverData, string $basePath, string $subdir, string $file): void
+    public function syncFile(array $driverData, string $basePath, string $subdir, string $file): void
     {
+    }
+
+    public function isEnabled(array $driverData): bool
+    {
+        return $driverData['enabled'];
     }
 }

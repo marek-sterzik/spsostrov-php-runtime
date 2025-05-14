@@ -21,9 +21,9 @@ class SyncManager
         if ($parsedUri === null) {
             throw new Exception(sprintf("invalid sync uri: %s", $uri));
         }
-        $service = $this->getSyncServiceByProtocol($parsedUri['protocol']);
+        $service = $this->getSyncServiceByProtocol($parsedUri['scheme']);
         if ($service === null) {
-            throw new Exception(sprintf("unsupported protocol: %s", $parsedUri['protocol']));
+            throw new Exception(sprintf("unsupported protocol: %s", $parsedUri['scheme']));
         }
         return $service->createSync($parsedUri);
     }
@@ -40,10 +40,10 @@ class SyncManager
     private function parseUri(string $uri): ?array
     {
         if (preg_match('/^[a-zA-Z0-9_]+(-[a-zA-Z0-9_]+)*$/', $uri)) {
-            return ["protocol" => $uri, "is_uri" => false, "uri" => $uri];
+            return ["scheme" => $uri, "is_uri" => false, "uri" => $uri];
         }
         $uriParsed = parse_url($uri);
-        if (!is_array($uriParsed) || !isset($uriParsed['protocol'])) {
+        if (!is_array($uriParsed) || !isset($uriParsed['scheme'])) {
             return null;
         }
         $uriParsed['is_uri'] = true;
@@ -58,6 +58,11 @@ class SyncManager
             foreach ($this->syncServices as $service) {
                 $class = get_class($service);
                 foreach ($class::getProtocols() as $protocol) {
+                    if (isset($this->protocolMap[$protocol]) && $this->protocolMap[$protocol] !== $service) {
+                        throw new Exception(
+                            sprintf("trying to register a protocol to multiple drivers: %s", $protocol)
+                        );
+                    }
                     $this->protocolMap[$protocol] = $service;
                 }
             }

@@ -8,13 +8,11 @@ abstract class AbstractSyncService implements SyncServiceInterface
 
     public function createSync(array $parsedUri): Sync
     {
-        $driverData = $this->createDriverData($parsedUri);
-        return new Sync(function ($basePath, $subdir, $file) use ($driverData) {
-            $this->syncFile($driverData, $basePath, $subdir, $file);
-        });
+        return new Sync($this, $this->createDriverData($parsedUri));
     }
 
     abstract protected function createDriverData(array $parsedUri): array;
-    abstract protected function syncFile(array $driverData, string $basePath, string $subdir, string $file): void;
+    abstract public function syncFile(array $driverData, string $basePath, string $subdir, string $file): void;
+    abstract public function isEnabled(array $driverData): bool;
 }
 
