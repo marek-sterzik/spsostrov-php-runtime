@@ -55,7 +55,7 @@ class ZipOperations
         for ($i = 0; $i < $zip->numFiles; $i++) {
             $stat = $zip->statIndex($i);
             if ($stat['name'] !== '/' . FileOperations::MANIFEST_NAME) {
-                $files[] = new FileDescriptorZip($zipFile, $stat);
+                $files[] = (new FileDescriptorZip($zipFile, $stat))->setSubmission($submission);
             }
         }
         $zip->close();
@@ -86,6 +86,6 @@ class ZipOperations
             return null;
         }
 
-        return new FileDescriptorZip($zipFile, $stat);
+        return (new FileDescriptorZip($zipFile, $stat))->setSubmission($submission);
     }
 }

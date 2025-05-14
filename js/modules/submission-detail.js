@@ -1,4 +1,5 @@
 import $ from "jquery"
+import updateHscroll from "../scroll"
 
 const doUpdate = async (updateUrl) => {
     var result
@@ -10,6 +11,12 @@ const doUpdate = async (updateUrl) => {
     $(".submission-state").html(result.state)
     if (result.stateIsFinal) {
         $(".submission-not-final").remove()
+    }
+    if (result.zipFile !== null) {
+        if ($(".zip-file").html().match(/^\s*$/)) {
+            $(".zip-file").html(result.zipFile)
+            updateHscroll()
+        }
     }
     return result.stateIsFinal ? null : result.timeout
 }

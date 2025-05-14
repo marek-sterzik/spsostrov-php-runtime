@@ -49,7 +49,7 @@ class FileOperations
         $submissionDirectory = $this->getSubmissionDirectory($submission);
         $files = $this->listFilesRaw($submissionDirectory, $includingManifest);
         sort($files);
-        return array_map(fn ($file) => $this->createFileDescriptor($file, $submissionDirectory), $files);
+        return array_map(fn ($file) => $this->createFileDescriptor($file, $submissionDirectory, $submission), $files);
     }
 
     public function getSingleFile(Submission $submission, string $filename): ?FileDescriptor
@@ -65,7 +65,7 @@ class FileOperations
         if (!is_file($submissionDirectory . "/" . $filename)) {
             return null;
         }
-        return $this->createFileDescriptor($filename, $submissionDirectory);
+        return $this->createFileDescriptor($filename, $submissionDirectory, $submission);
     }
 
     public function getZipFile(Submission $submission): ?FileDescriptor
@@ -77,12 +77,12 @@ class FileOperations
         if (!is_file($zipFile)) {
             return null;
         }
-        return new FileDescriptorFile($submission->getZipFileName(), $zipFile);
+        return (new FileDescriptorFile($submission->getZipFileName(), $zipFile))->setSubmission($submission);
     }
 
-    private function createFileDescriptor(string $filename, string $directory): FileDescriptor
+    private function createFileDescriptor(string $filename, string $directory, Submission $submission): FileDescriptor
     {
-        return new FileDescriptorFile($filename, $directory . "/" . $filename);
+        return (new FileDescriptorFile($filename, $directory . "/" . $filename))->setSubmission($submission);
     }
 
     public function addFiles(Submission $submission, array $uploadedFiles): self

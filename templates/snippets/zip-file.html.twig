@@ -1,0 +1,15 @@
+<h4>Zip archiv celého odevzdání</h4>
+<ul class="list-group">
+    <li class="list-group-item hscroll">
+        <div class="submitted-file-show">
+            <div class="submitted-file text-nowrap">
+                <span class="badge rounded-pill bg-secondary submitted-file-size">{{ zipFile.byteCountFormatted }}</span>
+                <a href="{{ path("submission-files", {"submission": zipFile.submissionId}) }}"
+                   class="font-monospace text-black file-link"
+                   target="_blank"
+                >{{ zipFile.filename }}</a>
+            </div>
+        </div>
+    </li>
+</ul>
+

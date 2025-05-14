@@ -32,7 +32,6 @@ class FileDescriptorFile extends FileDescriptor
     public function getByteCount(): ?int
     {
         return $this->byteCount;
-        
     }
 
     public function getDownloadResponse(): Response

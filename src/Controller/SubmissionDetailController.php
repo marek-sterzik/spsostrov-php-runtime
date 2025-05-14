@@ -26,12 +26,22 @@ class SubmissionDetailController extends AbstractController
             throw $this->createAccessDeniedException();
         }
         $timeout = $this->calcTimeout($submission);
+        $zipFile = $this->fileManager->getZipFile($submission);
         if ($request->query->get("state")) {
+            if ($zipFile !== null) {
+                $zipFileTemplate = $this->renderView(
+                    "snippets/zip-file.html.twig",
+                    ["zipFile" => $zipFile]
+                );
+            } else {
+                $zipFileTemplate = null;
+            }
             return $this->json([
                 "state" => $this->renderView(
                     "snippets/submission-state.html.twig",
                     ["state" => $submission->getState()]
                 ),
+                "zipFile" => $zipFileTemplate,
                 "stateIsFinal" => $submission->getState()->isFinal(),
                 "timeout" => $timeout,
             ]);
@@ -41,7 +51,7 @@ class SubmissionDetailController extends AbstractController
                 "files" => $this->fileManager->listFiles($submission),
                 "timeout" => $timeout,
                 "heading" => "Odevzdání dokončeno",
-                "zipFile" => $this->fileManager->getZipFile($submission),
+                "zipFile" => $zipFile,
             ]);
         }
     }

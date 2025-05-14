@@ -41,13 +41,21 @@ const enableScrollFeature = (scroll, left, right) => {
     setScrollStatus(scroll, left, right)
 }
 
-$(() => {
+const updateHscroll = () => {
     $(".hscroll").each(function () {
         const element = $(this)
-        const leftArrow = $("<a href=\"#\" class=\"button-left bi bi-caret-left-fill text-primary\"></a>")
-        const rightArrow = $("<a href=\"#\" class=\"button-right bi bi-caret-right-fill text-primary\"></a>")
-        element.prepend(rightArrow).prepend(leftArrow)
-        enableScrollFeature(element.find(">div"), leftArrow, rightArrow)
+        if (!element.data("hscroll")) {
+            element.data("hscroll", true)
+            const leftArrow = $("<a href=\"#\" class=\"button-left bi bi-caret-left-fill text-primary\"></a>")
+            const rightArrow = $("<a href=\"#\" class=\"button-right bi bi-caret-right-fill text-primary\"></a>")
+            element.prepend(rightArrow).prepend(leftArrow)
+            enableScrollFeature(element.find(">div"), leftArrow, rightArrow)
+        }
     })
+}
+
+$(() => {
+    updateHscroll()
 })
 
+export default updateHscroll
