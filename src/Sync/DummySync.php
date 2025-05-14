@@ -14,7 +14,9 @@ class DummySync extends AbstractSyncService
     protected function createDriverData(array $parsedUri): array
     {
         if ($parsedUri['is_uri']) {
-            throw new Exception(sprintf("Invalid driver configuration for driver %s: %s", $protocol));
+            throw new Exception(
+                sprintf("Invalid driver configuration for driver %s: %s", $parsedUri['scheme'], $parsedUri['uri'])
+            );
         }
         return ["enabled" => ($parsedUri['scheme'] === 'dummy') ? true : false];
     }

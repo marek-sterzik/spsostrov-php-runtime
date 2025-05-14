@@ -98,11 +98,11 @@ class SFTPSync extends AbstractSyncService
 
         $sftp = new SFTP($driverData['host'], $driverData['port']);
         if (!$sftp->login($driverData['user'], $key)) {
-            throw new \Exception('Login failed');
+            throw new Exception('Login failed');
         }
 
-        if(!$sftp->chdir($driverData['path'])) {
-            throw new \Exception('Cannot change the directory');
+        if (!$sftp->chdir($driverData['path'])) {
+            throw new Exception('Cannot change the directory');
         }
 
         return $sftp;
