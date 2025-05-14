@@ -61,4 +61,13 @@ class ZipOperations
         $zip->close();
         return $files;
     }
+
+    public function getSingleFile(Submission $submission, string $filename): ?FileDescriptor
+    {
+        $zipFile = $this->fileOperations->getSubmissionZipArchive($submission, false);
+        if (!is_file($zipFile)) {
+            return null;
+        }
+        return null;
+    }
 }

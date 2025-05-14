@@ -52,6 +52,22 @@ class FileOperations
         return array_map(fn ($file) => $this->createFileDescriptor($file, $submissionDirectory), $files);
     }
 
+    public function getSingleFile(Submission $submission, string $filename): ?FileDescriptor
+    {
+        if ($submission->getId() === null) {
+            return null;
+        }
+        $filename = $this->canonizeFilename($filename);
+        if ($filename === null) {
+            return null;
+        }
+        $submissionDirectory = $this->getSubmissionDirectory($submission);
+        if (!is_file($submissionDirectory . "/" . $filename)) {
+            return null;
+        }
+        return $this->createFileDescriptor($filename, $submissionDirectory);
+    }
+
     private function createFileDescriptor(string $filename, string $directory): FileDescriptor
     {
         $path = $directory . "/" . $filename;

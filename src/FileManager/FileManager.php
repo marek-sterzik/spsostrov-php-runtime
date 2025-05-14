@@ -35,6 +35,14 @@ class FileManager
         }, false);
     }
 
+    public function getSingleFile(Submission $submission, string $filename): ?FileDescriptor
+    {
+        return $this->locked($submission, function () use ($submission, $filename) {
+            return $this->zipOperations->getSingleFile($submission, $filename) ??
+                $this->fileOperations->getSingleFile($submission, $filename);
+        }, false);
+    }
+
     public function backupSubmission(Submission $submission): bool
     {
         return $this->locked($submission, function () use ($submission) {

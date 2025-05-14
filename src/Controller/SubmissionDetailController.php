@@ -58,7 +58,13 @@ class SubmissionDetailController extends AbstractController
         if (!is_string($file)) {
             throw $this->createNotFoundException();
         }
-        throw $this->createNotFoundException();
+
+        $fileDescriptor = $this->fileManager->getSingleFile($submission, $file);
+        if ($fileDescriptor === null) {
+            throw $this->createNotFoundException();
+        }
+
+        return new Response($fileDescriptor->getPath());
     }
 
     private function calcTimeout(Submission $submission): int
