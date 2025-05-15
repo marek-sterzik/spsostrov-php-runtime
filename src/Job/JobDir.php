@@ -16,7 +16,7 @@ class JobDir
         }
     }
 
-    public function listJobs(): array
+    public function listJobs(bool $runningOnly = false): array
     {
         $dd = @opendir($this->jobDir);
         $jobs = [];
@@ -25,22 +25,28 @@ class JobDir
                 if ($file === "." || $file === "..") {
                     continue;
                 }
-                if (preg_match('/^(.*)\.job\.yaml$/', $file, $matches)) {
-                    $jobs[] = $matches[1];
+                $regexp = '/^(.*)\.(' . ($runningOnly ? 'job' : 'job|result') . ')\.yaml$/';
+                if (preg_match($regexp, $file, $matches)) {
+                    $jobs[$matches[1]] = true;
                 }
             }
             closedir($dd);
         }
-        return array_map(fn ($uuid) => $this->job($uuid), $jobs);
+        return array_map(fn ($uuid) => $this->job($uuid), array_keys($jobs));
     }
 
     public function job(string $uuid): Job
     {
-        return new Job($uuid, $this->getFilename($uuid));
+        return new Job($uuid, $this->getFilename($uuid), $this->getResultFilename($uuid));
     }
 
     private function getFilename(string $uuid): string
     {
         return sprintf("%s/%s.job.yaml", $this->jobDir, $uuid);
+    }
+
+    private function getResultFilename(string $uuid): string
+    {
+        return sprintf("%s/%s.result.yaml", $this->jobDir, $uuid);
     }
 }

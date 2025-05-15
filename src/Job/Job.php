@@ -9,7 +9,7 @@ class Job
 {
     private mixed $fd = null;
 
-    public function __construct(private string $uuid, private string $jobFile)
+    public function __construct(private string $uuid, private string $jobFile, private string $resultFile)
     {
     }
 
@@ -22,6 +22,48 @@ class Job
     {
         $data = Yaml::dump($data, 3) . "\n";
         file_put_contents($this->jobFile, $data, LOCK_EX);
+        @unlink($this->resultFile);
+        return $this;
+    }
+
+    public function isFinished(): bool
+    {
+        return !is_file($this->jobFile);
+    }
+
+    public function getResult(bool $cleanup = true): ?array
+    {
+        if (!$this->isFinished()) {
+            throw new Exception("Cannot ask for result of a non-finished job");
+        }
+        $res = @file_get_contents($this->resultFile);
+        if (!is_string($res)) {
+            return null;
+        }
+        try {
+            $res = Yaml::parse($res);
+        } catch (Exception $e) {
+            $res = null;
+        }
+        if ($cleanup) {
+            @unlink($this->resultFile);
+        }
+        return $ret;
+    }
+
+    public function shouldBeCleanedUp(): bool
+    {
+        $ctime = @filectime($this->resultFile);
+        if ($ctime === false || $ctime < time() - 24 * 3600) {
+            return true;
+        }
+        return false;
+    }
+
+    public function cleanup(): self
+    {
+        @unlink($this->jobFile);
+        @unlink($this->resultFile);
         return $this;
     }
 
@@ -80,8 +122,14 @@ class Job
         return $data;
     }
 
-    public function finish(): self
+    public function finish(?array $ret): self
     {
+        if ($ret !== null) {
+            file_put_contents($this->resultFile, Yaml::dump($ret, 3));
+        } else {
+            @unlink($this->resultFile);
+        }
+
         if ($this->fd !== null) {
             fseek($this->fd, 0, SEEK_SET);
             ftruncate($this->fd, 0);

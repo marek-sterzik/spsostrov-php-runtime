@@ -33,4 +33,25 @@ class Sync
             return false;
         }
     }
+
+    public function getConfig(): array
+    {
+        return array_merge($this->getDefaultConfig(), $this->driver->getConfig($this->driverData));
+    }
+
+    private function getDefaultConfig(): array
+    {
+        $class = get_class($this->driver);
+        $driver = null;
+        if (is_callable([$class, "getProtocols"])) {
+            $protocols = $class::getProtocols();
+            $driver = $protocols[0] ?? null;
+        }
+
+        return [
+            "driver" => $driver ?? "unknown",
+            "enabled" => $this->isEnabled(),
+            "forceEnabled" => $this->isForceEnabled(),
+        ];
+    }
 }

@@ -21,7 +21,7 @@ class CloseSubmission extends AbstractJob
         return 'close_submission';
     }
 
-    public function run(array $arguments): void
+    public function run(array $arguments): ?array
     {
         $submission = $this->submissionRepository->find($arguments['id']);
         if ($submission !== null) {
@@ -44,5 +44,6 @@ class CloseSubmission extends AbstractJob
                 $this->entityManager->flush();
             }
         }
+        return null;
     }
 }

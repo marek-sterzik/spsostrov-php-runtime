@@ -22,4 +22,14 @@ class JobManager
         $this->jobStarter->runAllJobsAsync();
         return $uuid;
     }
+
+    public function getJobStatus(string $uuid, bool $cleanup = true): array
+    {
+        $job = $this->jobDir->job($uuid);
+        $res = ["finished" => $job->isFinished()];
+        if ($res['finished']) {
+            $res['result'] = $job->getResult($cleanup);
+        }
+        return $res;
+    }
 }

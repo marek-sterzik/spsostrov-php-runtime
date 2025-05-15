@@ -1,0 +1,17 @@
+{% extends "base.html.twig" %}
+{% block body %}
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-12">
+                <div>
+                    <h1>Informace o synchronizaci</h1>
+                </div>
+                <table class="table table-bordered thin-headings">
+                    {% for record in config %}
+                        <tr><th>{{ record.heading|raw }}:</th><td class="text-break{% if record.class is not null %} {{ record.class }}{% endif %}"><div>{{ record.valueHtml|raw }}</div></td></tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

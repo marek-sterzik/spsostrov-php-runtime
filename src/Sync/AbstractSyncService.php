@@ -16,4 +16,5 @@ abstract class AbstractSyncService implements SyncServiceInterface
     abstract public function isEnabled(array $driverData): bool;
     abstract public function isForceEnabled(array $driverData): bool;
     abstract public function testConnection(array $driverData): bool;
+    abstract public function getConfig(array $driverData): array;
 }

@@ -21,7 +21,7 @@ class RemoveSubmission extends AbstractJob
         return 'remove_submission';
     }
 
-    public function run(array $arguments): void
+    public function run(array $arguments): ?array
     {
         $submission = $this->submissionRepository->find($arguments['id']);
         if ($submission !== null && $submission->getState() === SubmissionState::Trash) {
@@ -29,5 +29,6 @@ class RemoveSubmission extends AbstractJob
             $this->entityManager->remove($submission);
             $this->entityManager->flush();
         }
+        return null;
     }
 }

@@ -39,4 +39,13 @@ class DummySync extends AbstractSyncService
     {
         return true;
     }
+
+    public function getConfig(array $driverData): array
+    {
+        if ($driverData['enabled']) {
+            return ["name" => 'Dummy driver', "driver" => "dummy"];
+        } else {
+            return ["name" => 'Disabled', "driver" => "disabled"];
+        }
+    }
 }

@@ -11,7 +11,6 @@ use App\Job\Jobs\AbstractJob;
 class JobStarter
 {
     const COMMAND = "job:run";
-    const ASYNC_COMMAND = "jobs:run";
 
     /**
      * @param ServiceLocator<AbstractJob> $jobs
@@ -23,16 +22,22 @@ class JobStarter
     public function runAllJobsAsync(): self
     {
         $command = escapeshellcmd('nohup') . " " . escapeshellarg($this->consoleCommand) . " " .
-            escapeshellarg(self::ASYNC_COMMAND);
+            escapeshellarg(self::COMMAND);
         system($command . " > /dev/null 2>&1 &");
         return $this;
     }
 
     public function runAllJobs(): self
     {
-        foreach ($this->jobDir->listJobs() as $job) {
-            if (!$job->isRunning()) {
-                $this->invokeConsoleCommandForJob($job);
+        foreach ($this->jobDir->listJobs(false) as $job) {
+            if (!$job->isFinished()) {
+                if (!$job->isRunning()) {
+                    $this->invokeConsoleCommandForJob($job);
+                }
+            } else {
+                if ($job->shouldBeCleanedUp()) {
+                    $job->cleanup();
+                }
             }
         }
         return $this;
@@ -49,22 +54,22 @@ class JobStarter
     {
         $job = $this->jobDir->job($uuid);
         $data = $job->tryStart();
+        $ret = null;
         if (isset($data['job']) && is_string($data['job'])) {
             if (!isset($data['arguments'])) {
                 $data['arguments'] = [];
             }
             if (is_array($data['arguments'])) {
-                $this->runJobRaw($data['job'], $data['arguments']);
+                $ret = $this->runJobRaw($data['job'], $data['arguments']);
             }
         }
-        $job->finish();
+        $job->finish($ret);
         return $this;
     }
 
-    private function runJobRaw(string $job, array $arguments): self
+    private function runJobRaw(string $job, array $arguments): ?array
     {
         $job = $this->jobs->get($job);
-        $job->run($arguments);
-        return $this;
+        return $job->realRun($arguments);
     }
 }

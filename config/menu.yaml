@@ -18,6 +18,9 @@ menu:
   - name: adminer
     route: adminer-frame
     roles: ['ROLE_SUPERADMIN']
+  - name: synchronizace
+    route: sync-info
+    roles: ['ROLE_SUPERADMIN']
   - name: detail uživatele
     route: user_detail
     roles: ['ROLE_USER']

@@ -22,8 +22,12 @@ class SFTPSync extends AbstractSyncService
         return ['sftp', 'ssh'];
     }
 
+
+    private string $sshKeyFilePub;
+
     public function __construct(private string $sshKeyFile)
     {
+        $this->sshKeyFilePub = $sshKeyFile . ".pub";
     }
 
     protected function createDriverData(array $parsedUri): array
@@ -152,6 +156,41 @@ class SFTPSync extends AbstractSyncService
     {
         $sftp = $this->connect($driverData);
         return is_array($sftp->rawList());
+    }
+
+    public function getConfig(array $driverData): array
+    {
+        $remoteHost = $driverData['host'];
+        if ($driverData['port'] !== 22) {
+            $remoteHost .= ":" . $driverData['port'];
+        }
+        $config = [
+            "name" => "SFTP driver",
+            "remoteHost" => $remoteHost,
+            "remotePath" => $driverData['path'],
+            "username" => $driverData['user'],
+        ];
+        if ($driverData['use_key']) {
+            $sshKey = @file_get_contents($this->sshKeyFilePub);
+            if (is_string($sshKey)) {
+                $sshKey = $this->patchPublicSshKey($sshKey);
+                $config["sshKey"] = $sshKey;
+            } else {
+                $config["sshKey"] = "unknown";
+            }
+        } else {
+            $config["password"] = str_repeat("*", strlen($driverData['pass']));
+        }
+        return $config;
+    }
+
+    private function patchPublicSshKey(string $sshKey): string
+    {
+        $sshKey = trim($sshKey);
+        if (preg_match('/^([^\s]+\s+[^\s]+)\s+[^\s]+@[^\s]+$/', $sshKey, $matches)) {
+            return $matches[1] . " submitter@submitter";
+        }
+        return $sshKey;
     }
 
     private function connect(array $driverData): SFTP

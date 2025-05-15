@@ -26,16 +26,30 @@ class JobRunCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addArgument('uuid', InputArgument::REQUIRED, 'UUID of the job being run')
+            ->addArgument('uuid', InputArgument::IS_ARRAY, 'UUID of the job being run')
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $uuid = $input->getArgument('uuid');
+        $uuids = $input->getArgument('uuid');
 
-        $this->jobStarter->runJob($uuid);
+        if (empty($uuids)) {
+            $this->jobStarter->runAllJobs();
+        } else {
+            while (!empty($uuids)) {
+                $uuid = array_shift($uuids);
+                if (!empty($uuids)) {
+                    if (pcntl_fork() == 0) {
+                        $this->jobStarter->runJob($uuid);
+                        return Command::SUCCESS;
+                    }
+                } else {
+                    $this->jobStarter->runJob($uuid);
+                }
+            }
+        }
 
         return Command::SUCCESS;
     }

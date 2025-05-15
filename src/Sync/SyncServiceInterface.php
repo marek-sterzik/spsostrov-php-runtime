@@ -10,4 +10,5 @@ interface SyncServiceInterface
     public function isEnabled(array $driverData): bool;
     public function isForceEnabled(array $driverData): bool;
     public function testConnection(array $driverData): bool;
+    public function getConfig(array $driverData): array;
 }
