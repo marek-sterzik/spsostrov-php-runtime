@@ -55,9 +55,7 @@ class SubmissionController extends AbstractController
         if ($user === null) {
             return $this->redirectBack(true);
         }
-        $lock = sprintf("sc-%d-%d", $assignment->getId(), $user->getId());
-        $this->lockManager->lock($lock);
-        try {
+        return $this->lock($assignment, $user, function () use ($assignment, $user, $error, $errorMessage) {
             $submission = $this->ensureSubmissionExists($assignment, $user);
             if ($submission === null) {
                 return $this->redirectBack(true);
@@ -77,9 +75,7 @@ class SubmissionController extends AbstractController
             ])
             ->handle()
             ;
-        } finally {
-            $this->lockManager->unlock($lock);
-        }
+        });
     }
 
     #[IsGranted('ROLE_STUDENT')]
@@ -115,20 +111,36 @@ class SubmissionController extends AbstractController
     public function closeAction(Assignment $assignment, Request $request): Response
     {
         $user = $this->getUserEntity();
-        $submission = $this->ensureSubmissionExists($assignment, $user);
-        if ($submission->getId() === null || $submission->getSubmitter() !== $user) {
-            return $this->redirectToRoute('create-submission', [
-                "assignment" => $assignment->getId(),
-                "_back" => false,
-            ]);
-        }
-        $submission->setSubmittedAt(new DateTimeImmutable());
-        $submission->setState(SubmissionState::Submitted);
-        $this->fileManager->putManifest($submission);
-        $this->getEntityManager()->flush();
-        $this->submissionRepository->updateCurrentFor($submission);
-        $this->jobManager->invoke("close_submission", ["id" => $submission->getId()]);
-        return $this->redirectToRoute('submission-detail', ["submission" => $submission->getId(), "_back" => false]);
+        return $this->lock($assignment, $user, function () use ($assignment, $request, $user) {
+            $submission = $this->ensureSubmissionExists($assignment, $user);
+            if ($submission->getId() === null || $submission->getSubmitter() !== $user) {
+                return $this->redirectToRoute('create-submission', [
+                    "assignment" => $assignment->getId(),
+                    "_back" => false,
+                ]);
+            }
+            $submission->setSubmittedAt(new DateTimeImmutable());
+            $submission->setState(SubmissionState::Submitted);
+            $this->fileManager->putManifest($submission);
+            $this->getEntityManager()->flush();
+            if ($assignment->getSubmissionMode()->deleteOld()) {
+                $submissions = [];
+                foreach ($this->submissionRepository->selectCurrentFor($submission) as $deactivatedSubmission) {
+                    $deactivatedSubmission->setCurrent(false);
+                    $submissions[] = $deactivatedSubmission->getId();
+                }
+                if (!empty($submissions)) {
+                    $this->getEntityManager()->flush();
+                    foreach ($submissions as $submissionId) {
+                        $this->jobManager->inoke("remove_submission", ["id" => $submissionId, "force" => true]);
+                    }
+                }
+            } else {
+                $this->submissionRepository->updateCurrentFor($submission);
+            }
+            $this->jobManager->invoke("close_submission", ["id" => $submission->getId()]);
+            return $this->redirectToRoute('submission-detail', ["submission" => $submission->getId(), "_back" => false]);
+        });
     }
 
     private function submitFiles(array $files, Submission $submission): void
@@ -161,5 +173,16 @@ class SubmissionController extends AbstractController
     protected function getDefaultBackUrl(): string
     {
         return $this->generateUrl("submit");
+    }
+
+    private function lock(Assignment $assignment, User $user, callable $criticalSection)
+    {
+        $lock = sprintf("sc-%d-%d", $assignment->getId(), $user->getId());
+        $this->lockManager->lock($lock);
+        try {
+            return $criticalSection();
+        } finally {
+            $this->lockManager->unlock($lock);
+        }
     }
 }

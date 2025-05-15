@@ -12,6 +12,7 @@
 * display submissions of a particular assignment (possiblity to rotate between submissions)
 * deal with functionality "delete outdated draft submission"
 * upload checks properly file sizes to match limits
+* sync info page shows sync test if available
 
 ## Nice to have
 

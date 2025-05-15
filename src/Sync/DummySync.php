@@ -25,6 +25,10 @@ class DummySync extends AbstractSyncService
     {
     }
 
+    public function removeFile(array $driverData, string $basePath, string $subdir, string $file): void
+    {
+    }
+
     public function isEnabled(array $driverData): bool
     {
         return $driverData['enabled'];

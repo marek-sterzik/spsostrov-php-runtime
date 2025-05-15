@@ -90,6 +90,7 @@ class FileManager
     {
         $this->locked($submission, function () use ($submission) {
             $this->fileOperations->cleanup($submission);
+            $this->backupOperations->cleanup($submission);
         });
         return $this;
     }

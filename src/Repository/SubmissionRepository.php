@@ -31,13 +31,37 @@ class SubmissionRepository extends ServiceEntityRepository
             ->andWhere("s.submitter = :user")
             ->andWhere("s.id != :submission")
             ->andWhere("s.state != :draft")
+            ->andWhere("s.isCurrent = :true")
             ->setParameter(":false", false)
+            ->setParameter(":true", true)
             ->setParameter(":assignment", $assignmentId)
             ->setParameter(":user", $userId)
             ->setParameter(":submission", $submissionId)
             ->setParameter(":draft", SubmissionState::Draft)
             ->getQuery()
             ->execute()
+        ;
+    }
+
+    public function selectCurrentFor(Submission $submission): array
+    {
+        $assignmentId = $submission->getAssignment()->getId();
+        $submissionId = $submission->getId();
+        $userId = $submission->getSubmitter()->getId();
+        return $this->createQueryBuilder("s")
+            ->andWhere("s.assignment = :assignment")
+            ->andWhere("s.submitter = :user")
+            ->andWhere("s.id != :submission")
+            ->andWhere("s.state != :draft")
+            ->andWhere("s.isCurrent = :true")
+            ->setParameter(":false", false)
+            ->setParameter(":true", true)
+            ->setParameter(":assignment", $assignmentId)
+            ->setParameter(":user", $userId)
+            ->setParameter(":submission", $submissionId)
+            ->setParameter(":draft", SubmissionState::Draft)
+            ->getQuery()
+            ->getResult()
         ;
     }
 

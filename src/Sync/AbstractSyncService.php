@@ -13,6 +13,7 @@ abstract class AbstractSyncService implements SyncServiceInterface
 
     abstract protected function createDriverData(array $parsedUri): array;
     abstract public function syncFile(array $driverData, string $basePath, string $subdir, string $file): void;
+    abstract public function removeFile(array $driverData, string $basePath, string $subdir, string $file): void;
     abstract public function isEnabled(array $driverData): bool;
     abstract public function isForceEnabled(array $driverData): bool;
     abstract public function testConnection(array $driverData): bool;

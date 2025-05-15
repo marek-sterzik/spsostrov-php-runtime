@@ -96,6 +96,51 @@ class SFTPSync extends AbstractSyncService
 
     public function syncFile(array $driverData, string $basePath, string $subdir, string $file): void
     {
+        $paths = $this->parsePaths($basePath, $subdir, $file);
+        
+        $sftp = $this->connect($driverData);
+        foreach ($paths['subdir'] as $dir) {
+            $this->forceChdir($sftp, $dir);
+        }
+        
+        $sftp->delete($paths['remoteFile']);
+        $sftp->put($paths['remoteFile'], $paths['localFile'], SFTP::SOURCE_LOCAL_FILE);
+        $sftp->disconnect();
+    }
+
+    public function removeFile(array $driverData, string $basePath, string $subdir, string $file): void
+    {
+        $paths = $this->parsePaths($basePath, $subdir, $file);
+        
+        $sftp = $this->connect($driverData);
+        $chdirFailed = false;
+        $toRemove = [];
+        foreach ($paths['subdir'] as $dir) {
+            if (!$sftp->chdir($dir)) {
+                $chdirFailed = true;
+                break;
+            }
+            $toRemove[] = $dir;
+        }
+
+        if (!$chdirFailed) {
+            $sftp->delete($paths['remoteFile']);
+        }
+
+        while (!empty($toRemove)) {
+            $dir = array_pop($toRemove);
+            if (!$sftp->chdir("..")) {
+                break;
+            }
+            if (!$sftp->rmdir($dir)) {
+                break;
+            }
+        }
+        $sftp->disconnect();
+    }
+
+    private function parsePaths(string $basePath, string $subdir, string $file): array
+    {
         $localFile = sprintf("%s/%s/%s", $basePath, $subdir, $file);
         $remoteFile = $file;
         
@@ -104,14 +149,11 @@ class SFTPSync extends AbstractSyncService
         } else {
             $subdir = explode("/", $subdir);
         }
-        
-        $sftp = $this->connect($driverData);
-        foreach ($subdir as $dir) {
-            $this->forceChdir($sftp, $dir);
-        }
-        
-        $sftp->delete($remoteFile);
-        $sftp->put($remoteFile, $localFile, SFTP::SOURCE_LOCAL_FILE);
+        return [
+            "localFile" => $localFile,
+            "remoteFile" => $remoteFile,
+            "subdir" => $subdir,
+        ];
     }
 
     private function forceChdir(SFTP $sftp, string $dir): void
