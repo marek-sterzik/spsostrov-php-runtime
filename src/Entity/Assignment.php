@@ -384,6 +384,27 @@ class Assignment
         return true;
     }
 
+    public function canSubmit(?User $user): bool
+    {
+        if ($user === null) {
+            return false;
+        }
+        if ($this->getState() !== AssignmentState::Active) {
+            return false;
+        }
+        if (!$user->isStudent()) {
+            return false;
+        }
+        $studentClass = $user->getRealStudentClass();
+        if ($studentClass === null) {
+            return false;
+        }
+        if (!preg_match('/'. $this->getClassesRegexp() .'/', $studentClass)) {
+            return false;
+        }
+        return true;
+    }
+
     private function isAfterDeadline(): bool
     {
         return ($this->hardDeadline !== null && (new DateTimeImmutable()) > $this->hardDeadline);

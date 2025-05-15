@@ -7,6 +7,10 @@ menu:
     route: submit
     routes: ['create-submission', 'submission-detail']
     roles: ['ROLE_STUDENT']
+  - name: moje práce
+    route: submissions
+    routes: ['submission-detail']
+    roles: ['ROLE_STUDENT']
   - name: uživatelé
     route: users
     routes: ["user"]

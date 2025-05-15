@@ -14,6 +14,7 @@
 * display submissions of a particular assignment (possiblity to rotate between submissions)
 * deal with functionality "delete outdated submission"
 * upload checks properly file sizes to match limits
+* submission allowed only if assignment class matches user class
 
 ## Nice to have
 

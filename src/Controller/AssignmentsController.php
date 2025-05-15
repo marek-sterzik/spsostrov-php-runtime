@@ -95,7 +95,7 @@ class AssignmentsController extends AbstractDbTableController
         $type = $this->renderView('snippets/assignment-public.html.twig', ["public" => $assignment->isPublic()]);
         $createdAt = $this->renderView('snippets/datetime.html.twig', ["date" => $assignment->getCreatedAt()]);
         $submissionCount = $this->submissionRepository->countSubmissions($assignment);
-        $submitted = $this->renderView('snippets/submission-count.html.twig', ["count" => $submissionCount]);
+        $submitted = $this->renderView('snippets/object-count.html.twig', ["count" => $submissionCount]);
 
         return [
             "caption" => $assignment->getCaption(),
@@ -104,7 +104,7 @@ class AssignmentsController extends AbstractDbTableController
             "type" => Cell::html($type),
             "state" => Cell::html($state),
             "createdAt" => Cell::html($createdAt),
-            "submitted" => Cell::html($submitted)->attribute("class", "text-center"),
+            "submitted" => Cell::html($submitted),
             "_actions" => $this->getAssignmentActions($assignment),
         ];
     }

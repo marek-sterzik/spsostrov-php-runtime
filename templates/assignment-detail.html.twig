@@ -1,9 +1,9 @@
 {% extends "base.html.twig" %}
 {% block body %}
+    {{ backAction.render()|raw }}
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-6 col-12">
-                {{ backAction.render()|raw }}
                 <div>
                     <h1>{{ assignment.caption }}</h1>
                     {{ descriptionHtml|raw }}
@@ -19,7 +19,7 @@
                     <tr><th>školní rok:</th><td>{{ assignment.schoolYear }}/{{ assignment.schoolYear + 1 }}</td></tr>
                     <tr><th>vytvořeno:</th><td>{% include "snippets/datetime.html.twig" with {"date": assignment.createdAt} %}</td></tr>
                         {% if submissionCount is not null %}
-                        <tr><th>počet&nbsp;odevzdání:</th><td>{% include "snippets/submission-count.html.twig" with {"count": submissionCount} %}</td></tr>
+                        <tr><th>počet&nbsp;odevzdání:</th><td>{% include "snippets/object-count.html.twig" with {"count": submissionCount} %}</td></tr>
                     {% endif %}
                     <tr><td colspan="2">
                         {% for action in actions %}{{ action.render()|raw }} {% endfor %}

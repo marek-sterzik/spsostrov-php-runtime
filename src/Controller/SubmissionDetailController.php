@@ -10,6 +10,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 use App\FileManager\FileManager;
 use App\Entity\Submission;
+use App\Component\Action;
 
 class SubmissionDetailController extends AbstractController
 {
@@ -46,7 +47,11 @@ class SubmissionDetailController extends AbstractController
                 "timeout" => $timeout,
             ]);
         } else {
+            $back = Action::get($this->getBackUrl(true))
+                ->label("zpět")->cssClass("btn-secondary")->icon("bi-arrow-left")
+            ;
             return $this->render("submission.html.twig", [
+                "backAction" => $back,
                 "submission" => $submission,
                 "files" => $this->fileManager->listFiles($submission),
                 "timeout" => $timeout,

@@ -140,7 +140,7 @@ class SubmissionController extends AbstractController
 
     private function ensureSubmissionExists(Assignment $assignment, User $user): ?Submission
     {
-        if ($assignment->getState() !== AssignmentState::Active) {
+        if (!$assignment->canSubmit($user)) {
             return null;
         }
         $submission = $this->submissionRepository->getLastSubmission($assignment, $user);

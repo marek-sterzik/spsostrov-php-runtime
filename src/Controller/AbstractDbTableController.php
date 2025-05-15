@@ -24,9 +24,15 @@ abstract class AbstractDbTableController extends AbstractTableController
         return $queryBuilder->select("count(1)");
     }
 
+    protected function setOrderByQuery(QueryBuilder $queryBuilder): QueryBuilder
+    {
+        return $queryBuilder;
+    }
+
     protected function getDataQuery(int $page, int $pageSize, array $filterData): QueryBuilder
     {
         $queryBuilder = $this->getBaseQueryBuilder($filterData);
+        $queryBuilder = $this->setOrderByQuery($queryBuilder);
         return $queryBuilder->setFirstResult($page * $pageSize)->setMaxResults($pageSize);
     }
 
