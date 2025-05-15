@@ -36,7 +36,7 @@ class ZipOperations
             throw new Exception("Zip archive cannot be created");
         }
 
-        $this->fileOperations->cleanup($submission);
+        $this->fileOperations->cleanup($submission, false);
         return $this;
     }
 

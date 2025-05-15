@@ -89,7 +89,7 @@ class FileManager
     public function cleanup(Submission $submission): self
     {
         $this->locked($submission, function () use ($submission) {
-            $this->fileOperations->cleanup($submission);
+            $this->fileOperations->cleanup($submission, true);
             $this->backupOperations->cleanup($submission);
         });
         return $this;

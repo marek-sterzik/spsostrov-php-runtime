@@ -27,7 +27,7 @@ class RemoveSubmission extends AbstractJob
         $submission = $this->submissionRepository->find($arguments['id']);
         $force = ($arguments['force'] ?? false) ? true : false;
         if ($submission !== null) {
-            if ($force && $submission->getState() !== Submission::Trash) {
+            if ($force && $submission->getState() !== SubmissionState::Trash) {
                 if (!$submission->getState()->isFinal()) {
                     throw new Exception("Job not yet finished, cannot be deleted");
                 }

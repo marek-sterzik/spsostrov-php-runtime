@@ -48,10 +48,8 @@ class Sync
     {
         $class = get_class($this->driver);
         $driver = null;
-        if (is_callable([$class, "getProtocols"])) {
-            $protocols = $class::getProtocols();
-            $driver = $protocols[0] ?? null;
-        }
+        $protocols = $class::getProtocols();
+        $driver = $protocols[0] ?? null;
 
         return [
             "driver" => $driver ?? "unknown",

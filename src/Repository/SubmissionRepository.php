@@ -54,7 +54,6 @@ class SubmissionRepository extends ServiceEntityRepository
             ->andWhere("s.id != :submission")
             ->andWhere("s.state != :draft")
             ->andWhere("s.isCurrent = :true")
-            ->setParameter(":false", false)
             ->setParameter(":true", true)
             ->setParameter(":assignment", $assignmentId)
             ->setParameter(":user", $userId)

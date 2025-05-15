@@ -74,10 +74,14 @@ class SyncInfoController extends AbstractController
 
     private function convertValue(mixed $value, string $field): ?string
     {
+        /** @phpstan-ignore-next-line */
         $convertor = self::FIELD_CONVERTORS[$field] ?? 'defaultConvertor';
         return $this->$convertor($value);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
+     */
     private function defaultConvertor(mixed $value): ?string
     {
         if ($value === null) {
@@ -91,5 +95,4 @@ class SyncInfoController extends AbstractController
         }
         return null;
     }
-
 }

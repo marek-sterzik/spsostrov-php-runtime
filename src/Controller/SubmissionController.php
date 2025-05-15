@@ -108,10 +108,10 @@ class SubmissionController extends AbstractController
 
     #[IsGranted('ROLE_STUDENT')]
     #[Route("/submission/{assignment}/close", name: 'submission-close')]
-    public function closeAction(Assignment $assignment, Request $request): Response
+    public function closeAction(Assignment $assignment): Response
     {
         $user = $this->getUserEntity();
-        return $this->lock($assignment, $user, function () use ($assignment, $request, $user) {
+        return $this->lock($assignment, $user, function () use ($assignment, $user) {
             $submission = $this->ensureSubmissionExists($assignment, $user);
             if ($submission->getId() === null || $submission->getSubmitter() !== $user) {
                 return $this->redirectToRoute('create-submission', [
@@ -132,14 +132,17 @@ class SubmissionController extends AbstractController
                 if (!empty($submissions)) {
                     $this->getEntityManager()->flush();
                     foreach ($submissions as $submissionId) {
-                        $this->jobManager->inoke("remove_submission", ["id" => $submissionId, "force" => true]);
+                        $this->jobManager->invoke("remove_submission", ["id" => $submissionId, "force" => true]);
                     }
                 }
             } else {
                 $this->submissionRepository->updateCurrentFor($submission);
             }
             $this->jobManager->invoke("close_submission", ["id" => $submission->getId()]);
-            return $this->redirectToRoute('submission-detail', ["submission" => $submission->getId(), "_back" => false]);
+            return $this->redirectToRoute(
+                'submission-detail',
+                ["submission" => $submission->getId(), "_back" => false]
+            );
         });
     }
 
@@ -175,7 +178,7 @@ class SubmissionController extends AbstractController
         return $this->generateUrl("submit");
     }
 
-    private function lock(Assignment $assignment, User $user, callable $criticalSection)
+    private function lock(Assignment $assignment, User $user, callable $criticalSection): mixed
     {
         $lock = sprintf("sc-%d-%d", $assignment->getId(), $user->getId());
         $this->lockManager->lock($lock);

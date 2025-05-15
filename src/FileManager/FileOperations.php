@@ -147,9 +147,13 @@ class FileOperations
         }
     }
 
-    public function cleanup(Submission $submission): self
+    public function cleanup(Submission $submission, bool $includeZip): self
     {
         $submissionDirectory = $this->getSubmissionDirectory($submission);
+        if ($includeZip) {
+            @unlink($this->getSubmissionZipArchive($submission, true));
+            @unlink($this->getSubmissionZipArchive($submission, false));
+        }
         $this->rmRf($submissionDirectory);
         foreach ($this->getParentDirectories($submission) as $dir) {
             @rmdir($dir);

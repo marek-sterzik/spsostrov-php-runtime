@@ -48,7 +48,7 @@ class Job
         if ($cleanup) {
             @unlink($this->resultFile);
         }
-        return $ret;
+        return $res;
     }
 
     public function shouldBeCleanedUp(): bool

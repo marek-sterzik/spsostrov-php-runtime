@@ -45,6 +45,5 @@ enum SubmissionMode: string
             self::Once => true,
             default => false
         };
-
     }
 }

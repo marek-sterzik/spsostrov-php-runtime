@@ -307,6 +307,7 @@ class Assignment
         $this->setDescription($template->getDescription());
         $this->setClasses($template->getClasses());
         $this->setPublic($template->isPublic());
+        $this->setBackedUp($template->isBackedUp());
 
         $schoolYear = $template->getSchoolYear();
         if ($schoolYear !== null && $schoolYear >= CurrentSchoolYear::get()) {
