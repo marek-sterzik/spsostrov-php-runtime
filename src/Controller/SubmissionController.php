@@ -126,6 +126,7 @@ class SubmissionController extends AbstractController
         $submission->setState(SubmissionState::Submitted);
         $this->fileManager->putManifest($submission);
         $this->getEntityManager()->flush();
+        $this->submissionRepository->updateCurrentFor($submission);
         $this->jobManager->invoke("close_submission", ["id" => $submission->getId()]);
         return $this->redirectToRoute('submission-detail', ["submission" => $submission->getId(), "_back" => false]);
     }

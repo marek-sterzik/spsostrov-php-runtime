@@ -23,7 +23,7 @@
                 {% endif %}
                 <h4>Informace</h4>
                 <table class="table table-bordered thin-headings">
-                    <tr><th>stav:</th><td class="submission-state">{% include "snippets/submission-state.html.twig" with {"state": submission.state} %}</td></tr>
+                    <tr><th>stav:</th><td class="submission-state">{% include "snippets/submission-state.html.twig" with {"state": submission.state, "isCurrent": submission.isCurrent} %}</td></tr>
                     <tr><th>odevzdal:</th><td>{{ submission.submitter.name }}{% if submission.submitter == userEntity %} {% include "snippets/me.html.twig" %}{% endif %}</td></tr>
                     {% if submission.submittedAt is not null %}
                         <tr><th>čas&nbsp;odevzdání:</th><td>{% include "snippets/submitted-at.html.twig" with {"submission": submission} %}</td></tr>

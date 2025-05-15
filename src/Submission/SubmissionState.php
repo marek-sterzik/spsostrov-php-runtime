@@ -33,7 +33,15 @@ enum SubmissionState: string
     #[Description("hotovo")]
     #[Parameter("icon", "bi-file-earmark")]
     case NotSynced = "not_synced";
-    
+
+    public function isClosed(): bool
+    {
+        return match ($this) {
+            self::Draft => false,
+            default => true
+        };
+    }
+
     public function isSynced(): bool
     {
         return match ($this) {

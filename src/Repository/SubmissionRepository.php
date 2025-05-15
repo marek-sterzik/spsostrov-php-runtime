@@ -19,6 +19,28 @@ class SubmissionRepository extends ServiceEntityRepository
         parent::__construct($registry, Submission::class);
     }
 
+    public function updateCurrentFor(Submission $submission)
+    {
+        $assignmentId = $submission->getAssignment()->getId();
+        $submissionId = $submission->getId();
+        $userId = $submission->getSubmitter()->getId();
+        $this->createQueryBuilder("s")
+            ->update()
+            ->set("s.isCurrent", ":false")
+            ->andWhere("s.assignment = :assignment")
+            ->andWhere("s.submitter = :user")
+            ->andWhere("s.id != :submission")
+            ->andWhere("s.state != :draft")
+            ->setParameter(":false", false)
+            ->setParameter(":assignment", $assignmentId)
+            ->setParameter(":user", $userId)
+            ->setParameter(":submission", $submissionId)
+            ->setParameter(":draft", SubmissionState::Draft)
+            ->getQuery()
+            ->execute()
+        ;
+    }
+
     public function countSubmissions(Assignment $assignment): ?int
     {
         if (!$assignment->getState()->submissionsAvailable()) {

@@ -32,6 +32,12 @@ class Submission
     #[ORM\Column(type: Types::STRING, length: 16, enumType: SubmissionState::class)]
     private SubmissionState $state = SubmissionState::Draft;
 
+    # an submission is current if it is the last finished submission
+    # and also all drafts are set as current
+    # current status on trash are irrelevant
+    #[ORM\Column]
+    private bool $isCurrent = true;
+
     #[ORM\Column]
     private DateTimeImmutable $createdAt;
     
@@ -95,6 +101,18 @@ class Submission
     public function setState(SubmissionState $state): static
     {
         $this->state = $state;
+
+        return $this;
+    }
+
+    public function isCurrent(): bool
+    {
+        return $this->isCurrent;
+    }
+
+    public function setCurrent(bool $isCurrent): self
+    {
+        $this->isCurrent = $isCurrent;
 
         return $this;
     }

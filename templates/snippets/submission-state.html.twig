@@ -1,1 +1,2 @@
 <span><i class="bi {{ state.param("icon") }} me-1"></i> {{ state.description }}</span>
+{% if state.isClosed() and  isCurrent is defined and isCurrent %}<span class="badge bg-success"><i class="bi bi-alarm"></i> aktuální</span>{% endif %}
