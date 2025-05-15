@@ -268,8 +268,10 @@ class FileOperations
 
     private function getAssignmentDirectory(Submission $submission, bool $relative = false): string
     {
-        $assignmentId = $submission->getAssignment()->getId();
-        return $relative ? ((string)$assignmentId) : sprintf("%s/%d", $this->storageDir, $assignmentId);
+        $assignment = $submission->getAssignment();
+        $schoolYear = $assignment->getSchoolYear();
+        $relativeDir = sprintf("%d-%02d/%d", $schoolYear, ($schoolYear + 1) % 100, $assignment->getId());
+        return $relative ? $relativeDir : sprintf("%s/%s", $this->storageDir, $relativeDir);
     }
 
     private function getParentDirectories(Submission $submission, bool $relative = false): array

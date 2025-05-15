@@ -19,7 +19,7 @@ class SubmissionRepository extends ServiceEntityRepository
         parent::__construct($registry, Submission::class);
     }
 
-    public function updateCurrentFor(Submission $submission)
+    public function updateCurrentFor(Submission $submission): void
     {
         $assignmentId = $submission->getAssignment()->getId();
         $submissionId = $submission->getId();
