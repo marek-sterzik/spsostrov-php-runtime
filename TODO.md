@@ -8,13 +8,10 @@
 * make some help for prefixed searches
 * trash drafts after assignment state becomes inactive (maybe after other criteria)
 * nice custom 404 and 500 templates
-* automatically appear whole zip file when available
 * limitation of submission size
-* display "my submissions"
 * display submissions of a particular assignment (possiblity to rotate between submissions)
-* deal with functionality "delete outdated submission"
+* deal with functionality "delete outdated draft submission"
 * upload checks properly file sizes to match limits
-* submission allowed only if assignment class matches user class
 
 ## Nice to have
 
