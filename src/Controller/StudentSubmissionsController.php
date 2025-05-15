@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Form\FormInterface;
+use App\Form\Filter\StudentSubmissionsType;
 use Doctrine\ORM\QueryBuilder;
 
 class StudentSubmissionsController extends AbstractSubmissionsController
@@ -32,13 +33,7 @@ class StudentSubmissionsController extends AbstractSubmissionsController
 
     protected function getForm(array $formData): ?FormInterface
     {
-        return null;
-    }
-
-    protected function getDefaultFilterData(): array
-    {
-        return [
-        ];
+        return $this->createForm(StudentSubmissionsType::class, $formData);
     }
 
     protected function isStudentView(): bool

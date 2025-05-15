@@ -25,10 +25,29 @@ abstract class AbstractSubmissionsController extends AbstractDbTableController
         $me = $this->getUser()->getUserData();
         $qb = $this->submissionRepository->createQueryBuilder('s');
         $qb
+            ->innerJoin('s.assignment', 'a')
+            ->innerJoin('s.submitter', 'u')
             ->addSelect("CASE WHEN s.submittedAt IS NULL THEN 1 ELSE 0 END AS HIDDEN isSubmitted")
             ->andWhere("s.state != :trash")
             ->setParameter(":trash", SubmissionState::Trash)
         ;
+        if (!($filterData['a'] ?? true)) {
+            $qb->andWhere("s.isCurrent = true");
+        }
+        $searchTool = new SearchTool();
+        $searchTool->handle(null, function (QueryBuilder $qb, string $string, ?string $type, string $var) {
+
+            $orClauses = [
+                $qb->expr()->like("a.caption", ":${var}"),
+            ];
+            if (!$this->isStudentView()) {
+                $orClauses[] = $qb->expr()->like("u.username", ":${var}");
+                $orClauses[] = $qb->expr()->like("u.name", ":${var}");
+            }
+            $qb->andWhere($qb->expr()->orX(...$orClauses));
+            $qb->setParameter(":${var}", "%$string%");
+        });
+        $searchTool->search($qb, $filterData['q'] ?? '');
         return $qb;
     }
 
@@ -107,4 +126,11 @@ abstract class AbstractSubmissionsController extends AbstractDbTableController
     }
 
     abstract protected function isStudentView(): bool;
+    
+    protected function getDefaultFilterData(): array
+    {
+        return [
+            "a" => false,
+        ];
+    }
 }

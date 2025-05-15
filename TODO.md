@@ -10,9 +10,9 @@
 * nice custom 404 and 500 templates
 * limitation of submission size
 * display submissions of a particular assignment (possiblity to rotate between submissions)
-* deal with functionality "delete outdated draft submission"
 * upload checks properly file sizes to match limits
 * sync info page shows sync test if available
+* alert when submitting after deadline and confirm if you really want to submit
 
 ## Nice to have
 
