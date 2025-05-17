@@ -37,7 +37,7 @@ class AssignmentsController extends AbstractDbTableController
     protected function getBaseQueryBuilder(array $filterData): QueryBuilder
     {
         $adminView = $this->isGranted("ROLE_ADMIN");
-        $me = $this->getUser()->getUserData();
+        $me = $this->getUserEntity();
         $qb = $this->getEntityManager()->getRepository(Assignment::class)->createQueryBuilder('a');
         if ($filterData['a']) {
             if (!$adminView) {

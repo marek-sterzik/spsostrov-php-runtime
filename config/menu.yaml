@@ -3,6 +3,9 @@ menu:
     route: assignments
     routes: ["new-assignment", "assignment-detail", "assignment"]
     roles: ['ROLE_TEACHER']
+  - name: odevzdané práce
+    route: all-submissions
+    roles: ['ROLE_TEACHER']
   - name: odevzdat
     route: submit
     routes: ['create-submission']

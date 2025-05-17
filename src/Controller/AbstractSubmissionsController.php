@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use Doctrine\ORM\QueryBuilder;
+use Symfony\Component\Form\FormInterface;
 use App\Entity\Submission;
 use App\Component\Cell;
 use App\Component\Action;
@@ -11,6 +12,7 @@ use App\Utility\SearchTool;
 use App\Submission\SubmissionState;
 use App\Repository\SubmissionRepository;
 use App\FileManager\FileManager;
+use App\Form\Filter\SubmissionsType;
 
 abstract class AbstractSubmissionsController extends AbstractDbTableController
 {
@@ -42,14 +44,13 @@ abstract class AbstractSubmissionsController extends AbstractDbTableController
         }
         $searchTool = new SearchTool();
         $searchTool->handle(null, function (QueryBuilder $qb, string $string, ?string $type, string $var) {
-
             $orClauses = [
                 $qb->expr()->like("a.caption", ":${var}"),
             ];
-            if (!$this->isStudentView()) {
-                $orClauses[] = $qb->expr()->like("u.username", ":${var}");
-                $orClauses[] = $qb->expr()->like("u.name", ":${var}");
-            }
+            
+            $orClauses[] = $qb->expr()->like("u.username", ":${var}");
+            $orClauses[] = $qb->expr()->like("u.name", ":${var}");
+            
             $qb->andWhere($qb->expr()->orX(...$orClauses));
             $qb->setParameter(":${var}", "%$string%");
         });
@@ -132,6 +133,11 @@ abstract class AbstractSubmissionsController extends AbstractDbTableController
     }
 
     abstract protected function isStudentView(): bool;
+
+    protected function getForm(array $formData): ?FormInterface
+    {
+        return $this->createForm(SubmissionsType::class, $formData);
+    }
     
     protected function getDefaultFilterData(): array
     {

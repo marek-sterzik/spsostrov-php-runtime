@@ -6,13 +6,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Form\FormInterface;
-use App\Form\Filter\StudentSubmissionsType;
 use Doctrine\ORM\QueryBuilder;
 
 class StudentSubmissionsController extends AbstractSubmissionsController
 {
     #[IsGranted('ROLE_STUDENT')]
-    #[Route("/submissions", name: "submissions")]
+    #[Route("/my-submissions", name: "submissions")]
     public function index(): Response
     {
         return $this->renderTable();
@@ -28,12 +27,6 @@ class StudentSubmissionsController extends AbstractSubmissionsController
         ;
 
         return $qb;
-    }
-
-
-    protected function getForm(array $formData): ?FormInterface
-    {
-        return $this->createForm(StudentSubmissionsType::class, $formData);
     }
 
     protected function isStudentView(): bool

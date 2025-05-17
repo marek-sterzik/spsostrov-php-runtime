@@ -31,7 +31,7 @@ class SearchTool
     private function getErrorHandler(): callable
     {
         return function (QueryBuilder $queryBuilder) {
-            $queryBuilder->andWhere('0');
+            $queryBuilder->andWhere('0 = 1');
         };
     }
 
