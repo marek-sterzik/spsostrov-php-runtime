@@ -57,6 +57,13 @@ abstract class AbstractSubmissionsController extends AbstractDbTableController
                 $builder->expr()->like("u.name", $var),
             );
         });
+        $searchTool->handle("assignment-id", function (Builder $builder) {
+            $id = $builder->searchString();
+            if (preg_match('/^[0-9]+$/', $id)) {
+                return $builder->expr()->eq("a.id", $builder->var((int)$id));
+            }
+            return null;
+        });
         $searchTool->search($qb, $filterData['q'] ?? '');
         return $qb;
     }
