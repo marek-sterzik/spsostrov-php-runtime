@@ -14,10 +14,16 @@ use App\FileManager\FileManager;
 
 abstract class AbstractSubmissionsController extends AbstractDbTableController
 {
-    public function __construct(
-        private SubmissionRepository $submissionRepository,
-        private FileManager $fileManager
-    ) {
+    private SubmissionRepository $submissionRepository;
+    private FileManager $fileManager;
+
+    public function injectSubmissionsControllerDependencies(
+        SubmissionRepository $submissionRepository,
+        FileManager $fileManager
+    ): self {
+        $this->submissionRepository = $submissionRepository;
+        $this->fileManager = $fileManager;
+        return $this;
     }
 
     protected function getBaseQueryBuilder(array $filterData): QueryBuilder

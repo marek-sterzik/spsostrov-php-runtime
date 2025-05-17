@@ -21,24 +21,25 @@
     {% endif %}
 {% endmacro %}
 {% block body %}
-    {% if form is defined and form is not null %}
-        {{ form(form) }}
+    {% block body_start_hook %}{% endblock %}
+    {% if _tableData.form is defined and _tableData.form is not null %}
+        {{ form(_tableData.form) }}
     {% endif %}
 
-    {{ _self.paginator(table.paginator) }}
-    {% if table.body is empty %}
+    {{ _self.paginator(_tableData.table.paginator) }}
+    {% if _tableData.table.body is empty %}
         <div class="text-center">žádná data</div>
     {% else %}
     <table class="table table-striped table-hover align-middle">
         <thead>
-            <tr>{% for h in table.header %}{{ h.render("th")|raw }}{% endfor %}</tr>
+            <tr>{% for h in _tableData.table.header %}{{ h.render("th")|raw }}{% endfor %}</tr>
         </thead>
         <tbody>
-            {% for row in table.body %}
+            {% for row in _tableData.table.body %}
                 <tr>{% for c in row %}{{ c.render("td")|raw }}{% endfor %}</tr>
             {% endfor %}
         </tbody>
     </table>
-    {{ _self.paginator(table.paginator) }}
+    {{ _self.paginator(_tableData.table.paginator) }}
     {% endif %}
 {% endblock %}

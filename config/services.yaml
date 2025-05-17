@@ -16,6 +16,9 @@ services:
         App\Controller\AbstractController:
             calls:
                 - setServices: []
+        App\Controller\AbstractSubmissionsController:
+            calls:
+                - injectSubmissionsControllerDependencies: []
         App\Job\Jobs\AbstractJob:
             tags:
                 - submitter_job

@@ -14,12 +14,13 @@ abstract class AbstractTableController extends AbstractController
 {
     const DEFAULT_ITEMS_PER_PAGE = 15;
     const FORBIDDEN_FILTER_KEYS = ["p"];
+    const DEFAULT_TEMPLATE = "table.html.twig";
 
     abstract protected function getItemCount(array $filterData): int;
     abstract protected function getHeader(array $filterData): array;
     abstract protected function getData(int $page, int $pageSize, array $filterData): array;
 
-    protected function renderTable(): Response
+    protected function renderTable(?string $template = null, array $templateData = []): Response
     {
         try {
             $requestData = $this->getRequestData($this->getRequest());
@@ -36,11 +37,13 @@ abstract class AbstractTableController extends AbstractController
             $header = $this->getHeader($requestData['filterData']);
             $data = $this->getData($requestData['page'], $requestData['itemsPerPage'], $requestData['filterData']);
             $table = $this->createTable($header, $data, $pageCount, $requestData['page'], $selfLink);
-            return $this->render($this->getTemplate(), [
-                "table" => $table,
-                "self" => $selfLink,
-                "form" => $form,
-            ]);
+            return $this->render($template ?? self::DEFAULT_TEMPLATE, array_merge($templateData, [
+                "_tableData" => [
+                    "table" => $table,
+                    "self" => $selfLink,
+                    "form" => $form?->createView(),
+                ],
+            ]));
         } catch (RequestCorrectionException $e) {
             return $e->getRedirectResponse();
         }
@@ -104,11 +107,6 @@ abstract class AbstractTableController extends AbstractController
     protected function getDefaultFilterData(): array
     {
         return [];
-    }
-
-    protected function getTemplate(): string
-    {
-        return "table.html.twig";
     }
 
     protected function getRequestData(Request $request): array
