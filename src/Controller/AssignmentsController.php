@@ -11,7 +11,7 @@ use App\Entity\Assignment;
 use App\Component\Cell;
 use App\Component\Action;
 use App\Component\MultiAction;
-use App\Utility\SearchTool;
+use App\SearchTool\SearchTool;
 use App\Form\Filter\AssignmentsType;
 use App\Assignment\AssignmentActions;
 use App\Assignment\AssignmentState;

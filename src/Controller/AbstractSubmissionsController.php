@@ -8,7 +8,7 @@ use App\Entity\Submission;
 use App\Component\Cell;
 use App\Component\Action;
 use App\Component\MultiAction;
-use App\Utility\SearchTool;
+use App\SearchTool\SearchTool;
 use App\Submission\SubmissionState;
 use App\Repository\SubmissionRepository;
 use App\FileManager\FileManager;

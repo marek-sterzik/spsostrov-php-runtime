@@ -10,7 +10,7 @@ use Doctrine\ORM\QueryBuilder;
 use App\Entity\User;
 use App\Component\Cell;
 use App\Component\Action;
-use App\Utility\SearchTool;
+use App\SearchTool\SearchTool;
 use App\Form\Filter\UsersType;
 
 class UsersController extends AbstractDbTableController

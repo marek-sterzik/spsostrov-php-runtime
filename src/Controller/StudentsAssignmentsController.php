@@ -12,7 +12,7 @@ use App\Entity\Assignment;
 use App\Entity\Submission;
 use App\Component\Cell;
 use App\Component\Action;
-use App\Utility\SearchTool;
+use App\SearchTool\SearchTool;
 use App\Form\Filter\StudentAssignmentsType;
 use App\Assignment\AssignmentState;
 use App\Utility\CurrentSchoolYear;
