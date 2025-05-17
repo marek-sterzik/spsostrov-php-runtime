@@ -1,11 +1,19 @@
 # TODO list
 
-## Really necessary
+# Required for the first preview version
+
+* link between the assignments page and submissions page
+* submission detail works also for `ROLE_TEACHER`
+* conditional joins in SearchTool, extending already existing searches
+* better SearchTool API allowing later making some prefix help
+* better container allowing job cron and having much bigger upload limit
+* temp deploy for testing
+
+## Necessary, but later
 
 * add indices for standard searches in the assignment table
 * add indices for standard searches in the submission table (mainly for the repository methods)
-* fix searches with prefixes
-* make some help for prefixed searches
+* make some help for prefixed searches from SearchTool
 * trash drafts after assignment state becomes inactive (maybe after other criteria)
 * nice custom 404 and 500 templates
 * limitation of submission size
