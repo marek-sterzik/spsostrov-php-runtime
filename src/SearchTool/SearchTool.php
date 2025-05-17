@@ -6,42 +6,59 @@ use Doctrine\ORM\QueryBuilder;
 
 class SearchTool
 {
-    private array $perTypeHandlers = [];
-    private mixed $defaultHandler = null;
+    private array $handlers = [];
+
+    public function __construct(private string $varPrefix = "var")
+    {
+    }
 
     public function handle(?string $type, callable $handler): self
     {
-        if ($type === null) {
-            $this->defaultHandler = $handler;
-        } else {
-            $this->perTypeHandlers[$type] = $handler;
+        if ($type !== null) {
+            $this->handlers[$type] = $handler;
         }
         return $this;
-    }
-
-    private function getHandler(?string $type): ?callable
-    {
-        if ($type === null) {
-            return $this->defaultHandler;
-        } else {
-            return $this->perTypeHandlers[$type] ?? null;
-        }
-    }
-
-    private function getErrorHandler(): callable
-    {
-        return function (QueryBuilder $queryBuilder) {
-            $queryBuilder->andWhere('0 = 1');
-        };
     }
 
     public function search(QueryBuilder $queryBuilder, string $query): self
     {
         $query = QueryParser::parse($query);
-        foreach ($query as $i => list($type, $string)) {
-            $handler = $this->getHandler($type) ?? $this->getErrorHandler();
-            $handler($queryBuilder, $string, $type, "var" . ($i + 1));
+        $builder = new Builder($queryBuilder, $this->varPrefix);
+        foreach ($query as list($type, $string)) {
+            $expression = $this->buildExpression($type, $string, $builder);
+            $queryBuilder->andWhere($expression);
+        }
+        foreach ($builder->getVars() as $var => $value) {
+            $queryBuilder->setParameter($var, $value);
         }
         return $this;
+    }
+
+    private function buildExpression(?string $type, string $string, Builder $builder): mixed
+    {
+        $handlers = $this->getHandlersFor($type);
+        $expressions = [];
+        foreach ($handlers as $handler) {
+            $builder->setup($string, $type);
+            $expression = $handler($builder);
+            if ($expression !== null) {
+                $expressions[] = $expression;
+            }
+        }
+
+        if (empty($expressions)) {
+            return $builder->expr()->eq(0, 1);
+        }
+
+        return $builder->expr()->orX(...$expressions);
+    }
+
+    private function getHandlersFor(?string $type): array
+    {
+        if ($type === null) {
+            return array_values($this->handlers);
+        } else {
+            return isset($this->handlers[$type]) ? [$this->handlers[$type]] : [];
+        }
     }
 }

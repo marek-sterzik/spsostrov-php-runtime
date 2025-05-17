@@ -9,6 +9,7 @@ use App\Component\Cell;
 use App\Component\Action;
 use App\Component\MultiAction;
 use App\SearchTool\SearchTool;
+use App\SearchTool\Builder;
 use App\Submission\SubmissionState;
 use App\Repository\SubmissionRepository;
 use App\FileManager\FileManager;
@@ -43,16 +44,18 @@ abstract class AbstractSubmissionsController extends AbstractDbTableController
             $qb->andWhere("s.isCurrent = true");
         }
         $searchTool = new SearchTool();
-        $searchTool->handle(null, function (QueryBuilder $qb, string $string, ?string $type, string $var) {
-            $orClauses = [
-                $qb->expr()->like("a.caption", ":${var}"),
-            ];
-            
-            $orClauses[] = $qb->expr()->like("u.username", ":${var}");
-            $orClauses[] = $qb->expr()->like("u.name", ":${var}");
-            
-            $qb->andWhere($qb->expr()->orX(...$orClauses));
-            $qb->setParameter(":${var}", "%$string%");
+        $searchTool->handle("caption", function (Builder $builder) {
+            return $builder->expr()->like("a.caption", $builder->var("%" . $builder->searchString() . "%"));
+        });
+        $searchTool->handle("description", function (Builder $builder) {
+            return $builder->expr()->like("a.description", $builder->var("%" . $builder->searchString() . "%"));
+        });
+        $searchTool->handle("submitter", function (Builder $builder) {
+            $var = $builder->var("%" . $builder->searchString() . "%");
+            return $builder->expr()->orX(
+                $builder->expr()->like("u.username", $var),
+                $builder->expr()->like("u.name", $var),
+            );
         });
         $searchTool->search($qb, $filterData['q'] ?? '');
         return $qb;

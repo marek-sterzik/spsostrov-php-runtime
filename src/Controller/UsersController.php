@@ -11,6 +11,7 @@ use App\Entity\User;
 use App\Component\Cell;
 use App\Component\Action;
 use App\SearchTool\SearchTool;
+use App\SearchTool\Builder;
 use App\Form\Filter\UsersType;
 
 class UsersController extends AbstractDbTableController
@@ -31,18 +32,25 @@ class UsersController extends AbstractDbTableController
             $this->roleQuery($qb, $filterData['a'], ['ROLE_TEACHER', 'ROLE_ADMIN', 'ROLE_SUPERADMIN', 'ROLE_OTHER']);
         }
         $searchTool = new SearchTool();
-        $searchTool->handle(null, function (QueryBuilder $qb, string $string, ?string $type, string $var) {
-            $qb->andWhere($qb->expr()->orX(
-                $qb->expr()->like("u.username", ":${var}"),
-                $qb->expr()->like("u.name", ":${var}"),
-                $qb->expr()->like("u.effectiveStudentClass", ":${var}_start"),
-                $qb->expr()->andX(
-                    $qb->expr()->isNull("u.effectiveStudentClass"),
-                    $qb->expr()->like("u.originalStudentClass", ":${var}_start"),
+        $searchTool->handle("username", function (Builder $builder) {
+            $var = $builder->var("%" . $builder->searchString() . "%");
+            return $builder->expr()->like("u.username", $var);
+            
+        });
+        $searchTool->handle("name", function (Builder $builder) {
+            $var = $builder->var("%" . $builder->searchString() . "%");
+            return $builder->expr()->like("u.name", $var);
+            
+        });
+        $searchTool->handle("class", function (Builder $builder) {
+            $var = $builder->var($builder->searchString() . "%");
+            return $builder->expr()->orX(
+                $builder->expr()->like("u.effectiveStudentClass", $var),
+                $builder->expr()->andX(
+                    $builder->expr()->isNull("u.effectiveStudentClass"),
+                    $builder->expr()->like("u.originalStudentClass", $var)
                 )
-            ));
-            $qb->setParameter(":${var}", "%$string%");
-            $qb->setParameter(":${var}_start", "$string%");
+            );
         });
         $searchTool->search($qb, $filterData['q'] ?? '');
         return $qb;
