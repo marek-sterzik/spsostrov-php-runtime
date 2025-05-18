@@ -4,8 +4,6 @@
 
 * link between the assignments page and submissions page
 * submission detail works also for `ROLE_TEACHER`
-* conditional joins in SearchTool, extending already existing searches
-* better SearchTool API allowing later making some prefix help
 * better container allowing job cron and having much bigger upload limit
 * temp deploy for testing
 

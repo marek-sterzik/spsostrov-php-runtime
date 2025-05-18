@@ -13,6 +13,7 @@ use App\Entity\Submission;
 use App\Component\Cell;
 use App\Component\Action;
 use App\SearchTool\SearchTool;
+use App\SearchTool\SearchToolPreset;
 use App\SearchTool\Builder;
 use App\Form\Filter\StudentAssignmentsType;
 use App\Assignment\AssignmentState;
@@ -55,17 +56,14 @@ class StudentsAssignmentsController extends AbstractDbTableController
             ))
             ->setParameter(":now", new DateTimeImmutable())
         ;
-        $searchTool = new SearchTool();
-        $searchTool->handle("caption", function(Builder $builder) {
-            return $builder->expr()->like("a.caption", $builder->var("%" . $builder->searchString() . "%"));
-        });
-        $searchTool->handle("description", function(Builder $builder) {
-            return $builder->expr()->like("a.description", $builder->var("%" . $builder->searchString() . "%"));
-        });
-        $searchTool->search($qb, $filterData['q'] ?? '');
         $qb->addOrderBy("a.mainOrder", "DESC");
         $qb->addOrderBy("a.createdAt", "DESC");
         return $qb;
+    }
+
+    protected function buildSearchTool(): ?SearchTool
+    {
+        return SearchToolPreset::assignment();
     }
 
     protected function getHeader(array $filterData): array

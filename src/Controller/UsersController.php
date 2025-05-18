@@ -11,6 +11,7 @@ use App\Entity\User;
 use App\Component\Cell;
 use App\Component\Action;
 use App\SearchTool\SearchTool;
+use App\SearchTool\SearchToolPreset;
 use App\SearchTool\Builder;
 use App\Form\Filter\UsersType;
 
@@ -31,29 +32,12 @@ class UsersController extends AbstractDbTableController
         } elseif ($filterData['t'] === UsersType::TYPE_TEACHERS) {
             $this->roleQuery($qb, $filterData['a'], ['ROLE_TEACHER', 'ROLE_ADMIN', 'ROLE_SUPERADMIN', 'ROLE_OTHER']);
         }
-        $searchTool = new SearchTool();
-        $searchTool->handle("username", function (Builder $builder) {
-            $var = $builder->var("%" . $builder->searchString() . "%");
-            return $builder->expr()->like("u.username", $var);
-            
-        });
-        $searchTool->handle("name", function (Builder $builder) {
-            $var = $builder->var("%" . $builder->searchString() . "%");
-            return $builder->expr()->like("u.name", $var);
-            
-        });
-        $searchTool->handle("class", function (Builder $builder) {
-            $var = $builder->var($builder->searchString() . "%");
-            return $builder->expr()->orX(
-                $builder->expr()->like("u.effectiveStudentClass", $var),
-                $builder->expr()->andX(
-                    $builder->expr()->isNull("u.effectiveStudentClass"),
-                    $builder->expr()->like("u.originalStudentClass", $var)
-                )
-            );
-        });
-        $searchTool->search($qb, $filterData['q'] ?? '');
         return $qb;
+    }
+
+    protected function buildSearchTool(): ?SearchTool
+    {
+        return SearchToolPreset::user();
     }
 
     private function roleQuery(QueryBuilder $qb, bool $includeOriginal, array $roles): void

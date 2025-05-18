@@ -9,6 +9,7 @@ use App\Component\Cell;
 use App\Component\Action;
 use App\Component\MultiAction;
 use App\SearchTool\SearchTool;
+use App\SearchTool\SearchToolPreset;
 use App\SearchTool\Builder;
 use App\Submission\SubmissionState;
 use App\Repository\SubmissionRepository;
@@ -34,8 +35,6 @@ abstract class AbstractSubmissionsController extends AbstractDbTableController
         $me = $this->getUser()->getUserData();
         $qb = $this->submissionRepository->createQueryBuilder('s');
         $qb
-            ->innerJoin('s.assignment', 'a')
-            ->innerJoin('s.submitter', 'u')
             ->addSelect("CASE WHEN s.submittedAt IS NULL THEN 1 ELSE 0 END AS HIDDEN isSubmitted")
             ->andWhere("s.state != :trash")
             ->setParameter(":trash", SubmissionState::Trash)
@@ -43,29 +42,12 @@ abstract class AbstractSubmissionsController extends AbstractDbTableController
         if (!($filterData['a'] ?? true)) {
             $qb->andWhere("s.isCurrent = true");
         }
-        $searchTool = new SearchTool();
-        $searchTool->handle("caption", function (Builder $builder) {
-            return $builder->expr()->like("a.caption", $builder->var("%" . $builder->searchString() . "%"));
-        });
-        $searchTool->handle("description", function (Builder $builder) {
-            return $builder->expr()->like("a.description", $builder->var("%" . $builder->searchString() . "%"));
-        });
-        $searchTool->handle("submitter", function (Builder $builder) {
-            $var = $builder->var("%" . $builder->searchString() . "%");
-            return $builder->expr()->orX(
-                $builder->expr()->like("u.username", $var),
-                $builder->expr()->like("u.name", $var),
-            );
-        });
-        $searchTool->handle("assignment-id", function (Builder $builder) {
-            $id = $builder->searchString();
-            if (preg_match('/^[0-9]+$/', $id)) {
-                return $builder->expr()->eq("a.id", $builder->var((int)$id));
-            }
-            return null;
-        });
-        $searchTool->search($qb, $filterData['q'] ?? '');
         return $qb;
+    }
+
+    protected function buildSearchTool(): ?SearchTool
+    {
+        return SearchToolPreset::submission();
     }
 
     protected function setOrderByQuery(QueryBuilder $qb): QueryBuilder

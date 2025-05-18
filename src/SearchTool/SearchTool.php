@@ -7,15 +7,19 @@ use Doctrine\ORM\QueryBuilder;
 class SearchTool
 {
     private array $handlers = [];
+    private array $defaultSearch = [];
 
     public function __construct(private string $varPrefix = "var")
     {
     }
 
-    public function handle(?string $type, callable $handler): self
+    public function handle(string $type, callable $handler, bool $inDefaultSearch = true): self
     {
-        if ($type !== null) {
-            $this->handlers[$type] = $handler;
+        $this->handlers[$type] = $handler;
+        if ($inDefaultSearch) {
+            $this->defaultSearch[$type] = true;
+        } else {
+            unset($this->defaultSearch[$type]);
         }
         return $this;
     }
@@ -27,6 +31,9 @@ class SearchTool
         foreach ($query as list($type, $string)) {
             $expression = $this->buildExpression($type, $string, $builder);
             $queryBuilder->andWhere($expression);
+        }
+        foreach ($builder->getJoins() as $alias => list($method, $field)) {
+            $queryBuilder->$method($field, $alias);
         }
         foreach ($builder->getVars() as $var => $value) {
             $queryBuilder->setParameter($var, $value);
@@ -56,7 +63,7 @@ class SearchTool
     private function getHandlersFor(?string $type): array
     {
         if ($type === null) {
-            return array_values($this->handlers);
+            return array_map(fn($key) => $this->handlers[$key], array_keys($this->defaultSearch));
         } else {
             return isset($this->handlers[$type]) ? [$this->handlers[$type]] : [];
         }
