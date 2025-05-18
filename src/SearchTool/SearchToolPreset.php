@@ -24,6 +24,10 @@ class SearchToolPreset
                 $builder->expr()->like("u.name", $var),
             );
         }, false);
+
+        self::id("assignment-id", "a.id", $searchTool);
+        self::id("owner-id", "u.id", $searchTool, ["leftJoin", "a.owner", "u"]);
+
         return $searchTool;
     }
 
@@ -50,13 +54,10 @@ class SearchToolPreset
             );
         }, false);
 
-        $searchTool->handle("assignment-id", function (Builder $builder) {
-            $id = $builder->searchString();
-            if (preg_match('/^[0-9]+$/', $id)) {
-                return $builder->expr()->eq("a.id", $builder->var((int)$id));
-            }
-            return null;
-        });
+        self::id("submission-id", "s.id", $searchTool);
+        self::id("submitter-id", "u.id", $searchTool, ["innerJoin", "s.submitter", "u"]);
+        self::id("assignment-id", "a.id", $searchTool, ["innerJoin", "s.assignment", "a"]);
+
         return $searchTool;
     }
 
@@ -81,6 +82,24 @@ class SearchToolPreset
                 )
             );
         });
+
+        self::id("user-id", "u.id", $searchTool);
+
         return $searchTool;
+    }
+
+    private static function id(string $searchField, string $idField, SearchTool $searchTool, ?array $join = null): void
+    {
+        $searchTool->handle($searchField, function (Builder $builder) use ($idField, $join) {
+            if ($join !== null) {
+                list($method, $field, $alias) = $join;
+                $builder->$method($field, $alias);
+            }
+            $id = $builder->searchString();
+            if (preg_match('/^[0-9]+$/', $id)) {
+                return $builder->expr()->eq($idField, $builder->var((int)$id));
+            }
+            return null;
+        }, false);
     }
 }
