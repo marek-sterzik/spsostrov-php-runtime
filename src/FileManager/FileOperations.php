@@ -238,7 +238,7 @@ class FileOperations
         if (preg_match('/-([1-9][0-9]*)$/', $filename, $matches)) {
             $num = (int)$matches[1];
             if (((string)$num) === $matches[1]) {
-                $filename = substr($filename, strlen($filename) - strlen($matches[0]));
+                $filename = substr($filename, 0, strlen($filename) - strlen($matches[0] - 1));
             } else {
                 $num = 0;
             }
