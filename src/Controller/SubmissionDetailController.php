@@ -63,7 +63,7 @@ class SubmissionDetailController extends AbstractController
         return true;
     }
 
-    #[IsGranted('ROLE_STUDENT')]
+    #[IsGranted(new Expression('is_granted("ROLE_STUDENT") or is_granted("ROLE_TEACHER")'))]
     #[Route("/submission/show/{submission}/files", name: 'submission-files')]
     public function files(Submission $submission, Request $request): Response
     {
