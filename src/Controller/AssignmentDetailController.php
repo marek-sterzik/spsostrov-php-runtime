@@ -34,9 +34,6 @@ class AssignmentDetailController extends AbstractController
             $this->assignmentActions->generate($assignment, false),
             fn ($item) => ($item !== null)
         );
-        $back = Action::get($this->getBackUrl(true))
-            ->label("zpět")->cssClass("btn-secondary")->icon("bi-arrow-left")
-        ;
 
         $isMe = ($assignment->getOwner() === $me) ? true : false;
 
@@ -46,7 +43,6 @@ class AssignmentDetailController extends AbstractController
             $submissionsLink = $this->assignmentLink->submissions($assignment, true);
         }
         return $this->render("assignment-detail.html.twig", [
-            "backAction" => $back,
             "assignment" => $assignment,
             "actions" => $actions,
             "ownerIsMe" => $isMe,
@@ -55,6 +51,11 @@ class AssignmentDetailController extends AbstractController
             "submissionCount" => $submissionCount,
             "submissionsLink" => $submissionsLink,
         ]);
+    }
+
+    protected function backLinkEnabled(): bool
+    {
+        return true;
     }
 
     protected function getDefaultBackUrl(): string

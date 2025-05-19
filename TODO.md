@@ -2,13 +2,12 @@
 
 # Required for the first preview version
 
-* link between the assignments page and submissions page
-* submission detail works also for `ROLE_TEACHER`
 * better container allowing job cron and having much bigger upload limit
 * temp deploy for testing
 
 ## Necessary, but later
 
+* users are sorted by name
 * add indices for standard searches in the assignment table
 * add indices for standard searches in the submission table (mainly for the repository methods)
 * make some help for prefixed searches from SearchTool

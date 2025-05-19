@@ -50,6 +50,11 @@
                 </menu>
             {% endif %}
             <div class="body">
+                {% if back is defined and back is not null %}
+                    <div>
+                        <a class="btn btn-sm btn-secondary" role="button" href="{{ back }}"><i class="bi me-1 bi-arrow-left"></i> zpět</a>
+                    </div>
+                {% endif %}
                 {% block body %}{% endblock %}
             </div>
         </div>

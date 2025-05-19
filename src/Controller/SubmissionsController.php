@@ -18,6 +18,11 @@ class SubmissionsController extends AbstractSubmissionsController
         return $this->renderTable();
     }
 
+    protected function backLinkEnabled(): bool
+    {
+        return true;
+    }
+
     protected function getBaseQueryBuilder(array $filterData): QueryBuilder
     {
         $qb = parent::getBaseQueryBuilder($filterData);

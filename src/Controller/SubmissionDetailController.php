@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 use App\FileManager\FileManager;
 use App\Entity\Submission;
@@ -18,7 +19,7 @@ class SubmissionDetailController extends AbstractController
     {
     }
 
-    #[IsGranted('ROLE_STUDENT')]
+    #[IsGranted(new Expression('is_granted("ROLE_STUDENT") or is_granted("ROLE_TEACHER")'))]
     #[Route("/submission/show/{submission}", name: 'submission-detail')]
     public function index(Submission $submission, Request $request): Response
     {
@@ -47,11 +48,7 @@ class SubmissionDetailController extends AbstractController
                 "timeout" => $timeout,
             ]);
         } else {
-            $back = Action::get($this->getBackUrl(true))
-                ->label("zpět")->cssClass("btn-secondary")->icon("bi-arrow-left")
-            ;
             return $this->render("submission.html.twig", [
-                "backAction" => $back,
                 "submission" => $submission,
                 "files" => $this->fileManager->listFiles($submission),
                 "timeout" => $timeout,
@@ -59,6 +56,11 @@ class SubmissionDetailController extends AbstractController
                 "zipFile" => $zipFile,
             ]);
         }
+    }
+
+    protected function backLinkEnabled(): bool
+    {
+        return true;
     }
 
     #[IsGranted('ROLE_STUDENT')]

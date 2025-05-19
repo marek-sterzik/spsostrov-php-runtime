@@ -66,7 +66,13 @@ class AbstractController extends AbstractControllerBase
             "menu" => $this->getMenu(),
             "user" => $this->getUser(),
             "userEntity" => $this->getUserEntity(),
+            "back" => $this->backLinkEnabled() ? $this->getBackUrl() : null,
         ];
+    }
+
+    protected function backLinkEnabled(): bool
+    {
+        return false;
     }
 
     protected function getMenu(): array

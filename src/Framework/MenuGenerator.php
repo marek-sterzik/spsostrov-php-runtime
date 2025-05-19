@@ -30,11 +30,19 @@ class MenuGenerator
         $currentRoute = $this->requestStack->getCurrentRequest()->attributes->get('_route');
         if ($this->menu === null) {
             $this->menu = [];
+            $actualItemPut = false;
             foreach ($this->menuTemplate as $menuItem) {
                 if ($this->granted($menuItem['roles'] ?? null)) {
                     $finalItem = $this->createMenuItem($menuItem, $currentRoute);
+                    if ($actualItemPut) {
+                        $finalItem['actual'] = false;
+                    }
+
                     if (!$finalItem['hidden'] || $finalItem['actual']) {
                         $this->menu[] = $finalItem;
+                        if ($finalItem['actual']) {
+                            $actualItemPut = true;
+                        }
                     }
                 }
             }
