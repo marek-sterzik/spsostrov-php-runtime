@@ -57,6 +57,10 @@ class SearchTool
             return $builder->expr()->eq(0, 1);
         }
 
+        if (count($expressions) === 1) {
+            return $expressions[0];
+        }
+
         return $builder->expr()->orX(...$expressions);
     }
 
