@@ -50,7 +50,7 @@
     </rule>
     <rule ref="rulesets/naming.xml/ShortMethodName">
         <properties>
-            <property name="exceptions" value="gt,lt,ge,le,eq"/>
+            <property name="exceptions" value="gt,lt,ge,le,eq,id"/>
         </properties>
     </rule>
     <rule ref="rulesets/design.xml/CouplingBetweenObjects">
