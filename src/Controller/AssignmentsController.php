@@ -16,6 +16,7 @@ use App\SearchTool\SearchToolPreset;
 use App\Form\Filter\AssignmentsType;
 use App\Assignment\AssignmentActions;
 use App\Assignment\AssignmentState;
+use App\Assignment\AssignmentLink;
 use App\Component\StudentClassPattern as StudentClassPatternComponent;
 use App\Repository\SubmissionRepository;
 use App\SearchTool\Builder;
@@ -24,7 +25,8 @@ class AssignmentsController extends AbstractDbTableController
 {
     public function __construct(
         private AssignmentActions $assignmentActions,
-        private SubmissionRepository $submissionRepository
+        private SubmissionRepository $submissionRepository,
+        private AssignmentLink $assignmentLink
     ) {
     }
 
@@ -93,7 +95,10 @@ class AssignmentsController extends AbstractDbTableController
         $type = $this->renderView('snippets/assignment-public.html.twig', ["public" => $assignment->isPublic()]);
         $createdAt = $this->renderView('snippets/datetime.html.twig', ["date" => $assignment->getCreatedAt()]);
         $submissionCount = $this->submissionRepository->countSubmissions($assignment);
-        $submitted = $this->renderView('snippets/object-count.html.twig', ["count" => $submissionCount]);
+        $submitted = $this->renderView('snippets/object-count.html.twig', [
+            "count" => $submissionCount,
+            "link" => $this->assignmentLink->submissions($assignment, true),
+        ]);
 
         return [
             "caption" => $assignment->getCaption(),

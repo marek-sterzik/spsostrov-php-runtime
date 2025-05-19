@@ -50,20 +50,24 @@ class Router implements WarmableInterface, RouterInterface, RequestMatcherInterf
 
     public function generate(string $name, array $parameters = [], int $referenceType = self::ABSOLUTE_PATH): string
     {
-        if (isset($parameters['_back']) && is_bool($parameters['_back'])) {
-            $currentRequest = $this->requestStack->getCurrentRequest();
-            if ($currentRequest !== null) {
-                if ($parameters['_back'] === true) {
-                    $parameters['_back'] = $currentRequest->getRequestUri();
-                } else {
-                    $parameters['_back'] = $currentRequest->query->get("_back");
-                    if (!is_string($parameters['_back'])) {
-                        unset($parameters['_back']);
+        if (isset($parameters['_back'])) {
+            if (is_bool($parameters['_back'])) {
+                $currentRequest = $this->requestStack->getCurrentRequest();
+                if ($currentRequest !== null) {
+                    if ($parameters['_back'] === true) {
+                        $parameters['_back'] = $currentRequest->getRequestUri();
+                    } else {
+                        $parameters['_back'] = $currentRequest->query->get("_back");
+                        if (!is_string($parameters['_back'])) {
+                            unset($parameters['_back']);
+                        }
                     }
+                } else {
+                    unset($parameters['_back']);
                 }
-            } else {
-                unset($parameters['_back']);
             }
+        } else {
+            unset($parameters['_back']);
         }
         return $this->router->generate($name, $parameters, $referenceType);
     }

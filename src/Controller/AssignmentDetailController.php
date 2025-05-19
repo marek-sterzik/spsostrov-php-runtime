@@ -9,6 +9,7 @@ use App\Entity\Assignment;
 use App\Form\AssignmentEditType;
 use App\Utility\RoleComparator;
 use App\Assignment\AssignmentActions;
+use App\Assignment\AssignmentLink;
 use App\Component\Action;
 use App\Markdown\Markdown;
 use App\Repository\SubmissionRepository;
@@ -19,7 +20,8 @@ class AssignmentDetailController extends AbstractController
     public function __construct(
         private AssignmentActions $assignmentActions,
         private Markdown $markdown,
-        private SubmissionRepository $submissionRepository
+        private SubmissionRepository $submissionRepository,
+        private AssignmentLink $assignmentLink
     ) {
     }
 
@@ -37,6 +39,12 @@ class AssignmentDetailController extends AbstractController
         ;
 
         $isMe = ($assignment->getOwner() === $me) ? true : false;
+
+        $submissionCount = $this->submissionRepository->countSubmissions($assignment);
+        $submissionsLink = null;
+        if ($submissionCount !== null && $submissionCount !== 0) {
+            $submissionsLink = $this->assignmentLink->submissions($assignment, true);
+        }
         return $this->render("assignment-detail.html.twig", [
             "backAction" => $back,
             "assignment" => $assignment,
@@ -44,7 +52,8 @@ class AssignmentDetailController extends AbstractController
             "ownerIsMe" => $isMe,
             "studentClassPattern" => StudentClassPatternComponent::get($assignment->getClasses()),
             "descriptionHtml" => $this->markdown->getDescriptionHtml($assignment, "h4"),
-            "submissionCount" => $this->submissionRepository->countSubmissions($assignment),
+            "submissionCount" => $submissionCount,
+            "submissionsLink" => $submissionsLink,
         ]);
     }
 

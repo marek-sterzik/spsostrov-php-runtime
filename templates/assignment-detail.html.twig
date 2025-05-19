@@ -19,7 +19,12 @@
                     <tr><th>školní rok:</th><td>{{ assignment.schoolYear }}/{{ assignment.schoolYear + 1 }}</td></tr>
                     <tr><th>vytvořeno:</th><td>{% include "snippets/datetime.html.twig" with {"date": assignment.createdAt} %}</td></tr>
                         {% if submissionCount is not null %}
-                        <tr><th>počet&nbsp;odevzdání:</th><td>{% include "snippets/object-count.html.twig" with {"count": submissionCount} %}</td></tr>
+                        <tr><th>počet&nbsp;odevzdání:</th><td>
+                                {% include "snippets/object-count.html.twig" with {"count": submissionCount, "link": submissionsLink} %}
+                                {% if submissionsLink is not null %}
+                                    <a href="{{ submissionsLink }}">zobrazit odevzdané práce</a>
+                                {% endif %}
+                        </td></tr>
                     {% endif %}
                     <tr><td colspan="2">
                         {% for action in actions %}{{ action.render()|raw }} {% endfor %}

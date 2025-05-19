@@ -7,6 +7,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Doctrine\ORM\QueryBuilder;
 use App\Assignment\AssignmentState;
+use App\Submission\SubmissionState;
 
 class SubmissionsController extends AbstractSubmissionsController
 {
@@ -33,6 +34,8 @@ class SubmissionsController extends AbstractSubmissionsController
             $qb->setParameter(":owner", $me);
             $qb->setParameter(":notState", AssignmentState::Draft);
         }
+        $qb->andWhere("s.state != :notSState");
+        $qb->setParameter(":notSState", SubmissionState::Draft);
 
         return $qb;
     }
