@@ -41,8 +41,10 @@ class SubmissionDetailController extends AbstractController
             }
             return $this->json([
                 "state" => $this->renderView(
-                    "snippets/submission-state.html.twig",
-                    ["state" => $submission->getState()]
+                    "snippets/submission-state.html.twig", [
+                        "state" => $submission->getState(),
+                        "isCurrent" => $submission->isCurrent(),
+                    ]
                 ),
                 "zipFile" => $zipFileTemplate,
                 "stateIsFinal" => $submission->getState()->isFinal(),
