@@ -1,0 +1,20 @@
+{% extends "base.html.twig" %}
+{% block body %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-12">
+                <div class="text-center mb-4">
+                    <h1>{% block error_heading %}Nastala chyba{% endblock %}</h1>
+                </div>
+                <div class="text-justify">
+                    {% block error_description%}{% endblock %}
+                </div>
+                <img class="spsostrov-logo" src="{{ asset('media/spsostrov.png') }}">
+                <div class="text-center">
+                    <a href="{{ path('main') }}">domů</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+{% endblock %}

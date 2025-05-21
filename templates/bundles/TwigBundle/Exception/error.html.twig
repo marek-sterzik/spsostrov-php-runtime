@@ -1,0 +1,6 @@
+{% extends "error_base.html.twig" %}
+{% block error_heading %}{{ status_code }} - {{ status_text }}{% endblock %}
+{% block error_description %}
+    Nastala neočekávaná chyba {{ status_code }}. Pravděpodobně se jedná o chybu v aplikaci. Kontaktujte prosím administrátora.
+{% endblock %}
+
