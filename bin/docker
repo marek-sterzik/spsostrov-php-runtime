@@ -20,10 +20,14 @@ docker_compose () {
     export WWW_DATA_UID="`id -u`"
     export WWW_DATA_GID="`id -g`"
     test -f ".config.env" && . .config.env
+    flags=""
+    if [ -f "docker-compose-extra.yml" ]; then
+        flags="-f docker-compose.yml -f docker-compose-extra.yml"
+    fi
     if [ "$RUNTIME_PLATFORM" == "windows" ]; then
-        winpty docker compose "$@"
+        winpty docker compose $flags "$@"
     else
-        docker compose "$@"
+        docker compose $flags "$@"
     fi
 }
 

@@ -14,6 +14,8 @@
 #ides (put your favorite IDE tmp file masks here)
 .*.swp
 
+/docker-compose-extra.yml
+
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
