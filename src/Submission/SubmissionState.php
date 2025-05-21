@@ -58,4 +58,15 @@ enum SubmissionState: string
             default => false
         };
     }
+
+    public function isWaiting(): bool
+    {
+        if ($this->isFinal()) {
+            return false;
+        }
+        if ($this === self::Draft) {
+            return false;
+        }
+        return true;
+    }
 }

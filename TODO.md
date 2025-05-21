@@ -1,10 +1,6 @@
 # TODO list
 
-# Required for the first preview version
-
-* temp deploy for testing
-
-## Necessary, but later
+## Necessary
 
 * better nginx-based container
 * users are sorted by name
@@ -17,6 +13,7 @@
 * upload checks properly file sizes to match limits
 * sync info page shows sync test if available
 * alert when submitting after deadline and confirm if you really want to submit
+* favicon
 
 ## Nice to have
 

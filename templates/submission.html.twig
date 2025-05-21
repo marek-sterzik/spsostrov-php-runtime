@@ -4,7 +4,7 @@
         <div class="row justify-content-center">
             <div class="col-lg-6 col-12">
                 <h3>{{ heading }}</h3>
-                {% if not submission.state.isFinal() %}
+                {% if submission.state.isWaiting() %}
                     <div class="alert alert-warning submission-not-final" role="alert" data-submission-state-update-timeout="{{ timeout }}"
                           data-submission-state-update="{{ path("submission-detail", {"submission": submission.id,"state": 1}) }}">
                         <div class="text-center">

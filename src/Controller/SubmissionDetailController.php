@@ -9,6 +9,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\ExpressionLanguage\Expression;
 
+use App\Submission\SubmissionState;
 use App\FileManager\FileManager;
 use App\Entity\Submission;
 use App\Component\Action;
@@ -48,11 +49,12 @@ class SubmissionDetailController extends AbstractController
                 "timeout" => $timeout,
             ]);
         } else {
+            $isDraft = ($submission->getState() === SubmissionState::Draft) ? true : false;
             return $this->render("submission.html.twig", [
                 "submission" => $submission,
                 "files" => $this->fileManager->listFiles($submission),
                 "timeout" => $timeout,
-                "heading" => "Odevzdání dokončeno",
+                "heading" => $isDraft ? "Rozpracované odevzdání" : "Odevzdání dokončeno",
                 "zipFile" => $zipFile,
             ]);
         }
