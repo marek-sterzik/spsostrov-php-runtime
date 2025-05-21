@@ -3,7 +3,7 @@
 echo "Submitter!"
 
 if [ -x "/var/www/html/bin/cron" ]; then
-    /var/www/html/bin/cron &
+    su www-data -c /var/www/html/bin/cron -s /bin/bash &
 fi
 
 exec docker-php-entrypoint "$@"
