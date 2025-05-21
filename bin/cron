@@ -1,0 +1,15 @@
+#!/bin/bash
+
+period=60
+
+invoke() {
+    lib/console job:run > /dev/null 2>&1 &
+}
+
+invoke
+
+while true; do
+    time="$(expr "$period" - \( "$(date +%s)" % "$period" \) )"
+    sleep "$time"
+    invoke
+done
