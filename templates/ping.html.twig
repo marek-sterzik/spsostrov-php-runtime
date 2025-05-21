@@ -1,0 +1,33 @@
+{% extends "base.html.twig" %}
+{% block body %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-12">
+                <div class="text-center mb-4">
+                    <div class="alert alert-warning">
+                        <div>
+                            Adresa tohoto skriptu je:
+                        </div>
+                        <div class="text-center mt-3 fs-4 font-monospace">
+                            {{ selfAddress }}
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mb-4">
+                    <div class="alert alert-warning">
+                        <div>
+                            IP adresa klienta:
+                        </div>
+                        <div class="text-center mt-3 fs-4 font-monospace">
+                            {{ remoteAddress }}
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <a href="{{ path('main') }}">domů</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+{% endblock %}
