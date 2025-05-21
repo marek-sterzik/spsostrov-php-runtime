@@ -6,6 +6,8 @@ invoke() {
     lib/console job:run > /dev/null 2>&1 &
 }
 
+echo "cron running"
+
 invoke
 
 while true; do

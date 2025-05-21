@@ -3,6 +3,7 @@ FROM php:8.2-apache
 ARG WWW_DATA_UID
 ARG WWW_DATA_GID
 
+# fix www-data uid and gid
 COPY fix-www-data-user /usr/local/sbin/fix-www-data-user
 RUN perl /usr/local/sbin/fix-www-data-user "${WWW_DATA_UID}" "${WWW_DATA_GID}"
 RUN chown -R www-data:www-data /var/www
@@ -11,7 +12,8 @@ RUN apt-get update && apt-get -y install git libzip-dev zip libicu-dev openssh-c
 
 RUN docker-php-ext-install zip bcmath pdo pdo_mysql intl
 
-# fix www-data uid and gid
+COPY docker-submitter-entrypoint /usr/local/bin/docker-submitter-entrypoint
+
 COPY upload-size.conf /etc/apache2/conf-available/upload-size.conf
 RUN cd /etc/apache2/conf-enabled && ln -s ../conf-available/upload-size.conf .
 
@@ -25,3 +27,6 @@ RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer
 
 RUN a2enmod rewrite
+
+ENTRYPOINT ["docker-submitter-entrypoint"]
+CMD ["apache2-foreground"]
