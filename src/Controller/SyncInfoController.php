@@ -16,6 +16,7 @@ class SyncInfoController extends AbstractController
         "driver" => "ovladač",
         "enabled" => "synchronizace zapnuta",
         "forceEnabled" => "vždy zapnuto",
+        "test" => "test",
         "remoteHost" => "vzdálený stroj",
         "remotePath" => "vzdálená cesta",
         "username" => "uživatel",
@@ -32,6 +33,7 @@ class SyncInfoController extends AbstractController
     ];
 
     const FIELD_CONVERTORS = [
+        "test" => "testConvertor",
     ];
 
     public function __construct(private Sync $sync)
@@ -42,7 +44,9 @@ class SyncInfoController extends AbstractController
     #[Route("/sync-info", name: "sync-info")]
     public function index(): Response
     {
+        $this->enableModule("sync-info");
         $config = $this->sync->getConfig();
+        $config['test'] = $this->sync->isEnabled();
 
         $configHtml = [];
         foreach (self::FIELD_HEADING as $field => $heading) {
@@ -69,12 +73,20 @@ class SyncInfoController extends AbstractController
                 ];
             }
         }
+
         return $this->render("sync-info.html.twig", ["config" => $configHtml]);
+    }
+
+    #[IsGranted('ROLE_SUPERADMIN')]
+    #[Route("/test-sync", name: "test-sync")]
+    public function doTest(): Response
+    {
+        $result = $this->sync->testConnection();
+        return $this->json(["testResult" => $result]);
     }
 
     private function convertValue(mixed $value, string $field): ?string
     {
-        /** @phpstan-ignore-next-line */
         $convertor = self::FIELD_CONVERTORS[$field] ?? 'defaultConvertor';
         return $this->$convertor($value);
     }
@@ -94,5 +106,24 @@ class SyncInfoController extends AbstractController
             return htmlspecialchars($value);
         }
         return null;
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
+     */
+    private function testConvertor(mixed $value): ?string
+    {
+        if (!$value) {
+            return null;
+        }
+        $spinner = "<div class=\"spinner-grow spinner-grow-sm text-secondary me-2\" role=\"status\"></div>";
+        $loadingMessage = "<span>načítá se...</span>";
+        $widget = sprintf(
+            "<div class=\"sync-test-status\" data-test-url=\"%s\">%s%s</div>",
+            htmlspecialchars($this->generateUrl("test-sync")),
+            $spinner,
+            $loadingMessage
+        );
+        return $widget;
     }
 }
