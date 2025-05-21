@@ -436,4 +436,14 @@ class Assignment
             "activatedAt" => $this->getActivatedAt()?->format("Y-m-d H:i:s"),
         ];
     }
+
+    public function getFileLimit(): ?int
+    {
+        return null;
+    }
+
+    public function getSizeLimit(): ?int
+    {
+        return null;
+    }
 }

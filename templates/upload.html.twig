@@ -1,13 +1,21 @@
 {% extends "form.html.twig" %}
 {% block form %}
+    {% if form is not null %}
     <div class="card">
         <div class="card-body">
             {{ form(form) }}
         </div>
     </div>
+    {% endif %}
 {% endblock %}
 
 {% block before_form_hook %}
+    {% if errorMessage is not null %}
+        <span class="submitted-file-error" 
+              data-file-error-message="{{ errorMessage }}"
+              data-reload-url="{{ path("create-submission", { "_back": false, "assignment": assignment.id })}}"
+        ></span>
+    {% endif %}
     {% if files|length > 0 %}
     <div class="alert alert-danger" role="alert">
         <strong>Pozor:</strong> Odevzdání není kompletní, dokud nebude uzavřeno.
@@ -18,10 +26,7 @@
     <table class="submitted-files table table-bordered thin-headings" data-file-action-url="{{ path("submission-file-action", {
         "_back": false,
         "assignment": assignment.id
-    }) }}" data-reload-url="{{ path("create-submission", {
-        "_back": false,
-        "assignment": assignment.id 
-    })}}"{% if errorMessage is not null %} data-file-error-message="{{ errorMessage }}"{% endif %}>
+    }) }}">
         {% for file in files %}
             <tr><td class="submitted-file-item">
                 <div class="submitted-file-show hscroll">

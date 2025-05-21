@@ -14,7 +14,7 @@ class FileSubmitType extends AbstractType
     {
         $builder
             ->add('file', FileType::class, [
-                'multiple' => true,
+                'multiple' => $options['allow_multiple_files'],
                 'label' => 'přidat soubory:',
             ])
         ;
@@ -23,6 +23,7 @@ class FileSubmitType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            "allow_multiple_files" => true,
         ]);
     }
 }

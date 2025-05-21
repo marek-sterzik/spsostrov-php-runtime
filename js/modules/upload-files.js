@@ -99,9 +99,9 @@ $(() => {
         }
     })
 
-    const errorMessage = $("table.submitted-files").attr("data-file-error-message")
+    const errorMessage = $("span.submitted-file-error").attr("data-file-error-message")
     if (errorMessage) {
-        const reloadUrl = $("table.submitted-files").attr("data-reload-url")
+        const reloadUrl = $("span.submitted-file-error").attr("data-reload-url")
         alertBox(errorMessage, "Chyba").then(() => {
             window.location = reloadUrl
         })

@@ -23,12 +23,22 @@ use App\Job\JobManager;
 class SubmissionController extends AbstractController
 {
     const ERRORS = [
-        "submission_is_closed" => "Odevzdání už je uzavřeno a nelze jej měnit.",
-        "delete_file_failed" => "Nelze smazat soubor.",
-        "invlid_file_name" => "Neplatný název souboru.",
-        "moved_file_does_not_exist" => "Přejmenovávaný soubor neexistuje.",
-        "destination_file_already_exist" => "Cílovy soubor už existuje.",
-        "move_file_failed" => "Nelze přejmenovat soubor.",
+        "submission_is_closed" =>
+            "Odevzdání už je uzavřeno a nelze jej měnit.",
+        "delete_file_failed" =>
+            "Nelze smazat soubor.",
+        "invlid_file_name" =>
+            "Neplatný název souboru.",
+        "moved_file_does_not_exist" =>
+            "Přejmenovávaný soubor neexistuje.",
+        "destination_file_already_exist" =>
+            "Cílovy soubor už existuje.",
+        "move_file_failed" =>
+            "Nelze přejmenovat soubor.",
+        "incomplete_upload_file_limit_reached" => 
+            "Některé soubory nebyly nahrány protože zadání má omezen počet souborů k odevzdání.",
+        "incomplete_upload_size_limit_reached" => 
+            "Některé soubory nebyly nahrány protože zadání má omezenu celkovou velikost souborů.",
     ];
     public function __construct(
         private SubmissionRepository $submissionRepository,
@@ -55,26 +65,75 @@ class SubmissionController extends AbstractController
         if ($user === null) {
             return $this->redirectBack(true);
         }
-        return $this->lock($assignment, $user, function () use ($assignment, $user, $error, $errorMessage) {
+        return $this->lock($assignment, $user, function () use ($assignment, $user, $error, $errorMessage, $request) {
             $submission = $this->ensureSubmissionExists($assignment, $user);
             if ($submission === null) {
                 return $this->redirectBack(true);
             }
-            return $this->form(FileSubmitType::class, [], ["attr" => ["class" => "with-progress"]])
-            ->action("nahrát soubory", function (array $data) use ($submission) {
-                $this->submitFiles($data['file'], $submission);
-                return $this->redirect($this->getRequest()->getRequestUri());
-            })
-            ->caption("Nahrát soubory")
-            ->useTemplate("upload.html.twig", [
-                "files" => $this->fileManager->listFiles($submission),
+
+            $files = $this->fileManager->listFiles($submission);
+
+            $fileLimit = $this->makeLimit($assignment->getFileLimit(), count($files));
+            $sizeLimit = $this->makeLimit($assignment->getSizeLimit(), $this->totalSize($files));
+
+            $caption = "Nahrát soubory";
+
+            $templateArgs = [
+                "files" => $files,
                 "assignment" => $assignment,
                 "submissionId" => $submission->getId(),
                 "errorCode" => $error,
                 "errorMessage" => $errorMessage,
-            ])
-            ->handle()
-            ;
+            ];
+
+            $fileLimitOk = ($fileLimit === null || $fileLimit > 0) ? true : false;
+            $sizeLimitOk = ($sizeLimit === null || $sizeLimit > 0) ? true : false;
+
+            if ($fileLimitOk && $sizeLimitOk) {
+                $allowMultiple = ($fileLimit === null || $fileLimit > 1);
+                $formOptions = [
+                    "attr" => ["class" => "with-progress"],
+                    "allow_multiple_files" => $allowMultiple,
+                ];
+                return $this->form(FileSubmitType::class, [], $formOptions)
+                ->action("nahrát soubory", function (array $data) use ($submission, $fileLimit, $sizeLimit) {
+                    $file = $data['file'];
+                    if (!is_array($file)) {
+                        $file = [$file];
+                    }
+                    $urlParams = [
+                        "assignment" => $submission->getAssignment()->getId(),
+                        "_back" => false,
+                    ];
+                    $err = $this->submitFiles($file, $submission, $fileLimit, $sizeLimit);
+                    if ($err !== null) {
+                        $urlParams['err'] = $err;
+                    }
+                    return $this->redirectToRoute("create-submission", $urlParams);
+                })
+                ->caption($caption)
+                ->useTemplate("upload.html.twig", $templateArgs)
+                ->handle()
+                ;
+            } else {
+                if ($request->getMethod() === "POST") {
+                    if (!$fileLimitOk) {
+                        $err = 'incomplete_upload_file_limit_reached';
+                    } else {
+                        $err = 'incomplete_upload_size_limit_reached';
+                    }
+                    $urlParams = [
+                        "assignment" => $assignment->getId(),
+                        "_back" => false,
+                        'err' => $err,
+                    ];
+                    return $this->redirectToRoute("create-submission", $urlParams);
+                } else {
+                    $templateArgs['caption'] = $caption;
+                    $templateArgs['form'] = null;
+                    return $this->render("upload.html.twig", $templateArgs);
+                }
+            }
         });
     }
 
@@ -146,12 +205,57 @@ class SubmissionController extends AbstractController
         });
     }
 
-    private function submitFiles(array $files, Submission $submission): void
+    private function makeLimit(?int $totalLimit, int $usedLimit): ?int
+    {
+        if ($totalLimit === null) {
+            return null;
+        }
+        $totalLimit -= $usedLimit;
+        $totalLimit = max($totalLimit, 0);
+        return $totalLimit;
+    }
+
+    private function totalSize(array $files): int
+    {
+        $size = 0;
+        foreach ($files as $file) {
+            if ($file instanceof UploadedFile) {
+                $size += $file->getSize() ?: 0;
+            } else {
+                $size += $file->getByteCount() ?? 0;
+            }
+        }
+        return $size;
+    }
+
+    private function submitFiles(array $files, Submission $submission, ?int $fileLimit, ?int $sizeLimit): ?string
     {
         if ($submission->getId() === null) {
             $this->getEntityManager()->flush();
         }
+        $ret = null;
+        if ($fileLimit !== null && count($files) > $fileLimit) {
+            $ret = "incomplete_upload_file_limit_reached";
+            $files = array_slice($files, 0, $fileLimit);
+        }
+
+        if ($sizeLimit !== null && $this->totalSize($files) > $sizeLimit) {
+            $ret = "incomplete_upload_size_limit_reached";
+            $oldFiles = $files;
+            $files = [];
+            foreach ($oldFiles as $file) {
+                $fileSize = $file->getSize() ?: 0;
+                if ($sizeLimit > $fileSize) {
+                    $sizeLimit -= $fileSize;
+                    $files[] = $file;
+                } else {
+                    break;
+                }
+            }
+        }
+        
         $this->fileManager->addFiles($submission, $files);
+        return $ret;
     }
 
     private function ensureSubmissionExists(Assignment $assignment, User $user): ?Submission
