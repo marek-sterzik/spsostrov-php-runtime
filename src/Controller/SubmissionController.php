@@ -90,10 +90,11 @@ class SubmissionController extends AbstractController
             $sizeLimitOk = ($sizeLimit === null || $sizeLimit > 0) ? true : false;
 
             if ($fileLimitOk && $sizeLimitOk) {
-                $allowMultiple = ($fileLimit === null || $fileLimit > 1);
                 $formOptions = [
                     "attr" => ["class" => "with-progress"],
-                    "allow_multiple_files" => $allowMultiple,
+                    "file_limit" => $fileLimit,
+                    "size_limit" => $sizeLimit,
+                    "upload_limit" => $this->getUploadLimit(),
                 ];
                 return $this->form(FileSubmitType::class, [], $formOptions)
                 ->action("nahrát soubory", function (array $data) use ($submission, $fileLimit, $sizeLimit) {
@@ -291,5 +292,34 @@ class SubmissionController extends AbstractController
         } finally {
             $this->lockManager->unlock($lock);
         }
+    }
+
+    private function getUploadLimit(): ?int
+    {
+        $limit1 = $this->limitToBytes(ini_get('upload_max_filesize'));
+        $limit2 = $this->limitToBytes(ini_get('post_max_size'));
+        return min($limit1, $limit2);
+    }
+
+    private function limitToBytes($val): int
+    {
+        $val  = trim($val);
+
+        if (is_numeric($val))
+            return $val;
+
+        $last = strtolower($val[strlen($val)-1]);
+        $val  = (int)substr($val, 0, -1);
+
+        switch($last) {
+        case 'g':
+            $val *= 1024;
+        case 'm':
+            $val *= 1024;
+        case 'k':
+            $val *= 1024;
+        }
+
+        return $val;
     }
 }

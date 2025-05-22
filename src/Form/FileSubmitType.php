@@ -10,12 +10,22 @@ use Symfony\Component\Validator\Constraints\File;
 
 class FileSubmitType extends AbstractType
 {
+    const LIMITS = ["file_limit", "size_limit", "upload_limit"];
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $attrs = [];
+        foreach (self::LIMITS as $limit) {
+            $attr = "data-" . str_replace("_", "-", $limit);
+            if ($options[$limit] !== null) {
+                $attrs[$attr] = $options[$limit];
+            }
+        }
         $builder
             ->add('file', FileType::class, [
-                'multiple' => $options['allow_multiple_files'],
+                'multiple' => ($options['file_limit'] === null || $options['file_limit'] > 1),
                 'label' => 'přidat soubory:',
+                'attr' => $attrs,
             ])
         ;
     }
@@ -23,7 +33,9 @@ class FileSubmitType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            "allow_multiple_files" => true,
+            "file_limit" => null,
+            "size_limit" => null,
+            "upload_limit" => null,
         ]);
     }
 }
