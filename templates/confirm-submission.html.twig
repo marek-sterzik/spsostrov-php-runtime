@@ -1,0 +1,18 @@
+{% extends "base.html.twig" %}
+{% block body %}
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-12">
+                <h3>Potvrdit odevzdání</h3>
+                <div class="alert alert-danger" role="alert">
+                    <strong>Pozor:</strong> Odevzdali jste práci po termínu. Dokončením odevzdání zrušíte předchozí odevzdání, které bylo v termínu.
+                    <div class="text-center mt-3">
+                        {{ confirm.render()|raw }}
+                        {{ dismiss.render()|raw }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

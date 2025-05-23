@@ -30,14 +30,15 @@ class SubmissionRepository extends ServiceEntityRepository
             ->andWhere("s.assignment = :assignment")
             ->andWhere("s.submitter = :user")
             ->andWhere("s.id != :submission")
-            ->andWhere("s.state != :draft")
+            ->andWhere("s.state NOT IN (:drafts)")
+            ->andWhere("s.state != :locked")
             ->andWhere("s.isCurrent = :true")
             ->setParameter(":false", false)
             ->setParameter(":true", true)
             ->setParameter(":assignment", $assignmentId)
             ->setParameter(":user", $userId)
             ->setParameter(":submission", $submissionId)
-            ->setParameter(":draft", SubmissionState::Draft)
+            ->setParameter(":drafts", SubmissionState::drafts())
             ->getQuery()
             ->execute()
         ;
@@ -52,13 +53,13 @@ class SubmissionRepository extends ServiceEntityRepository
             ->andWhere("s.assignment = :assignment")
             ->andWhere("s.submitter = :user")
             ->andWhere("s.id != :submission")
-            ->andWhere("s.state != :draft")
+            ->andWhere("s.state NOT IN (:drafts)")
             ->andWhere("s.isCurrent = :true")
             ->setParameter(":true", true)
             ->setParameter(":assignment", $assignmentId)
             ->setParameter(":user", $userId)
             ->setParameter(":submission", $submissionId)
-            ->setParameter(":draft", SubmissionState::Draft)
+            ->setParameter(":drafts", SubmissionState::drafts())
             ->getQuery()
             ->getResult()
         ;
@@ -74,10 +75,8 @@ class SubmissionRepository extends ServiceEntityRepository
             ->select($qb->expr()->countDistinct('s.submitter'))
             ->andWhere('s.assignment = :assignment')
             ->setParameter(':assignment', $assignment->getId())
-            ->andWhere('s.state != :draft')
-            ->setParameter(':draft', SubmissionState::Draft)
-            ->andWhere('s.state != :trash')
-            ->setParameter(':trash', SubmissionState::Trash)
+            ->andWhere('s.state NOT IN (:draftOrTrash)')
+            ->setParameter(':draftOrTrash', SubmissionState::draftsAndTrash())
             ->getQuery()
             ->getSingleScalarResult()
         ;
@@ -100,5 +99,32 @@ class SubmissionRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult()
         ;
+    }
+
+    public function hasEarlySubmission(Assignment $assignment, User $submitter): bool
+    {
+        if (!$assignment->getState()->submissionsAvailable()) {
+            return false;
+        }
+        $queryBuilder = $this->createQueryBuilder('s');
+        $queryBuilder
+            ->select("count(1)")
+            ->andWhere('s.assignment = :assignment')
+            ->setParameter(':assignment', $assignment->getId())
+            ->andWhere('s.submitter = :submitter')
+            ->setParameter(':submitter', $submitter->getId())
+            ->andWhere('s.state NOT IN (:drafts)')
+            ->setParameter(':drafts', SubmissionState::draftsAndTrash())
+        ;
+        $deadline = $assignment->getSoftDeadline();
+        
+        if ($deadline !== null) {
+            $queryBuilder
+                ->andWhere('s.submittedAt <= :deadline')
+                ->setParameter(':deadline', $deadline)
+            ;
+        }
+
+        return $queryBuilder->getQuery()->getSingleScalarResult();
     }
 }

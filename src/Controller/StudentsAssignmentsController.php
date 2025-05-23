@@ -112,7 +112,7 @@ class StudentsAssignmentsController extends AbstractDbTableController
     private function getSubmitAction(Assignment $assignment, ?Submission $lastSubmission): Action
     {
         if ($lastSubmission === null ||
-            $lastSubmission->getState() === SubmissionState::Draft ||
+            $lastSubmission->getState()->isDraft() ||
             $assignment->getSubmissionMode()->allowMultiple()
         ) {
             $label = $this->getSubmitLabel($lastSubmission);
@@ -133,7 +133,7 @@ class StudentsAssignmentsController extends AbstractDbTableController
             return "odevzdat";
         }
 
-        if ($lastSubmission->getState() === SubmissionState::Draft) {
+        if ($lastSubmission->getState()->isDraft()) {
             return "dokončit odevzdání";
         }
 

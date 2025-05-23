@@ -41,7 +41,8 @@ class SubmissionDetailController extends AbstractController
             }
             return $this->json([
                 "state" => $this->renderView(
-                    "snippets/submission-state.html.twig", [
+                    "snippets/submission-state.html.twig",
+                    [
                         "state" => $submission->getState(),
                         "isCurrent" => $submission->isCurrent(),
                     ]
@@ -51,7 +52,7 @@ class SubmissionDetailController extends AbstractController
                 "timeout" => $timeout,
             ]);
         } else {
-            $isDraft = ($submission->getState() === SubmissionState::Draft) ? true : false;
+            $isDraft = $submission->getState()->isDraft();
             return $this->render("submission.html.twig", [
                 "submission" => $submission,
                 "files" => $this->fileManager->listFiles($submission),

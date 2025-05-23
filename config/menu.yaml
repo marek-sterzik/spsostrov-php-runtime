@@ -9,7 +9,7 @@ menu:
     roles: ['ROLE_TEACHER']
   - name: odevzdat
     route: submit
-    routes: ['create-submission']
+    routes: ['create-submission', 'submission-close']
     roles: ['ROLE_STUDENT']
   - name: moje práce
     route: submissions

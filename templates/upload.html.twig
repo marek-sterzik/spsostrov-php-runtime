@@ -18,9 +18,11 @@
     {% endif %}
     {% if files|length > 0 %}
     <div class="alert alert-danger" role="alert">
-        <strong>Pozor:</strong> Odevzdání není kompletní, dokud nebude uzavřeno.
+        <strong>Pozor:</strong> Práce bude označena za odevzdanou až uzavřením celého odevzdání.
         <div class="text-center mt-3">
-            <a class="btn btn-danger" role="button" href="{{ path("submission-close", {"assignment": assignment.id, "_back": false}) }}">uzavřít a odevzdat</a>
+            <a class="btn btn-danger" 
+               role="button" href="{{ path("submission-lock", {"assignment": assignment.id, "_back": false}) }}"
+            >uzavřít a odevzdat</a>
         </div>
     </div>
     <table class="submitted-files table table-bordered thin-headings" data-file-action-url="{{ path("submission-file-action", {

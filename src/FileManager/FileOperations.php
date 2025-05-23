@@ -87,7 +87,7 @@ class FileOperations
 
     public function addFiles(Submission $submission, array $uploadedFiles): self
     {
-        if ($submission->getState() !== SubmissionState::Draft) {
+        if (!$submission->getState()->isWritableDraft()) {
             throw new Exception("Files can be uploaded only to submission drafts");
         }
         $submissionDirectory = $this->getSubmissionDirectory($submission);
@@ -100,7 +100,7 @@ class FileOperations
 
     public function deleteFile(Submission $submission, string $filename): ?string
     {
-        if ($submission->getState() !== SubmissionState::Draft) {
+        if (!$submission->getState()->isWritableDraft()) {
             return 'submission_is_closed';
         }
         $filename = $this->canonizeFilename($filename);
@@ -123,7 +123,7 @@ class FileOperations
 
     public function moveFile(Submission $submission, string $fileFrom, string $fileTo): ?string
     {
-        if ($submission->getState() !== SubmissionState::Draft) {
+        if (!$submission->getState()->isWritableDraft()) {
             return 'submission_is_closed';
         }
         $fileFrom = $this->canonizeFilename($fileFrom);

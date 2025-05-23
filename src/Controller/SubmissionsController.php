@@ -39,8 +39,8 @@ class SubmissionsController extends AbstractSubmissionsController
             $qb->setParameter(":owner", $me);
             $qb->setParameter(":notState", AssignmentState::Draft);
         }
-        $qb->andWhere("s.state != :notSState");
-        $qb->setParameter(":notSState", SubmissionState::Draft);
+        $qb->andWhere("s.state NOT IN (:drafts)");
+        $qb->setParameter(":drafts", SubmissionState::drafts());
 
         return $qb;
     }

@@ -14,6 +14,10 @@ enum SubmissionState: string
     #[Parameter("icon", "bi-pencil")]
     case Draft = "draft";
 
+    #[Description("uzamknuto")]
+    #[Parameter("icon", "bi-lock")]
+    case Locked = "locked";
+
     #[Description("zahozeno")]
     #[Parameter("icon", "bi-trash")]
     case Trash = "trash";
@@ -34,10 +38,46 @@ enum SubmissionState: string
     #[Parameter("icon", "bi-file-earmark")]
     case NotSynced = "not_synced";
 
+    public static function drafts(): array
+    {
+        return [self::Draft, self::Locked];
+    }
+
+    public static function draftsAndTrash(): array
+    {
+        return [self::Draft, self::Locked, self::Trash];
+    }
+
+    public function isDraft(): bool
+    {
+        return match ($this) {
+            self::Draft => true,
+            self::Locked => true,
+            default => false,
+        };
+    }
+
+    public function isWritableDraft(): bool
+    {
+        return match ($this) {
+            self::Draft => true,
+            default => false,
+        };
+    }
+
+    public function isLockedDraft(): bool
+    {
+        return match ($this) {
+            self::Locked => true,
+            default => false,
+        };
+    }
+
     public function isClosed(): bool
     {
         return match ($this) {
             self::Draft => false,
+            self::Locked => false,
             default => true
         };
     }
@@ -64,7 +104,7 @@ enum SubmissionState: string
         if ($this->isFinal()) {
             return false;
         }
-        if ($this === self::Draft) {
+        if ($this === self::Draft || $this === self::Locked) {
             return false;
         }
         return true;

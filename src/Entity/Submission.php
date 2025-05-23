@@ -161,7 +161,7 @@ class Submission
         if ($this->submitter === $user) {
             return true;
         }
-        if ($this->getState() === SubmissionState::Draft) {
+        if ($this->getState()->isDraft()) {
             return false;
         }
         if ($this->assignment->canBeViewedBy($user)) {

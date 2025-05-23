@@ -7,7 +7,7 @@
 * add indices for standard searches in the assignment table
 * add indices for standard searches in the submission table (mainly for the repository methods)
 * make some help for prefixed searches from SearchTool
-* trash drafts after assignment state becomes inactive (maybe after other criteria)
+* trash drafts after assignment state becomes inactive, close locked drafts (maybe after other criteria)
 * possiblity to rotate between submissions when viewing
 * alert when submitting after deadline and confirm if you really want to submit
 * favicon

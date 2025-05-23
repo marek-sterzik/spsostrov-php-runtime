@@ -19,6 +19,7 @@ use App\Entity\User;
 use App\Lock\LockManager;
 use App\FileManager\FileManager;
 use App\Job\JobManager;
+use App\Component\Action;
 
 class SubmissionController extends AbstractController
 {
@@ -35,9 +36,9 @@ class SubmissionController extends AbstractController
             "Cílovy soubor už existuje.",
         "move_file_failed" =>
             "Nelze přejmenovat soubor.",
-        "incomplete_upload_file_limit_reached" => 
+        "incomplete_upload_file_limit_reached" =>
             "Některé soubory nebyly nahrány protože zadání má omezen počet souborů k odevzdání.",
-        "incomplete_upload_size_limit_reached" => 
+        "incomplete_upload_size_limit_reached" =>
             "Některé soubory nebyly nahrány protože zadání má omezenu celkovou velikost souborů.",
     ];
     public function __construct(
@@ -69,6 +70,12 @@ class SubmissionController extends AbstractController
             $submission = $this->ensureSubmissionExists($assignment, $user);
             if ($submission === null) {
                 return $this->redirectBack(true);
+            }
+            if ($submission->getState()->isLockedDraft()) {
+                return $this->redirectToRoute('submission-close', [
+                    "assignment" => $assignment->getId(),
+                    "_back" => false
+                ]);
             }
 
             $files = $this->fileManager->listFiles($submission);
@@ -167,8 +174,8 @@ class SubmissionController extends AbstractController
     }
 
     #[IsGranted('ROLE_STUDENT')]
-    #[Route("/submission/{assignment}/close", name: 'submission-close')]
-    public function closeAction(Assignment $assignment): Response
+    #[Route("/submission/{assignment}/lock", name: 'submission-lock')]
+    public function lockAction(Assignment $assignment): Response
     {
         $user = $this->getUserEntity();
         return $this->lock($assignment, $user, function () use ($assignment, $user) {
@@ -179,7 +186,41 @@ class SubmissionController extends AbstractController
                     "_back" => false,
                 ]);
             }
-            $submission->setSubmittedAt(new DateTimeImmutable());
+            if ($submission->getState()->isWritableDraft()) {
+                $submission->setSubmittedAt(new DateTimeImmutable());
+                $submission->setState(SubmissionState::Locked);
+                $this->fileManager->putManifest($submission);
+                $this->getEntityManager()->flush();
+            }
+
+            return $this->redirectToRoute('submission-close', [
+                "assignment" => $assignment->getId(),
+                "_back" => false
+            ]);
+        });
+    }
+
+    #[IsGranted('ROLE_STUDENT')]
+    #[Route("/submission/{assignment}/close", name: 'submission-close')]
+    public function closeAction(Assignment $assignment, Request $request): Response
+    {
+        $force = $request->query->get("force") ? true : false;
+        $user = $this->getUserEntity();
+        return $this->lock($assignment, $user, function () use ($assignment, $user, $force) {
+            $submission = $this->ensureSubmissionExists($assignment, $user);
+            if ($submission->getId() === null ||
+                $submission->getSubmitter() !== $user ||
+                !$submission->getState()->isLockedDraft()
+            ) {
+                return $this->redirectToRoute('create-submission', [
+                    "assignment" => $assignment->getId(),
+                    "_back" => false,
+                ]);
+            }
+            if ($this->submissionNeedsConfirmation($submission) && !$force) {
+                return $this->confirmSubmission($submission);
+            }
+
             $submission->setState(SubmissionState::Submitted);
             $this->fileManager->putManifest($submission);
             $this->getEntityManager()->flush();
@@ -204,6 +245,60 @@ class SubmissionController extends AbstractController
                 ["submission" => $submission->getId(), "_back" => false]
             );
         });
+    }
+
+    #[IsGranted('ROLE_STUDENT')]
+    #[Route("/submission/{submission}/dismiss", name: 'submission-dismiss')]
+    public function dismissAction(Submission $submission): Response
+    {
+        $submission->setState(SubmissionState::Trash);
+        $this->getEntityManager()->flush();
+        $this->jobManager->invoke("remove_submission", ["id" => $submission->getId(), "force" => true]);
+        return $this->redirectBack(true);
+    }
+
+    private function confirmSubmission(Submission $submission): Response
+    {
+        $assignment = $submission->getAssignment();
+        $confirmLink = $this->generateUrl("submission-close", [
+            "assignment" => $assignment->getId(),
+            "_back" => false,
+            "force" => "true",
+        ]);
+        $dismissLink = $this->generateUrl("submission-dismiss", [
+            "submission" => $submission->getId(),
+            "_back" => false,
+        ]);
+        $confirmAction = Action::get($confirmLink)
+            ->label("dokončit odevzdání")->cssClass("btn-danger")
+        ;
+        $dismissAction = Action::get($dismissLink)
+            ->label("zrušit odevzdání")->cssClass("btn-secondary")
+            ->confirm("Zrušením odevzdání bude práce smazána a zapomenuta. Chcete pokračovat?", "Potvrdit smazání")
+            ->confirmButtons("zrušit odevzdání a smazat práci", "zpět")
+        ;
+        return $this->render("confirm-submission.html.twig", [
+            "confirm" => $confirmAction,
+            "dismiss" => $dismissAction
+        ]);
+    }
+
+    private function submissionNeedsConfirmation(Submission $submission): bool
+    {
+        if (!$submission->getAssignment()->getSubmissionMode()->deleteOld()) {
+            return false;
+        }
+        if (!$submission->isSubmittedLate()) {
+            return false;
+        }
+        $hasEarlySubmission = $this->submissionRepository->hasEarlySubmission(
+            $submission->getAssignment(),
+            $submission->getSubmitter()
+        );
+        if (!$hasEarlySubmission) {
+            return false;
+        }
+        return true;
     }
 
     private function makeLimit(?int $totalLimit, int $usedLimit): ?int
@@ -265,7 +360,7 @@ class SubmissionController extends AbstractController
             return null;
         }
         $submission = $this->submissionRepository->getLastSubmission($assignment, $user);
-        if ($submission !== null && $submission->getState() === SubmissionState::Draft) {
+        if ($submission !== null && $submission->getState()->isDraft()) {
             return $submission;
         }
 
@@ -294,30 +389,33 @@ class SubmissionController extends AbstractController
         }
     }
 
-    private function getUploadLimit(): ?int
+    private function getUploadLimit(): int
     {
         $limit1 = $this->limitToBytes(ini_get('upload_max_filesize'));
         $limit2 = $this->limitToBytes(ini_get('post_max_size'));
         return min($limit1, $limit2);
     }
 
-    private function limitToBytes($val): int
+    private function limitToBytes(string|int $val): int
     {
         $val  = trim($val);
 
-        if (is_numeric($val))
-            return $val;
+        if (is_numeric($val)) {
+            return (int)$val;
+        }
 
         $last = strtolower($val[strlen($val)-1]);
         $val  = (int)substr($val, 0, -1);
 
-        switch($last) {
-        case 'g':
-            $val *= 1024;
-        case 'm':
-            $val *= 1024;
-        case 'k':
-            $val *= 1024;
+        switch ($last) {
+            case 'g':
+                $val *= 1024;
+                /* pass */
+            case 'm':
+                $val *= 1024;
+                /* pass */
+            case 'k':
+                $val *= 1024;
         }
 
         return $val;

@@ -78,7 +78,8 @@ abstract class AbstractSubmissionsController extends AbstractDbTableController
         $isMe = ($submission->getSubmitter() === $this->getUserEntity()) ? true : false;
         $meBadge = $isMe ? (' ' . $this->renderView('snippets/me.html.twig')) : '';
         $submissionState = $this->renderView(
-            'snippets/submission-state.html.twig', [
+            'snippets/submission-state.html.twig',
+            [
                 "state" => $submission->getState(),
                 "isCurrent" => $submission->isCurrent(),
             ]
@@ -107,7 +108,7 @@ abstract class AbstractSubmissionsController extends AbstractDbTableController
     private function getSubmissionActions(Submission $submission): array
     {
         $actions = [];
-        if ($submission->getState() !== SubmissionState::Draft) {
+        if (!$submission->getState()->isDraft()) {
             $actions[] = Action::get(
                 $this->generateUrl(
                     "submission-detail",
