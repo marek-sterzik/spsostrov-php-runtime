@@ -9,7 +9,6 @@
 * make some help for prefixed searches from SearchTool
 * trash drafts after assignment state becomes inactive, close locked drafts (maybe after other criteria)
 * possiblity to rotate between submissions when viewing
-* alert when submitting after deadline and confirm if you really want to submit
 * favicon
 
 ## Nice to have
