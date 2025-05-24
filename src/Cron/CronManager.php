@@ -4,12 +4,14 @@ namespace App\Cron;
 
 use App\Repository\AssignmentRepository;
 use App\Repository\SubmissionRepository;
+use App\Submission\SubmissionManager;
 
 class CronManager
 {
     public function __construct(
         private AssignmentRepository $assignmentRepository,
-        private SubmissionRepository $submissionRepository
+        private SubmissionRepository $submissionRepository,
+        private SubmissionManager $submissionManager
     ) {
     }
 
@@ -27,6 +29,8 @@ class CronManager
     private function closeLockedSubmissions(): void
     {
         foreach ($this->submissionRepository->findLockedInactiveSubmissions() as $submission) {
+            $descriptor = $submission->getSubmissionDescriptor();
+            $this->submissionManager->closeLockedSubmission($descriptor, false);
         }
     }
 }

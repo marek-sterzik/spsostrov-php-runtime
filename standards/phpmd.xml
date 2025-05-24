@@ -24,6 +24,7 @@
         <exclude name="TooManyPublicMethods"/>
         <exclude name="TooManyFields"/>
         <exclude name="ExcessiveClassComplexity"/>
+        <exclude name="ExcessivePublicCount"/>
     </rule>
     <rule ref="rulesets/controversial.xml" />
     <rule ref="rulesets/design.xml">
@@ -81,6 +82,11 @@
     <rule ref="rulesets/codesize.xml/ExcessiveClassComplexity">
         <properties>
             <property name="maximum" value="90"/>
+        </properties>
+    </rule>
+    <rule ref="rulesets/codesize.xml/ExcessivePublicCount">
+        <properties>
+            <property name="minimum" value="50"/>
         </properties>
     </rule>
 </ruleset>

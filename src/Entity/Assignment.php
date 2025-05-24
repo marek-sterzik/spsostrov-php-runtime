@@ -7,6 +7,7 @@ use DateTimeImmutable;
 use App\Repository\AssignmentRepository;
 use App\Assignment\AssignmentState;
 use App\Assignment\SubmissionMode;
+use App\Assignment\MissedDraftPolicy;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -52,6 +53,9 @@ class Assignment
     
     #[ORM\Column]
     private bool $backedUp = false;
+
+    #[ORM\Column(type: Types::STRING, length: 16, enumType: MissedDraftPolicy::class)]
+    private MissedDraftPolicy $missedDraftPolicy = MissedDraftPolicy::AcceptFirst;
 
     #[ORM\Column(type: Types::STRING, length: 16, enumType: AssignmentState::class)]
     private AssignmentState $state = AssignmentState::Draft;
@@ -204,6 +208,18 @@ class Assignment
     public function setBackedUp(bool $backedUp): self
     {
         $this->backedUp = $backedUp;
+
+        return $this;
+    }
+
+    public function getMissedDraftPolicy(): MissedDraftPolicy
+    {
+        return $this->missedDraftPolicy;
+    }
+
+    public function setMissedDraftPolicy(MissedDraftPolicy $missedDraftPolicy): self
+    {
+        $this->missedDraftPolicy = $missedDraftPolicy;
 
         return $this;
     }

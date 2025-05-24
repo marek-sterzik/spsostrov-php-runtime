@@ -33,7 +33,6 @@ class SubmissionRepository extends ServiceEntityRepository
             ->andWhere("s.submitter = :user")
             ->andWhere("s.id != :submission")
             ->andWhere("s.state NOT IN (:drafts)")
-            ->andWhere("s.state != :locked")
             ->andWhere("s.isCurrent = :true")
             ->setParameter(":false", false)
             ->setParameter(":true", true)
