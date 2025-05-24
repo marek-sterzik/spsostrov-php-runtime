@@ -36,17 +36,18 @@ class SubmissionManager
         return $this->lastProcessedSubmission;
     }
 
-    public function lockSubmission(Assignment $assignment, User $user): bool
+    public function lockSubmission(SubmissionDescriptor $descriptor): bool
     {
-        $this->lastError = null;
-        $this->lastProcessedSubmission = null;
-        return $this->lock($assignment, $user, function () use ($assignment, $user) {
-            $submission = $this->ensureSubmissionExists($assignment, $user);
-            if ($submission->getId() === null || $submission->getSubmitter() !== $user) {
+        return $this->lockOn($descriptor, false, function ($submission) {
+            if ($submission === null) {
                 $this->lastError = "no_submission_available";
                 return false;
             }
-            $this->lastProcessedSubmission = $submission;
+
+            if (!$submission->getState()->isDraft()) {
+                $this->lastError = "not_a_draft";
+                return false;
+            }
 
             if ($submission->getState()->isWritableDraft()) {
                 $submission->setSubmittedAt(new DateTimeImmutable());
@@ -59,31 +60,81 @@ class SubmissionManager
         });
     }
 
-    public function deleteSubmission(Submission $submission): bool
+    public function deleteSubmission(SubmissionDescriptor $descriptor): bool
     {
-        $this->lastError = null;
-        $this->lastProcessedSubmission = null;
-        return $this->lock($submission->getAssignment(), $submission->getSubmitter(), function () use ($submission) {
+        return $this->lockOn($descriptor, false, function ($submission) {
+            if ($submission === null) {
+                $this->lastError = "no_submission_available";
+                return false;
+            }
+
             $submission->setState(SubmissionState::Trash);
             $this->entityManager->flush();
-            $this->jobManager->invoke("remove_submission", ["id" => $submission->getId(), "force" => true]);
+            $this->jobManager->invoke("remove_submission", ["id" => $submission->getId()]);
             return true;
         });
     }
 
-    public function closeLockedSubmission(Assignment $assignment, User $user, bool $force): bool
+    public function deleteFile(SubmissionDescriptor $descriptor, string $filename): bool
     {
-        $this->lastError = null;
-        $this->lastProcessedSubmission = null;
-        return $this->lock($assignment, $user, function () use ($assignment, $user, $force) {
-            $submission = $this->ensureSubmissionExists($assignment, $user);
-            if ($submission->getId() === null ||
-                $submission->getSubmitter() !== $user
-            ) {
+        return $this->lockOn($descriptor, false, function ($submission) use ($filename) {
+            if ($submission === null) {
+                $this->lastError = "submission_does_not_exist";
+                return false;
+            }
+
+            if (!$submission->getState()->isWritableDraft()) {
+                $this->lastError = "not_a_draft";
+                return false;
+            }
+
+            $error = $this->fileManager->deleteFile($submission, $filename);
+
+            if ($error === "empty") {
+                $submission->setState(SubmissionState::Trash);
+                $this->entityManager->flush();
+                $this->jobManager->invoke("remove_submission", ["id" => $submission->getId()]);
+                $error = null;
+            }
+
+            if ($error !== null) {
+                $this->lastError = $error;
+                return false;
+            }
+            return true;
+        });
+    }
+
+    public function moveFile(SubmissionDescriptor $descriptor, string $fromFilename, string $toFilename): bool
+    {
+        return $this->lockOn($descriptor, false, function ($submission) use ($fromFilename, $toFilename) {
+            if ($submission === null) {
+                $this->lastError = "submission_does_not_exist";
+                return false;
+            }
+
+            if (!$submission->getState()->isWritableDraft()) {
+                $this->lastError = "not_a_draft";
+                return false;
+            }
+
+            $error = $this->fileManager->moveFile($submission, $fromFilename, $toFilename);
+
+            if ($error !== null) {
+                $this->lastError = $error;
+                return false;
+            }
+            return true;
+        });
+    }
+
+    public function closeLockedSubmission(SubmissionDescriptor $descriptor, bool $force): bool
+    {
+        return $this->lockOn($descriptor, false, function ($submission) use ($force) {
+            if ($submission === null) {
                 $this->lastError = "no_submission_available";
                 return false;
             }
-            $this->lastProcessedSubmission = $submission;
             if (!$submission->getState()->isLockedDraft()) {
                 $this->lastError = "submission_not_locked";
                 return false;
@@ -100,7 +151,7 @@ class SubmissionManager
             $submission->setState(SubmissionState::Submitted);
             $this->fileManager->putManifest($submission);
             $this->entityManager->flush();
-            if ($assignment->getSubmissionMode()->deleteOld()) {
+            if ($submission->getAssignment()->getSubmissionMode()->deleteOld()) {
                 $submissions = [];
                 foreach ($this->submissionRepository->selectCurrentFor($submission) as $deactivatedSubmission) {
                     $deactivatedSubmission->setCurrent(false);
@@ -120,29 +171,42 @@ class SubmissionManager
         });
     }
 
-    public function lock(Assignment $assignment, User $user, callable $criticalSection): mixed
+    public function lockOn(SubmissionDescriptor $descriptor, bool $createNonexistent, callable $criticalSection): mixed
     {
-        $lock = sprintf("sc-%d-%d", $assignment->getId(), $user->getId());
+        $this->lastError = null;
+        $this->lastProcessedSubmission = null;
+        $lock = $descriptor->getLock();
         $this->lockManager->lock($lock);
         try {
-            return $criticalSection();
+            $submission = $descriptor->getSubmission();
+            if ($submission === null) {
+                $submission = $this->getSubmission($descriptor, $createNonexistent);
+            }
+            $this->lastProcessedSubmission = $submission;
+            return $criticalSection($submission);
         } finally {
             $this->lockManager->unlock($lock);
         }
     }
 
-    public function ensureSubmissionExists(Assignment $assignment, User $user): ?Submission
+    private function getSubmission(SubmissionDescriptor $descriptor, bool $createNonexistent): ?Submission
     {
-        if (!$assignment->canSubmit($user)) {
+        $assignment = $descriptor->getAssignment();
+        $submitter = $descriptor->getSubmitter();
+
+        if (!$assignment->canSubmit($submitter)) {
             return null;
         }
-        $submission = $this->submissionRepository->getLastSubmission($assignment, $user);
+
+        $submission = $this->submissionRepository->getLastSubmission($assignment, $submitter);
         if ($submission !== null && $submission->getState()->isDraft()) {
             return $submission;
         }
 
-        if ($submission === null || $assignment->getSubmissionMode()->allowMultiple()) {
-            $submission = new Submission($assignment, $user);
+        if ($createNonexistent &&
+            ($submission === null || $assignment->getSubmissionMode()->allowMultiple())
+        ) {
+            $submission = new Submission($assignment, $submitter);
             $this->entityManager->persist($submission);
             return $submission;
         }

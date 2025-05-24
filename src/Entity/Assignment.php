@@ -14,6 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Validator\StudentClassPattern;
 use App\Validator\DeadlineInSchoolYear;
 use App\Utility\CurrentSchoolYear;
+use App\Submission\SubmissionDescriptor;
 
 #[ORM\Entity(repositoryClass: AssignmentRepository::class)]
 #[ORM\Index(name: 'main_order_created_at_index', fields: ['mainOrder', 'createdAt'])]
@@ -459,5 +460,10 @@ class Assignment
     public function getSizeLimit(): ?int
     {
         return null;
+    }
+
+    public function getSubmissionDescriptor(User $user): SubmissionDescriptor
+    {
+        return SubmissionDescriptor::assignmentUserDraft($this, $user);
     }
 }

@@ -6,6 +6,7 @@ use DateTimeImmutable;
 use App\Entity\Assignment;
 use App\Entity\User;
 use App\Entity\Submission;
+use App\Assignment\AssignmentState;
 use App\Submission\SubmissionState;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -126,6 +127,19 @@ class SubmissionRepository extends ServiceEntityRepository
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult()
+        ;
+    }
+
+    public function findLockedInactiveSubmissions(): array
+    {
+        return $this->createQueryBuilder('s')
+            ->innerJoin("s.assignment", "a")
+            ->andWhere('a.state != :active')
+            ->setParameter(':active', AssignmentState::Active)
+            ->andWhere('s.state = :locked')
+            ->setParameter(':locked', SubmissionState::Locked)
+            ->getQuery()
+            ->getResult()
         ;
     }
 }

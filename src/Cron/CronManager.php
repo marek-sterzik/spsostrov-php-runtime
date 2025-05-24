@@ -4,14 +4,12 @@ namespace App\Cron;
 
 use App\Repository\AssignmentRepository;
 use App\Repository\SubmissionRepository;
-use Doctrine\ORM\EntityManagerInterface as EntityManager;
 
 class CronManager
 {
     public function __construct(
         private AssignmentRepository $assignmentRepository,
-        private SubmissionRepository $submissionRepository,
-        private EntityManager $entityManager
+        private SubmissionRepository $submissionRepository
     ) {
     }
 
@@ -23,5 +21,12 @@ class CronManager
     public function allTasks(): void
     {
         $this->assignmentsCronTasks();
+        $this->closeLockedSubmissions();
+    }
+
+    private function closeLockedSubmissions(): void
+    {
+        foreach ($this->submissionRepository->findLockedInactiveSubmissions() as $submission) {
+        }
     }
 }

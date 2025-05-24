@@ -19,6 +19,7 @@ use App\Entity\User;
 use App\Lock\LockManager;
 use App\FileManager\FileManager;
 use App\Component\Action;
+use App\Utility\UploadLimit;
 
 class SubmissionController extends AbstractController
 {
@@ -39,6 +40,8 @@ class SubmissionController extends AbstractController
             "Některé soubory nebyly nahrány protože zadání má omezen počet souborů k odevzdání.",
         "incomplete_upload_size_limit_reached" =>
             "Některé soubory nebyly nahrány protože zadání má omezenu celkovou velikost souborů.",
+        "submission_does_not_exist" =>
+            "Odevzdání už neexistuje.",
     ];
     public function __construct(
         private FileManager $fileManager,
@@ -63,11 +66,10 @@ class SubmissionController extends AbstractController
         if ($user === null) {
             return $this->redirectBack(true);
         }
-        return $this->submissionManager->lock(
-            $assignment,
-            $user,
-            function () use ($assignment, $user, $error, $errorMessage, $request) {
-                $submission = $this->submissionManager->ensureSubmissionExists($assignment, $user);
+        return $this->submissionManager->lockOn(
+            $assignment->getSubmissionDescriptor($user),
+            true,
+            function ($submission) use ($assignment, $error, $errorMessage, $request) {
                 if ($submission === null) {
                     return $this->redirectBack(true);
                 }
@@ -101,7 +103,7 @@ class SubmissionController extends AbstractController
                         "attr" => ["class" => "with-progress"],
                         "file_limit" => $fileLimit,
                         "size_limit" => $sizeLimit,
-                        "upload_limit" => $this->getUploadLimit(),
+                        "upload_limit" => UploadLimit::get(),
                     ];
                     return $this->form(FileSubmitType::class, [], $formOptions)
                     ->action("nahrát soubory", function (array $data) use ($submission, $fileLimit, $sizeLimit) {
@@ -151,18 +153,18 @@ class SubmissionController extends AbstractController
     public function fileAction(Assignment $assignment, Request $request): Response
     {
         $user = $this->getUserEntity();
-        $submission = $this->submissionManager->ensureSubmissionExists($assignment, $user);
+        $descriptor = $assignment->getSubmissionDescriptor($user);
         $error = null;
-        if ($submission->getId() !== null && $submission->getSubmitter() === $user) {
-            $deleteFile = $request->query->get("delete");
-            if (is_string($deleteFile)) {
-                $error = $this->fileManager->deleteFile($submission, $deleteFile);
-            }
-            $mvFrom = $request->query->get("mvfrom");
-            $mvTo = $request->query->get("mvto");
-            if (is_string($mvFrom) && is_string($mvTo)) {
-                $error = $this->fileManager->moveFile($submission, $mvFrom, $mvTo);
-            }
+        $deleteFile = $request->query->get("delete");
+        if (is_string($deleteFile)) {
+            $error = $this->submissionManager->deleteFile($descriptor, $deleteFile) ?
+                null : $this->submissionManager->getLastError();
+        }
+        $mvFrom = $request->query->get("mvfrom");
+        $mvTo = $request->query->get("mvto");
+        if (is_string($mvFrom) && is_string($mvTo)) {
+            $error = $this->submissionManager->moveFile($descriptor, $mvFrom, $mvTo) ?
+                null : $this->submissionManager->getLastError();
         }
         $routeParams = [
             "assignment" => $assignment->getId(),
@@ -179,7 +181,7 @@ class SubmissionController extends AbstractController
     public function lockAction(Assignment $assignment): Response
     {
         $user = $this->getUserEntity();
-        if ($this->submissionManager->lockSubmission($assignment, $user)) {
+        if ($this->submissionManager->lockSubmission($assignment->getSubmissionDescriptor($user))) {
             return $this->redirectToRoute('submission-close', [
                 "assignment" => $assignment->getId(),
                 "_back" => false,
@@ -197,9 +199,9 @@ class SubmissionController extends AbstractController
     public function closeAction(Assignment $assignment, Request $request): Response
     {
         $force = $request->query->get("force") ? true : false;
-        $user = $this->getUserEntity();
+        $descriptor = $assignment->getSubmissionDescriptor($this->getUserEntity());
 
-        $success = $this->submissionManager->closeLockedSubmission($assignment, $user, $force);
+        $success = $this->submissionManager->closeLockedSubmission($descriptor, $force);
 
         if ($success) {
             return $this->redirectToRoute(
@@ -229,7 +231,7 @@ class SubmissionController extends AbstractController
     {
         $user = $this->getUserEntity();
         if ($submission->getSubmitter() === $user && $submission->getState()->isDraft()) {
-            $this->submissionManager->deleteSubmission($submission);
+            $this->submissionManager->deleteSubmission($submission->getSubmissionDescriptor());
         }
         return $this->redirectBack(true);
     }
@@ -317,37 +319,5 @@ class SubmissionController extends AbstractController
     protected function getDefaultBackUrl(): string
     {
         return $this->generateUrl("submit");
-    }
-
-    private function getUploadLimit(): int
-    {
-        $limit1 = $this->limitToBytes(ini_get('upload_max_filesize'));
-        $limit2 = $this->limitToBytes(ini_get('post_max_size'));
-        return min($limit1, $limit2);
-    }
-
-    private function limitToBytes(string|int $val): int
-    {
-        $val  = trim($val);
-
-        if (is_numeric($val)) {
-            return (int)$val;
-        }
-
-        $last = strtolower($val[strlen($val)-1]);
-        $val  = (int)substr($val, 0, -1);
-
-        switch ($last) {
-            case 'g':
-                $val *= 1024;
-                /* pass */
-            case 'm':
-                $val *= 1024;
-                /* pass */
-            case 'k':
-                $val *= 1024;
-        }
-
-        return $val;
     }
 }

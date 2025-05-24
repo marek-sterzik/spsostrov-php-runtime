@@ -9,6 +9,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Utility\Uuid;
 use App\Utility\NameToId;
+use App\Submission\SubmissionDescriptor;
 
 #[ORM\Entity(repositoryClass: SubmissionRepository::class)]
 class Submission
@@ -183,5 +184,10 @@ class Submission
     {
         $username = NameToId::get($this->getSubmitter()->getName());
         return sprintf("prace-%d-%s.zip", $this->getId(), $username);
+    }
+
+    public function getSubmissionDescriptor(): SubmissionDescriptor
+    {
+        return SubmissionDescriptor::submission($this);
     }
 }

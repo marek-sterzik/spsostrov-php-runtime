@@ -2,18 +2,14 @@
 
 namespace App\FileManager;
 
-use Doctrine\ORM\EntityManagerInterface as EntityManager;
 use App\Submission\SubmissionState;
 use App\Entity\Submission;
 use App\Lock\LockManager;
-use App\Job\JobManager;
 
 class FileManager
 {
     public function __construct(
         private LockManager $lockManager,
-        private EntityManager $entityManager,
-        private JobManager $jobManager,
         private FileOperations $fileOperations,
         private ZipOperations $zipOperations,
         private BackupOperations $backupOperations
@@ -68,14 +64,7 @@ class FileManager
     public function deleteFile(Submission $submission, string $filename): ?string
     {
         return $this->locked($submission, function () use ($submission, $filename) {
-            $code = $this->fileOperations->deleteFile($submission, $filename);
-            if ($code === "empty") {
-                $submission->setState(SubmissionState::Trash);
-                $this->entityManager->flush();
-                $this->jobManager->invoke("remove_submission", ["id" => $submission->getId()]);
-                return null;
-            }
-            return $code;
+            return $this->fileOperations->deleteFile($submission, $filename);
         });
     }
 
