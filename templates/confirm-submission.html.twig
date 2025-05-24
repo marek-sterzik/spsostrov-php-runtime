@@ -5,7 +5,12 @@
             <div class="col-lg-6 col-12">
                 <h3>Potvrdit odevzdání</h3>
                 <div class="alert alert-danger" role="alert">
-                    <strong>Pozor:</strong> Odevzdali jste práci po termínu. Dokončením odevzdání zrušíte a zahodíte předchozí odevzdání, které bylo v termínu.
+                    <strong>Pozor:</strong>
+                    {% if overrideLateSubmitted %}
+                        Odevzdali jste práci po termínu. Dokončením odevzdání zrušíte a zahodíte předchozí práci odevzdanou dříve, ale také po termínu.
+                    {% else %}
+                        Odevzdali jste práci po termínu. Dokončením odevzdání zrušíte a zahodíte předchozí práci, která byla odevzdána v termínu.
+                    {% endif %}
                     <div class="text-center mt-3">
                         {{ confirm.render()|raw }}
                         {{ dismiss.render()|raw }}

@@ -217,8 +217,9 @@ class SubmissionController extends AbstractController
                     "_back" => false,
                 ]);
             }
-            if ($this->submissionNeedsConfirmation($submission) && !$force) {
-                return $this->confirmSubmission($submission);
+            $lateOverriddenSubmission = $this->getLateOverriddenSubmission($submission);
+            if ($lateOverriddenSubmission !== null && !$force) {
+                return $this->confirmSubmission($submission, $lateOverriddenSubmission->isSubmittedLate());
             }
 
             $submission->setState(SubmissionState::Submitted);
@@ -257,7 +258,7 @@ class SubmissionController extends AbstractController
         return $this->redirectBack(true);
     }
 
-    private function confirmSubmission(Submission $submission): Response
+    private function confirmSubmission(Submission $submission, bool $overrideLateSubmitted): Response
     {
         $assignment = $submission->getAssignment();
         $confirmLink = $this->generateUrl("submission-close", [
@@ -279,26 +280,20 @@ class SubmissionController extends AbstractController
         ;
         return $this->render("confirm-submission.html.twig", [
             "confirm" => $confirmAction,
-            "dismiss" => $dismissAction
+            "dismiss" => $dismissAction,
+            "overrideLateSubmitted" => $overrideLateSubmitted,
         ]);
     }
 
-    private function submissionNeedsConfirmation(Submission $submission): bool
+    private function getLateOverriddenSubmission(Submission $submission): ?Submission
     {
         if (!$submission->getAssignment()->getSubmissionMode()->deleteOld()) {
-            return false;
+            return null;
         }
         if (!$submission->isSubmittedLate()) {
-            return false;
+            return null;
         }
-        $hasEarlySubmission = $this->submissionRepository->hasEarlySubmission(
-            $submission->getAssignment(),
-            $submission->getSubmitter()
-        );
-        if (!$hasEarlySubmission) {
-            return false;
-        }
-        return true;
+        return $this->submissionRepository->getEarlierSubmission($submission);
     }
 
     private function makeLimit(?int $totalLimit, int $usedLimit): ?int

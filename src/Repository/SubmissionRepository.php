@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use DateTimeImmutable;
 use App\Entity\Assignment;
 use App\Entity\User;
 use App\Entity\Submission;
@@ -101,30 +102,30 @@ class SubmissionRepository extends ServiceEntityRepository
         ;
     }
 
-    public function hasEarlySubmission(Assignment $assignment, User $submitter): bool
+    public function getEarlierSubmission(Submission $submission): ?Submission
     {
-        if (!$assignment->getState()->submissionsAvailable()) {
-            return false;
+        if (!$submission->getAssignment()->getState()->submissionsAvailable()) {
+            return null;
         }
-        $queryBuilder = $this->createQueryBuilder('s');
-        $queryBuilder
-            ->select("count(1)")
+        $assignmentId = $submission->getAssignment()->getId();
+        $submitterId = $submission->getSubmitter()->getId();
+        $submissionId = $submission->getId();
+        $timestamp = $submission->getSubmittedAt() ?? (new DateTimeImmutable());
+        return $this->createQueryBuilder('s')
             ->andWhere('s.assignment = :assignment')
-            ->setParameter(':assignment', $assignment->getId())
+            ->setParameter(':assignment', $assignmentId)
             ->andWhere('s.submitter = :submitter')
-            ->setParameter(':submitter', $submitter->getId())
-            ->andWhere('s.state NOT IN (:drafts)')
-            ->setParameter(':drafts', SubmissionState::draftsAndTrash())
+            ->setParameter(':submitter', $submitterId)
+            ->andWhere('s.state NOT IN (:draftsAndTrash)')
+            ->setParameter(':draftsAndTrash', SubmissionState::draftsAndTrash())
+            ->andWhere('s.submittedAt <= :timestamp')
+            ->setParameter(':timestamp', $timestamp)
+            ->andWhere('s.id != :submission')
+            ->setParameter(":submission", $submissionId)
+            ->addOrderBy('s.submittedAt', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult()
         ;
-        $deadline = $assignment->getSoftDeadline();
-        
-        if ($deadline !== null) {
-            $queryBuilder
-                ->andWhere('s.submittedAt <= :deadline')
-                ->setParameter(':deadline', $deadline)
-            ;
-        }
-
-        return $queryBuilder->getQuery()->getSingleScalarResult();
     }
 }
