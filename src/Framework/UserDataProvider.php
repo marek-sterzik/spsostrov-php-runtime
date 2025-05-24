@@ -10,6 +10,7 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface as EntityManager;
 use App\Entity\User;
 use App\StudentClass\StudentClass;
+use App\Utility\SurnameGuesser;
 
 class UserDataProvider implements SSOUserDataProviderInterface, SSORoleDeciderInterface
 {
@@ -17,6 +18,7 @@ class UserDataProvider implements SSOUserDataProviderInterface, SSORoleDeciderIn
         private UserRepository $userRepository,
         private EntityManager $entityManager,
         private StudentClass $studentClass,
+        private SurnameGuesser $surnameGuesser,
     ) {
     }
 
@@ -45,6 +47,7 @@ class UserDataProvider implements SSOUserDataProviderInterface, SSORoleDeciderIn
             }
             if ($userEntity->getName() !== $user->getName()) {
                 $userEntity->setName($user->getName());
+                $userEntity->setGuessedSurname($this->surnameGuesser->guessSurname($user->getName()));
                 $changed = true;
             }
             
