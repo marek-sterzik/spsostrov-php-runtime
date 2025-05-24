@@ -390,11 +390,10 @@ class Assignment
             return false;
         }
 
-        if ($finalState === AssignmentState::Active &&
-            $this->getState() === AssignmentState::Finished &&
-            $this->isAfterDeadline()
-        ) {
-            return false;
+        if ($finalState === AssignmentState::Active && $this->getState() === AssignmentState::Finished) {
+            if ($this->isAfterDeadline()) {
+                return false;
+            }
         }
         
         return true;
