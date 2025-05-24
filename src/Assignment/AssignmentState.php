@@ -35,6 +35,15 @@ enum AssignmentState: string
     #[Parameter("order", 1)]
     case Archived = "archived";
 
+    public function needsDeactivationTimestamp(): bool
+    {
+        return match ($this) {
+            self::Finished => true,
+            self::Archived => true,
+            default => false
+        };
+    }
+
     public function canTransitTo(self $state): bool
     {
         if ($this === $state) {

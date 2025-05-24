@@ -73,6 +73,9 @@ class Assignment
     
     #[ORM\Column(nullable: true)]
     private ?DateTimeImmutable $activatedAt = null;
+    
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $deactivatedAt = null;
 
     /**
      * @var Collection<int, Submission>
@@ -228,6 +231,13 @@ class Assignment
         if ($state === AssignmentState::Active && $this->activatedAt === null) {
             $this->activatedAt = new DateTimeImmutable();
         }
+        if ($state->needsDeactivationTimestamp()) {
+            if ($this->deactivatedAt === null) {
+                $this->deactivatedAt = new DateTimeImmutable();
+            }
+        } else {
+            $this->deactivatedAt = null;
+        }
 
         return $this;
     }
@@ -299,6 +309,11 @@ class Assignment
     public function getActivatedAt(): ?DateTimeImmutable
     {
         return $this->activatedAt;
+    }
+
+    public function getDeactivatedAt(): ?DateTimeImmutable
+    {
+        return $this->deactivatedAt;
     }
 
     public function fillFrom(self $template): self
