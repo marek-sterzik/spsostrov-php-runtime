@@ -17,5 +17,6 @@ class CronManager
 
     public function allTasks(): void
     {
+        $this->assignmentsCronTasks();
     }
 }

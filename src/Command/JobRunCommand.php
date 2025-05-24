@@ -11,6 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 use App\Job\JobStarter;
+use App\Cron\CronManager;
 
 #[AsCommand(
     name: 'job:run',
@@ -18,7 +19,7 @@ use App\Job\JobStarter;
 )]
 class JobRunCommand extends Command
 {
-    public function __construct(private JobStarter $jobStarter)
+    public function __construct(private JobStarter $jobStarter, private CronManager $cronManager)
     {
         parent::__construct();
     }
@@ -27,6 +28,7 @@ class JobRunCommand extends Command
     {
         $this
             ->addArgument('uuid', InputArgument::IS_ARRAY, 'UUID of the job being run')
+            ->addOption('include-cron', 'c', InputOption::VALUE_NONE, 'Include cron tasks')
         ;
     }
 
@@ -34,6 +36,11 @@ class JobRunCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
         $uuids = $input->getArgument('uuid');
+        $includeCron = $input->getOption('include-cron');
+
+        if ($includeCron) {
+            $this->cronManager->allTasks();
+        }
 
         if (empty($uuids)) {
             $this->jobStarter->runAllJobs();
