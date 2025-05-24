@@ -20,13 +20,15 @@ use App\Assignment\AssignmentLink;
 use App\Component\StudentClassPattern as StudentClassPatternComponent;
 use App\Repository\SubmissionRepository;
 use App\SearchTool\Builder;
+use App\Cron\CronManager;
 
 class AssignmentsController extends AbstractDbTableController
 {
     public function __construct(
         private AssignmentActions $assignmentActions,
         private SubmissionRepository $submissionRepository,
-        private AssignmentLink $assignmentLink
+        private AssignmentLink $assignmentLink,
+        private CronManager $cronManager
     ) {
     }
 
@@ -34,7 +36,7 @@ class AssignmentsController extends AbstractDbTableController
     #[Route("/assignments", name: "assignments")]
     public function index(): Response
     {
-        $this->getEntityManager()->getRepository(Assignment::class)->updateStates();
+        $this->cronManager->assignmentsCronTasks();
         return $this->renderTable();
     }
 

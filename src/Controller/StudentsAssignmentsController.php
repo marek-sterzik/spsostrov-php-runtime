@@ -21,12 +21,14 @@ use App\Utility\CurrentSchoolYear;
 use App\Markdown\Markdown;
 use App\Repository\SubmissionRepository;
 use App\Submission\SubmissionState;
+use App\Cron\CronManager;
 
 class StudentsAssignmentsController extends AbstractDbTableController
 {
     public function __construct(
         private Markdown $markdown,
-        private SubmissionRepository $submissionRepository
+        private SubmissionRepository $submissionRepository,
+        private CronManager $cronManager
     ) {
     }
 
@@ -34,8 +36,8 @@ class StudentsAssignmentsController extends AbstractDbTableController
     #[Route("/submit", name: "submit")]
     public function index(): Response
     {
-        $this->getEntityManager()->getRepository(Assignment::class)->updateStates();
         $this->enableModule("students-assignments");
+        $this->cronManager->assignmentsCronTasks();
         return $this->renderTable();
     }
 
