@@ -27,6 +27,10 @@ class UsersController extends AbstractDbTableController
     protected function getBaseQueryBuilder(array $filterData): QueryBuilder
     {
         $qb = $this->getEntityManager()->getRepository(User::class)->createQueryBuilder('u');
+        $qb
+            ->addOrderBy("u.guessedSurname", "ASC")
+            ->addOrderBy("u.name", "ASC")
+        ;
         if ($filterData['t'] === UsersType::TYPE_STUDENTS) {
             $this->roleQuery($qb, $filterData['a'], ['ROLE_STUDENT']);
         } elseif ($filterData['t'] === UsersType::TYPE_TEACHERS) {
