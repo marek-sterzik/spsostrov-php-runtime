@@ -2,6 +2,7 @@
 
 ## TOP Priority
 
+* cron subsystem to automatically invoke tasks without any trigger action
 * trash drafts after assignment state becomes inactive, close locked drafts (maybe after other criteria)
 * possiblity to rotate between submissions when viewing
 * add indices for standard searches in the assignment table
