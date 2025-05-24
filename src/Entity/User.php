@@ -12,6 +12,7 @@ use App\Utility\RoleComparator;
 use App\Validator\StudentClass as StudentClassConstraint;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\Index(name: 'guessed_surname_index', fields: ['guessedSurname'])]
 class User
 {
     /**
@@ -40,6 +41,9 @@ class User
 
     #[ORM\Column(length: 255)]
     private string $name;
+    
+    #[ORM\Column(length: 255)]
+    private ?string $guessedSurname = null;
 
     #[ORM\Column(length: 255)]
     private string $originalRole;
@@ -103,6 +107,18 @@ class User
     public function setName(string $name): static
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getGuessedSurname(): ?string
+    {
+        return $this->guessedSurname;
+    }
+
+    public function setGuessedSurname(string $guessedSurname): static
+    {
+        $this->guessedSurname = $guessedSurname;
 
         return $this;
     }
