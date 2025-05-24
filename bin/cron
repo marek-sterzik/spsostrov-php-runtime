@@ -3,7 +3,7 @@
 period=60
 
 invoke() {
-    lib/console job:run &
+    lib/console job:run --include-cron &
 }
 
 echo "cron running"
