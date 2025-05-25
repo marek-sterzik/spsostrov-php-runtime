@@ -45,4 +45,9 @@ enum MissedDraftPolicy: string
             default => false
         };
     }
+
+    public function delayedDeletion(): bool
+    {
+        return $this->allowReactivation();
+    }
 }

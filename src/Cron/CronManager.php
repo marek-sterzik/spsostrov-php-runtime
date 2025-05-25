@@ -23,19 +23,25 @@ class CronManager
     public function allTasks(): void
     {
         $this->assignmentsCronTasks();
+        $this->closeLockedSubmissions();
         $this->applyMissedDraftPolicy();
+    }
+
+    private function closeLockedSubmissions(): void
+    {
+        foreach ($this->submissionRepository->findLockedInactiveSubmissions() as $submission) {
+            $descriptor = $submission->getSubmissionDescriptor();
+            $this->submissionManager->closeLockedSubmission($descriptor, false);
+        }
+
     }
 
     private function applyMissedDraftPolicy(): void
     {
-        foreach ($this->submissionRepository->findLockedInactiveSubmissions() as $submission) {
-            $descriptor = $submission->getSubmissionDescriptor();
-            if (!$this->submissionManager->closeLockedSubmission($descriptor, false)) {
-                $this->submissionManager->applyMissedDraftPolicy($descriptor);
-            }
-        }
-
         foreach ($this->submissionRepository->findDraftInactiveSubmissions() as $submission) {
+            if ($submission->getState()->isLockedDraft()) {
+                $this->submissionManager->closeLockedSubmission($descriptor, false);
+            }
             $this->submissionManager->applyMissedDraftPolicy($submission->getSubmissionDescriptor());
         }
     }

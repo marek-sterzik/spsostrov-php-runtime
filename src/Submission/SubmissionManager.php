@@ -187,7 +187,9 @@ class SubmissionManager
                 $this->lockSubmission($descriptor);
                 $this->closeLockedSubmission($descriptor, true);
             } else {
-                $this->deleteSubmission($descriptor);
+                if (!$assignment->getMissedDraftPolicy()->delayedDeletion() || !$assignment->allowReactivation()) {
+                    $this->deleteSubmission($descriptor);
+                }
             }
             return true;
         });

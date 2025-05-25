@@ -27,6 +27,8 @@ use App\Submission\SubmissionDescriptor;
 #[DeadlineInSchoolYear]
 class Assignment
 {
+    const REACTIVATION_INTERVAL = "PT1H";
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -418,9 +420,25 @@ class Assignment
             if (!$this->getMissedDraftPolicy()->allowReactivation()) {
                 return false;
             }
+            if (!$this->allowReactivation()) {
+                return false;
+            }
         }
         
         return true;
+    }
+
+    public function allowReactivation(): bool
+    {
+        if ($this->deactivatedAt === null) {
+            return true;
+        }
+        $interval = new DateInterval(self::REACTIVATION_INTERVAL);
+        if ($this->deactivatedAt->add($interval) >= new DateTimeImmutable()) {
+            return true;
+        }
+
+        return false;
     }
 
     public function canSubmit(?User $user): bool
