@@ -44,7 +44,6 @@ class SearchToolPreset
         });
 
         $searchTool->handle("submitter", function (Builder $builder) {
-            $builder->innerJoin('s.submitter', 'u');
             $var = $builder->var("%" . $builder->searchString() . "%");
             return $builder->expr()->orX(
                 $builder->expr()->like("u.username", $var),
@@ -53,8 +52,8 @@ class SearchToolPreset
         }, false);
 
         self::id("submission-id", "s.id", $searchTool);
-        self::id("submitter-id", "u.id", $searchTool, ["innerJoin", "s.submitter", "u"]);
-        self::id("assignment-id", "a.id", $searchTool, ["innerJoin", "s.assignment", "a"]);
+        self::id("submitter-id", "u.id", $searchTool);
+        self::id("assignment-id", "a.id", $searchTool);
 
         return $searchTool;
     }

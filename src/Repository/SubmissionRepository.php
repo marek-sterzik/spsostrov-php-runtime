@@ -10,6 +10,7 @@ use App\Assignment\AssignmentState;
 use App\Submission\SubmissionState;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\QueryBuilder;
 
 /**
  * @extends ServiceEntityRepository<Submission>
@@ -162,5 +163,63 @@ class SubmissionRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult()
         ;
+    }
+
+    public function getNextUserSubmission(Submission $submission, bool $desc): ?Submission
+    {
+        $qb = $this->getNextUserSubmissionBase($submission, $desc);
+        $this->moreThanUser($qb, $submission->getSubmitter(), $desc);
+        $result = $qb->getQuery()->getOneOrNullResult();
+        if ($result !== null) {
+            return $result;
+        }
+        $qb = $this->getNextUserSubmissionBase($submission, $desc);
+        $result = $qb->getQuery()->getOneOrNullResult();
+        if ($result !== null) {
+            return $result;
+        }
+        return $submission;
+    }
+
+    private function getNextUserSubmissionBase(Submission $submission, bool $desc): QueryBuilder
+    {
+        $qb = $this->createQueryBuilder('s');
+        $qb
+            ->innerJoin('s.submitter', 'u')
+            ->andWhere('s.isCurrent = :true')
+            ->setParameter(':true', true)
+            ->andWhere('s.assignment = :assignment')
+            ->setParameter(':assignment', $submission->getAssignment()->getId())
+            ->andWhere('s.submitter != :submitter')
+            ->setParameter(":submitter", $submission->getSubmitter()->getId())
+            ->addOrderBy("u.guessedSurname", $desc ? 'DESC' : 'ASC')
+            ->addOrderBy("u.name", $desc ? 'DESC' : 'ASC')
+            ->addOrderBy("u.id", $desc ? 'DESC' : 'ASC')
+            ->setMaxResults(1)
+        ;
+        return $qb;
+    }
+
+    private function moreThanUser(QueryBuilder $qb, User $user, bool $desc): self
+    {
+        $gt = $desc ? "lt" : "gt";
+        $clause = $qb->expr()->orX(
+            $qb->expr()->$gt("u.guessedSurname", ":guessedSurname"),
+            $qb->expr()->andX(
+                $qb->expr()->eq("u.guessedSurname", ":guessedSurname"),
+                $qb->expr()->$gt("u.name", ":name"),
+            ),
+            $qb->expr()->andX(
+                $qb->expr()->eq("u.guessedSurname", ":guessedSurname"),
+                $qb->expr()->eq("u.name", ":name"),
+                $qb->expr()->$gt("u.id", ":id"),
+            )
+        );
+        $qb->andWhere($clause);
+        $qb->setParameter(":guessedSurname", $user->getGuessedSurname());
+        $qb->setParameter(":name", $user->getName());
+        $qb->setParameter(":id", $user->getId());
+
+        return $this;
     }
 }

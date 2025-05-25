@@ -1,4 +1,14 @@
 {% extends "base.html.twig" %}
+{% block nav %}
+    {% if previousSubmissionLink is not null or nextSubmissionLink is not null %}
+        <div class="float-end">
+            <div class="btn-group" role="group" aria-label="Basic example">
+                {% if previousSubmissionLink is not null %}<a class="btn btn-sm btn-secondary" role="button" href="{{ previousSubmissionLink }}"><i class="bi me-1 bi-arrow-left"></i></a>{% endif %}
+                {% if nextSubmissionLink is not null %}<a class="btn btn-sm btn-secondary" role="button" href="{{ nextSubmissionLink }}"><i class="bi me-1 bi-arrow-right"></i></a>{% endif %}
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
 {% block body %}
     <div class="container">
         <div class="row justify-content-center">

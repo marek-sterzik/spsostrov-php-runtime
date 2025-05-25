@@ -12,11 +12,12 @@ use Symfony\Component\ExpressionLanguage\Expression;
 use App\Submission\SubmissionState;
 use App\FileManager\FileManager;
 use App\Entity\Submission;
+use App\Repository\SubmissionRepository;
 use App\Component\Action;
 
 class SubmissionDetailController extends AbstractController
 {
-    public function __construct(private FileManager $fileManager)
+    public function __construct(private FileManager $fileManager, private SubmissionRepository $submissionRepository)
     {
     }
 
@@ -24,6 +25,7 @@ class SubmissionDetailController extends AbstractController
     #[Route("/submission/show/{submission}", name: 'submission-detail')]
     public function index(Submission $submission, Request $request): Response
     {
+        $teacherView = $this->isGranted('ROLE_TEACHER');
         $this->enableModule("submission-detail");
         if (!$submission->canBeViewedBy($this->getUserEntity())) {
             throw $this->createAccessDeniedException();
@@ -52,15 +54,36 @@ class SubmissionDetailController extends AbstractController
                 "timeout" => $timeout,
             ]);
         } else {
+            $previousSubmissionLink = null;
+            $nextSubmissionLink = null;
+            if ($teacherView) {
+                $previousSubmissionLink = $this->changeSubmissionLink($submission, "prev");
+                $nextSubmissionLink = $this->changeSubmissionLink($submission, "next");
+            }
             $isDraft = $submission->getState()->isDraft();
+            $heading = $teacherView ?
+                "Informace o odevzdání" :
+                ($isDraft ? "Rozpracované odevzdání" : "Odevzdání dokončeno")
+            ;
             return $this->render("submission.html.twig", [
+                "previousSubmissionLink" => $previousSubmissionLink,
+                "nextSubmissionLink" => $nextSubmissionLink,
                 "submission" => $submission,
                 "files" => $this->fileManager->listFiles($submission),
                 "timeout" => $timeout,
-                "heading" => $isDraft ? "Rozpracované odevzdání" : "Odevzdání dokončeno",
+                "heading" => $heading,
                 "zipFile" => $zipFile,
             ]);
         }
+    }
+
+    private function changeSubmissionLink(Submission $submission, string $type): string
+    {
+        return $this->generateUrl('change-submission', [
+            'submission' => $submission->getId(),
+            'type' => $type,
+            '_back' => false,
+        ]);
     }
 
     protected function backLinkEnabled(): bool
@@ -88,6 +111,25 @@ class SubmissionDetailController extends AbstractController
             throw $this->createNotFoundException();
         }
         return $fileDescriptor->getDownloadResponse();
+    }
+
+    #[IsGranted('ROLE_TEACHER')]
+    #[Route("/submission/show/{submission}/change/{type}", name: 'change-submission')]
+    public function changeSubmission(Submission $submission, string $type, Request $request): Response
+    {
+        $submission = $this->getChangedSubmission($submission, $type) ?? $submission;
+        return $this->redirectToRoute('submission-detail', [
+            'submission' => $submission->getId(),
+            '_back' => false,
+        ]);
+    }
+
+    private function getChangedSubmission(Submission $submission, string $type): ?Submission
+    {
+        if ($type === "prev" || $type === "next") {
+            return $this->submissionRepository->getNextUserSubmission($submission, ($type === "prev") ? true : false);
+        }
+        return null;
     }
 
     private function calcTimeout(Submission $submission): int

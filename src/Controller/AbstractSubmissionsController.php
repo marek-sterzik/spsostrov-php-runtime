@@ -37,6 +37,7 @@ abstract class AbstractSubmissionsController extends AbstractDbTableController
         $qb = $this->submissionRepository->createQueryBuilder('s');
         $qb
             ->innerJoin('s.assignment', 'a')
+            ->innerJoin('s.submitter', 'u')
             ->addSelect("CASE WHEN s.submittedAt IS NULL THEN 1 ELSE 0 END AS HIDDEN isSubmitted")
             ->andWhere("s.state != :trash")
             ->setParameter(":trash", SubmissionState::Trash)
@@ -60,6 +61,9 @@ abstract class AbstractSubmissionsController extends AbstractDbTableController
     {
         $qb
             ->addOrderBy("isSubmitted", "DESC")
+            ->addOrderBy("u.guessedSurname", "ASC")
+            ->addOrderBy("u.name", "ASC")
+            ->addOrderBy("u.id", "ASC")
             ->addOrderBy("s.submittedAt", "DESC")
             ->addOrderBy("s.createdAt", "DESC")
         ;
