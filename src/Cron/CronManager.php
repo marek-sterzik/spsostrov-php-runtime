@@ -33,16 +33,16 @@ class CronManager
             $descriptor = $submission->getSubmissionDescriptor();
             $this->submissionManager->closeLockedSubmission($descriptor, false);
         }
-
     }
 
     private function applyMissedDraftPolicy(): void
     {
         foreach ($this->submissionRepository->findDraftInactiveSubmissions() as $submission) {
+            $descriptor = $submission->getSubmissionDescriptor();
             if ($submission->getState()->isLockedDraft()) {
                 $this->submissionManager->closeLockedSubmission($descriptor, false);
             }
-            $this->submissionManager->applyMissedDraftPolicy($submission->getSubmissionDescriptor());
+            $this->submissionManager->applyMissedDraftPolicy($descriptor);
         }
     }
 }
