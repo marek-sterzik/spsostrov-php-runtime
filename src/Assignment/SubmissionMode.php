@@ -37,4 +37,12 @@ enum SubmissionMode: string
             default => false
         };
     }
+
+    public function hasVersionedSubmissions(): bool
+    {
+        return match ($this) {
+            self::MultipleTimesKeep => true,
+            default => false
+        };
+    }
 }

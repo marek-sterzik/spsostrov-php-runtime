@@ -222,4 +222,21 @@ class SubmissionRepository extends ServiceEntityRepository
 
         return $this;
     }
+
+    public function getAllVersions(Submission $submission): array
+    {
+        return $this->createQueryBuilder('s')
+            ->select("s.id, s.isCurrent")
+            ->andWhere('s.assignment = :assignment')
+            ->setParameter(':assignment', $submission->getAssignment()->getId())
+            ->andWhere('s.submitter = :submitter')
+            ->setParameter(":submitter", $submission->getSubmitter()->getId())
+            ->andWhere('s.state NOT IN (:draftOrTrash)')
+            ->setParameter(":draftOrTrash", SubmissionState::draftsAndTrash())
+            ->addOrderBy('s.submittedAt', 'DESC')
+            ->addOrderBy('s.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }

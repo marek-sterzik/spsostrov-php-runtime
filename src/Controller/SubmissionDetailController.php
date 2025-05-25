@@ -68,6 +68,7 @@ class SubmissionDetailController extends AbstractController
             return $this->render("submission.html.twig", [
                 "previousSubmissionLink" => $previousSubmissionLink,
                 "nextSubmissionLink" => $nextSubmissionLink,
+                "versionInfo" => $this->getVersionInfo($submission),
                 "submission" => $submission,
                 "files" => $this->fileManager->listFiles($submission),
                 "timeout" => $timeout,
@@ -75,6 +76,44 @@ class SubmissionDetailController extends AbstractController
                 "zipFile" => $zipFile,
             ]);
         }
+    }
+
+    private function getVersionInfo(Submission $submission): ?array
+    {
+        if (!$submission->getAssignment()->getSubmissionMode()->hasVersionedSubmissions()) {
+            return null;
+        }
+        $versions = $this->submissionRepository->getAllVersions($submission);
+        if (empty($versions)) {
+            return null;
+        }
+        $versionInfo = ["current" => null, "versions" => []];
+        $n = count($versions);
+        foreach ($versions as $i => $version) {
+            $record = [
+                "id" => $version['id'],
+                "version" => $n - $i,
+                "isCurrent" => $version['isCurrent'],
+                "link" => $this->generateUrl('submission-detail', [
+                    'submission' => $version['id'],
+                    '_back' => false,
+                ]),
+            ];
+            $versionInfo['versions'][] = $record;
+            if ($version['id'] === $submission->getId() && $versionInfo['current'] === null) {
+                $versionInfo['current'] = $record;
+            }
+        }
+
+        if ($versionInfo['current'] === null) {
+            $versionInfo['current'] = [
+                "id" => $submission->getId(),
+                "version" => "?",
+                "isCurrent" => $submission->isCurrent(),
+            ];
+        }
+
+        return $versionInfo;
     }
 
     private function changeSubmissionLink(Submission $submission, string $type): string
