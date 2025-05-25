@@ -89,7 +89,7 @@ abstract class AbstractSubmissionsController extends AbstractDbTableController
         $fileCount = count($this->fileManager->listFiles($submission));
         $fileCount = $this->renderView(
             'snippets/object-count.html.twig',
-            ["count" => $fileCount, "link" => $detailLink]
+            ["count" => $fileCount, "link" => $submission->getState()->isDraft() ? null : $detailLink]
         );
        
         $submittedAt = $this->renderView("snippets/submitted-at.html.twig", ["submission" =>  $submission]);
