@@ -2,7 +2,6 @@
 
 ## TOP Priority
 
-* possiblity to rotate between submissions when viewing
 * add indices for standard searches in the assignment table
 * add indices for standard searches in the submission table (mainly for the repository methods)
 
