@@ -14,6 +14,7 @@
                     {% include "snippets/deadlines.html.twig" with {"assignment": assignment} %}
                     <tr><th>odevzdávání:</th><td>{{ assignment.submissionMode.description }}</td></tr>
                     <tr><th>zálohování:</th><td>{% include "snippets/backed-up.html.twig" with {"backedUp": assignment.backedUp} %}</td></tr>
+                    <tr><th>nedokončená&nbsp;odevzdání:</th><td>{{ assignment.missedDraftPolicy.description }}</td></tr>
                     <tr><th>vlastník:</th><td>{{ assignment.owner.name }} {% if ownerIsMe %}{% include "snippets/me.html.twig" %}{% endif %}</td></tr>
                     <tr><th>školní rok:</th><td>{{ assignment.schoolYear }}/{{ assignment.schoolYear + 1 }}</td></tr>
                     <tr><th>vytvořeno:</th><td>{% include "snippets/datetime.html.twig" with {"date": assignment.createdAt} %}</td></tr>
