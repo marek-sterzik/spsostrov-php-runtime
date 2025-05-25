@@ -43,6 +43,7 @@ class SubmissionController extends AbstractController
         "submission_does_not_exist" =>
             "Odevzdání už neexistuje.",
     ];
+
     public function __construct(
         private FileManager $fileManager,
         private SubmissionManager $submissionManager

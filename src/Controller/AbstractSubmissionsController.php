@@ -35,6 +35,7 @@ abstract class AbstractSubmissionsController extends AbstractDbTableController
         $me = $this->getUser()->getUserData();
         $qb = $this->submissionRepository->createQueryBuilder('s');
         $qb
+            ->innerJoin('s.assignment', 'a')
             ->addSelect("CASE WHEN s.submittedAt IS NULL THEN 1 ELSE 0 END AS HIDDEN isSubmitted")
             ->andWhere("s.state != :trash")
             ->setParameter(":trash", SubmissionState::Trash)

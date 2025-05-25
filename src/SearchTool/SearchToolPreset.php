@@ -36,12 +36,10 @@ class SearchToolPreset
         $searchTool = new SearchTool();
 
         $searchTool->handle("caption", function (Builder $builder) {
-            $builder->innerJoin('s.assignment', 'a');
             return $builder->expr()->like("a.caption", $builder->var("%" . $builder->searchString() . "%"));
         });
 
         $searchTool->handle("description", function (Builder $builder) {
-            $builder->innerJoin('s.assignment', 'a');
             return $builder->expr()->like("a.description", $builder->var("%" . $builder->searchString() . "%"));
         });
 

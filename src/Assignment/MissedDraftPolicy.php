@@ -19,6 +19,25 @@ enum MissedDraftPolicy: string
     #[Description("vždy přijmout")]
     case AcceptAlways = "accept_always";
 
+    public static function showDraftsInAdminPolicies(): array
+    {
+        $policies = [];
+        foreach (self::cases() as $policy) {
+            if ($policy->showDraftInAdmin()) {
+                $policies[] = $policy;
+            }
+        }
+        return $policies;
+    }
+
+    public function showDraftInAdmin(): bool
+    {
+        return match ($this) {
+            self::Dismiss => false,
+            default => true
+        };
+    }
+
     public function allowReactivation(): bool
     {
         return match ($this) {

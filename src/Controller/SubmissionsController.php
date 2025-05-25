@@ -7,6 +7,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Doctrine\ORM\QueryBuilder;
 use App\Assignment\AssignmentState;
+use App\Assignment\MissedDraftPolicy;
 use App\Submission\SubmissionState;
 
 class SubmissionsController extends AbstractSubmissionsController
@@ -39,6 +40,13 @@ class SubmissionsController extends AbstractSubmissionsController
             $qb->setParameter(":owner", $me);
             $qb->setParameter(":notState", AssignmentState::Draft);
         }
+
+        $qb->andWhere($qb->expr()->orX(
+            $qb->expr()->notIn("s.state", ":notStates"),
+            $qb->expr()->in("a.missedDraftPolicy", ":policies")
+        ));
+        $qb->setParameter(":notStates", SubmissionState::drafts());
+        $qb->setParameter(":policies", MissedDraftPolicy::showDraftsInAdminPolicies());
 
         return $qb;
     }
