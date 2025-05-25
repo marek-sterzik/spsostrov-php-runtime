@@ -12,6 +12,7 @@ use App\SearchTool\SearchTool;
 use App\SearchTool\SearchToolPreset;
 use App\SearchTool\Builder;
 use App\Submission\SubmissionState;
+use App\Assignment\AssignmentState;
 use App\Repository\SubmissionRepository;
 use App\FileManager\FileManager;
 use App\Form\Filter\SubmissionsType;
@@ -42,6 +43,10 @@ abstract class AbstractSubmissionsController extends AbstractDbTableController
         ;
         if (!($filterData['a'] ?? true)) {
             $qb->andWhere("s.isCurrent = true");
+        }
+        if ($this->hasArchivedFilter() && !($filterData['d'] ?? false)) {
+            $qb->andWhere("a.state != :archived");
+            $qb->setParameter(":archived", AssignmentState::Archived);
         }
         return $qb;
     }
@@ -130,15 +135,22 @@ abstract class AbstractSubmissionsController extends AbstractDbTableController
 
     abstract protected function isStudentView(): bool;
 
+    protected function hasArchivedFilter(): bool
+    {
+        return true;
+    }
+
     protected function getForm(array $formData): ?FormInterface
     {
-        return $this->createForm(SubmissionsType::class, $formData);
+        return $this->createForm(SubmissionsType::class, $formData, ["archived_filter" => $this->hasArchivedFilter()]);
     }
     
     protected function getDefaultFilterData(): array
     {
-        return [
-            "a" => false,
-        ];
+        $data = ["a" => false];
+        if ($this->hasArchivedFilter()) {
+            $data['d'] = false;
+        }
+        return $data;
     }
 }

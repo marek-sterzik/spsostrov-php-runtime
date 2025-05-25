@@ -34,6 +34,19 @@ class SubmissionsType extends AbstractType
                 },
                 "label" => false,
             ])
+        ;
+        if ($options['archived_filter']) {
+            $builder->add('d', CheckboxType::class, [
+                "required" => false,
+                "label" => "včetně archivovaných",
+                'attr' => [
+                    "class" => "btn-check autosubmit",
+                ],
+                "row_attr" => ["class" => "me-2"],
+                'label_attr' => ['class' => 'btn btn-outline-secondary'],
+            ]);
+        }
+        $builder
             ->add('q', TextType::class, [
                 "label" => false,
                 "required" => false,
@@ -58,6 +71,7 @@ class SubmissionsType extends AbstractType
                 "class" => "btn-toolbar justify-content-center mb-3 mt-4",
                 "role" => "toolbar",
             ],
+            "archived_filter" => false,
         ]);
     }
 }
