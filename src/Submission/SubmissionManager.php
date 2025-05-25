@@ -11,6 +11,7 @@ use App\Entity\Submission;
 use App\Entity\Assignment;
 use App\Entity\User;
 use App\Lock\LockManager;
+use App\Assignment\MissedDraftPolicy;
 
 class SubmissionManager
 {
@@ -169,6 +170,46 @@ class SubmissionManager
             $this->jobManager->invoke("close_submission", ["id" => $submission->getId()]);
             return true;
         });
+    }
+
+    public function applyMissedDraftPolicy(SubmissionDescriptor $descriptor): bool
+    {
+        return $this->lockOn($descriptor, false, function ($submission) use ($descriptor) {
+            if ($submission === null) {
+                return true;
+            }
+            $assignment = $submission->getAssignment();
+            $submitter = $submission->getSubmitter();
+            if (!$assignment->getState()->needsDeactivationTimestamp()) {
+                return true;
+            }
+            if ($this->missedSubmissionShouldBeAccepted($assignment, $submitter)) {
+                $this->lockSubmission($descriptor);
+                $this->closeLockedSubmission($descriptor, true);
+            } else {
+                $this->deleteSubmission($descriptor);
+            }
+            return true;
+        });
+    }
+
+    private function missedSubmissionShouldBeAccepted(Assignment $assignment, User $user): bool
+    {
+        $policy = $assignment->getMissedDraftPolicy();
+        if ($policy === MissedDraftPolicy::AcceptFirst) {
+            return (($this->submissionRepository->countSubmissions($assignment, $user) ?? 0) > 0) ? false : true;
+        }
+
+        if ($policy === MissedDraftPolicy::Dismiss) {
+            return false;
+        }
+
+        if ($policy === MissedDraftPolicy::AcceptAlways) {
+            return true;
+        }
+
+        /** @phpstan-ignore-next-line */
+        return false;
     }
 
     public function lockOn(SubmissionDescriptor $descriptor, bool $createNonexistent, callable $criticalSection): mixed

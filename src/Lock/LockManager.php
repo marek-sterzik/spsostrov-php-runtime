@@ -38,7 +38,7 @@ class LockManager
             }
         }
 
-        self::$perThreadLocks[$lockId] ++;
+        self::$perThreadLocks[$lockId]++;
     }
 
     public function unlock(string $lockId): void
@@ -48,7 +48,7 @@ class LockManager
                 sprintf('Trying to release a lock which was not acquired: %s', $this->getLockName($lockId))
             );
         }
-        self::$perThreadLocks[$lockId] --;
+        self::$perThreadLocks[$lockId]--;
         if (self::$perThreadLocks[$lockId] <= 0) {
             unset(self::$perThreadLocks[$lockId]);
 

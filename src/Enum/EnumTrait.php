@@ -6,6 +6,15 @@ use ReflectionClassConstant;
 
 trait EnumTrait
 {
+    public static function choices(): array
+    {
+        $choices = [];
+        foreach (self::cases() as $case) {
+            $choices[$case->getDescription()] = $case;
+        }
+        return $choices;
+    }
+
     public function getDescription(): string
     {
         return Enumerator::getDescription($this);

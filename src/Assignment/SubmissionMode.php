@@ -10,15 +10,6 @@ enum SubmissionMode: string
 {
     use EnumTrait;
 
-    public static function choices(): array
-    {
-        $choices = [];
-        foreach (self::cases() as $case) {
-            $choices[$case->getDescription()] = $case;
-        }
-        return $choices;
-    }
-
     #[Description("více možných odevzdání, poslední zůstává")]
     case MultipleTimes = "multiple";
     

@@ -66,18 +66,27 @@ class SubmissionRepository extends ServiceEntityRepository
         ;
     }
 
-    public function countSubmissions(Assignment $assignment): ?int
+    public function countSubmissions(Assignment $assignment, ?User $user = null): ?int
     {
         if (!$assignment->getState()->submissionsAvailable()) {
             return null;
         }
         $qb = $this->createQueryBuilder('s');
-        return $qb
+        $qb
             ->select($qb->expr()->countDistinct('s.submitter'))
             ->andWhere('s.assignment = :assignment')
             ->setParameter(':assignment', $assignment->getId())
             ->andWhere('s.state NOT IN (:draftOrTrash)')
             ->setParameter(':draftOrTrash', SubmissionState::draftsAndTrash())
+        ;
+        if ($user !== null) {
+            $qb
+                ->andWhere('s.submitter = :user')
+                ->setParameter(":user", $user->getId())
+            ;
+        }
+
+        return $qb
             ->getQuery()
             ->getSingleScalarResult()
         ;
@@ -137,6 +146,19 @@ class SubmissionRepository extends ServiceEntityRepository
             ->setParameter(':active', AssignmentState::Active)
             ->andWhere('s.state = :locked')
             ->setParameter(':locked', SubmissionState::Locked)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function findDraftInactiveSubmissions(): array
+    {
+        return $this->createQueryBuilder('s')
+            ->innerJoin("s.assignment", "a")
+            ->andWhere('a.state != :active')
+            ->setParameter(':active', AssignmentState::Active)
+            ->andWhere('s.state = :draft')
+            ->setParameter(':draft', SubmissionState::Draft)
             ->getQuery()
             ->getResult()
         ;

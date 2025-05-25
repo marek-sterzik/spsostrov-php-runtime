@@ -10,12 +10,20 @@ enum MissedDraftPolicy: string
 {
     use EnumTrait;
 
+    #[Description("přijmout pokud je odevzdání první (doporučeno)")]
+    case AcceptFirst = "accept_first";
+
     #[Description("vždy zahodit")]
     case Dismiss = "dismiss";
 
     #[Description("vždy přijmout")]
     case AcceptAlways = "accept_always";
 
-    #[Description("přijmout první odevzdání")]
-    case AcceptFirst = "accept_first";
+    public function allowReactivation(): bool
+    {
+        return match ($this) {
+            self::Dismiss => true,
+            default => false
+        };
+    }
 }

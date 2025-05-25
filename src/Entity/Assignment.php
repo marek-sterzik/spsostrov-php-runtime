@@ -17,6 +17,9 @@ use App\Validator\DeadlineInSchoolYear;
 use App\Utility\CurrentSchoolYear;
 use App\Submission\SubmissionDescriptor;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 #[ORM\Entity(repositoryClass: AssignmentRepository::class)]
 #[ORM\Index(name: 'main_order_created_at_index', fields: ['mainOrder', 'createdAt'])]
 #[ORM\Index(name: 'state_hard_deadline_index', fields: ['state', 'hardDeadline'])]
@@ -340,6 +343,7 @@ class Assignment
         $this->setClasses($template->getClasses());
         $this->setPublic($template->isPublic());
         $this->setBackedUp($template->isBackedUp());
+        $this->setMissedDraftPolicy($template->getMissedDraftPolicy());
 
         $schoolYear = $template->getSchoolYear();
         if ($schoolYear !== null && $schoolYear >= CurrentSchoolYear::get()) {
@@ -409,6 +413,9 @@ class Assignment
 
         if ($finalState === AssignmentState::Active && $this->getState() === AssignmentState::Finished) {
             if ($this->isAfterDeadline()) {
+                return false;
+            }
+            if (!$this->getMissedDraftPolicy()->allowReactivation()) {
                 return false;
             }
         }

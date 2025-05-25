@@ -6,6 +6,7 @@ use App\Entity\Assignment;
 use App\Entity\User;
 use App\Utility\CurrentSchoolYear;
 use App\Assignment\SubmissionMode;
+use App\Assignment\MissedDraftPolicy;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -61,6 +62,12 @@ class AssignmentEditType extends AbstractType
             ->add('submissionMode', ChoiceType::class, [
                 'label' => "způsob odevzdávání:",
                 'choices' => SubmissionMode::choices(),
+            ])
+            ->add('missedDraftPolicy', ChoiceType::class, [
+                'label' => "způsob nakládání s nedokončenými odevzdáními:",
+                'choices' => MissedDraftPolicy::choices(),
+                'help' => 'Tato volba udává způsob nakládání s nedokončenými odevzdáními po ukončení odevzdávání. ' .
+                    'Některé z voleb mohou být u konkrétních způsobů odevzdání nevhodné k použití.',
             ])
             ->add('schoolYear', ChoiceType::class, [
                 "label" => "školní rok:",
