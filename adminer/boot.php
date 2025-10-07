@@ -71,7 +71,7 @@ class AdminerLoginPasswordLess
         foreach ($data as $var => $value) {
             echo sprintf("<input type=\"hidden\" name=\"auth[%s]\" value=\"%s\">\n", htmlspecialchars($var), htmlspecialchars($value));
         }
-        $nonce = get_nonce();
+        $nonce = \adminer\get_nonce();
         echo "<input type=\"submit\" value=\"Login\">\n";
         echo "<script type=\"text/javascript\" nonce=\"$nonce\">\n";
         echo "window.onload = () => {qs('form').submit()}\n";
@@ -158,17 +158,7 @@ function http_authorize($httpAuthorize)
 http_authorize($httpAuth ?? null);
 AdminerLoginPasswordLess::setDbConf($dbConf ?? null);
 
-function adminer_object()
-{
-    include_once __DIR__ . "/adminer-plugin.php";
-    $plugins = [];
-    if (AdminerLoginPasswordLess::isConfigured()) {
-        $plugins[] = new AdminerLoginPasswordLess();
-    }
-
-    return new AdminerPlugin($plugins);
-}
-
+chdir(__DIR__);
 
 if (defined("SID") && session_status() !== PHP_SESSION_ACTIVE){
     session_start();
