@@ -26,12 +26,10 @@ Instalaci ve Windows je věnována [samostatná stránka](README.windows.md).
 
 ## Rychlý start
 
-Pro rychlý start systému, spusťte tuto sekvenci příkazů:
+Pro rychlý start systému, spusťte příkaz:
 
 ```
-bin/docker configure
-bin/docker up
-bin/docker initialize
+bin/docker start
 ```
 
 **Aplikaci přitom vždy ze zásady spouštíme jako obyčejný uživatel, nikdy jako root!**
@@ -63,7 +61,12 @@ Prostředí stačí nakonfigurovat jednou před prvním spuštěním. V případ
 
 ## Spuštění a vypnutí kontejnerů
 
-Kontejnery spustíte příkazem:
+Rychlé spuštění celé aplikace (zkratka za trojici příkazů `bin/docker configure; bin/docker up; bin/docker initialize`):
+```
+bin/docker start
+```
+
+Samotné kontejnery spustíte příkazem:
 ```
 bin/docker up
 ```
