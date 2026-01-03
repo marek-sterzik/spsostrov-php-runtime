@@ -1,0 +1,84 @@
+#!/bin/bash
+
+set -e
+
+source envcheck
+
+if [ "$WORKER_ENV_BOOTED" != "full" -a "$WORKER_ENV_BOOTED" != "cron" ]; then
+    envcheck SYMFONY_ENV=default:prod .=enum:dev:test:prod
+    export XDEBUG=0
+    if [ -z "$XDEBUG_PORT" -o "$XDEBUG_PORT" = "none" ]; then
+        XDEBUG_PORT=""
+    else
+        envcheck XDEBUG_PORT=port
+        XDEBUG=1
+    fi
+
+    export NGINX_RSYSLOG_URL=""
+    export NGINX_RSYSLOG_URL_ERR=""
+    export WORKER_ROOT="public"
+    export WORKER_PHP_SCRIPT="index.php"
+    export CRON_JOBS=""
+    export SERVER_UID=33
+    export SERVER_GID=33
+    export PERSISTENT_DIR=""
+    export MAX_BODY_SIZE=""
+    export MEMORY_LIMIT=""
+    export ACCESS_LOG_FILE="/var/log/nginx/access.log"
+    export ERROR_LOG_FILE="/var/log/nginx/error.log"
+    export FPM_ACCESS_LOG_FILE="/var/log/phpfpm/www.access.log"
+    export FPM_ERROR_LOG_FILE="/var/log/phpfpm/www.error.log"
+    export FPM_SLOW_LOG_FILE="/var/log/phpfpm/www.slow.log"
+
+    WORKER_COMMANDS=()
+    WRITABLE_FILES=()
+
+
+    if [ "$SYMFONY_ENV" = prod ]; then
+        export SYMFONY_DEBUG="0"
+    else
+        export SYMFONY_DEBUG="1"
+    fi
+
+    if [ -f "/app/bin/docker-entrypoint" ]; then
+        test "$ENTRYPOINT" != 1 || echo "Setting up application..." 1>&2
+        source /app/bin/docker-entrypoint
+        test "$ENTRYPOINT" != 1 || echo "Application was set up." 1>&2
+    fi
+
+    envcheck NGINX_RSYSLOG_URL=default:""
+    if [ -n "$NGINX_RSYSLOG_URL" ]; then
+        envcheck NGINX_RSYSLOG_URL=url:schemes=rsyslog
+    fi
+    envcheck NGINX_RSYSLOG_URL_ERR=default:""
+    if [ -n "$NGINX_RSYSLOG_URL_ERR" ]; then
+        envcheck NGINX_RSYSLOG_URL_ERR=url:schemes=rsyslog
+    fi
+    envcheck WORKER_PHP_SCRIPT=re:'^[a-zA-Z_\-\.]+$'
+    envcheck WORKER_ROOT=re:'^[a-zA-Z_\-\.]+$'
+    envcheck PERSISTENT_DIR=re:'^[^/]*$'
+    envcheck MAX_BODY_SIZE=default:default .=lc .=re:'^([0-9]+[km]?)|default|unlimited$'
+    if [ "$MAX_BODY_SIZE" = "default" ]; then
+        MAX_BODY_SIZE=""
+    elif [ "$MAX_BODY_SIZE" = "unlimited" ]; then
+        MAX_BODY_SIZE="0"
+    fi
+    envcheck MEMORY_LIMIT=default:default .=lc .=re:'^([0-9]+[km])|default|unlimited$'
+    if [ "$MEMORY_LIMIT" = "default" ]; then
+        MEMORY_LIMIT=""
+    elif [ "$MEMORY_LIMIT" = "unlimited" ]; then
+        MEMORY_LIMIT="-1"
+    else
+        envcheck MEMORY_LIMIT=uc
+    fi
+
+    if [ "$PERSISTENT_DIR" = "." -o "$PERSISTENT_DIR" = ".." ]; then
+        echo "Error: invalid persistent directory" 1>&2
+        exit 1
+    fi
+
+    if [ -n "PERSISTENT_DIR" ]; then
+         PERSISTENT_DIR="/persistent/$PERSISTENT_DIR"
+    fi
+    export WORKER_ENV_BOOTED=full
+fi

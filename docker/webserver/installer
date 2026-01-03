@@ -1,0 +1,98 @@
+#!/bin/bash
+
+set -e
+packages=(ca-certificates gpg git nginx openssl openssh-client zip python3 python3-rpi-lgpio "php$PHPVER")
+packages_preinstall=(apt-transport-https gnupg2 iproute2 cron apt curl)
+php_packages=(fpm cli bcmath common curl dev dom intl mbstring mysql opcache readline redis sqlite xdebug xml zip gd snmp)
+
+add_apt_repository() {
+    local id
+    local repository
+    local suite
+    local component
+    local key
+    local trustfile
+    local opts
+    id="$1"
+    repository="$2"
+    suite="$3"
+    component="$4"
+    key="$5"
+    trustfile=""
+
+    if [ -n "$key" ]; then
+        if [ -n "$key" -a "/" = "${key:0:1}" ]; then
+            trustfile="$key"
+        elif echo "$key" | grep -q '^https\?://'; then
+            trustfile="/usr/share/keyrings/$id-archive-keyring.gpg"
+            curl "$key" | gpg --dearmor -o "$trustfile"
+        elif echo "$key" | grep -q '/'; then
+            echo "Error: invalid key descriptor" 1>&2
+            exit 1
+        else
+            trustfile="/usr/share/keyrings/$key"
+        fi
+    fi
+
+    (
+        echo "Types: deb"
+        echo "URIs: $repository"
+        echo "Suites: $suite"
+        echo "Components: $component"
+        if [ -n "$trustfile" ]; then
+            echo "Signed-By: $trustfile"
+        fi
+    ) > "/etc/apt/sources.list.d/$id.sources"
+}
+
+install_deb() {
+    local url
+    local file
+    url="$1"
+    file="`basename "$url"`"
+    curl -sSLo "/tmp/$file" "$url"
+    apt-get install "/tmp/$file"
+    rm -f "/tmp/$file"
+}
+
+
+
+for php_package in "${php_packages[@]}"; do
+    packages+=("php$PHPVER-$php_package")
+done
+
+apt-get -y update
+apt-get -y install "${packages_preinstall[@]}"
+
+install_deb "https://packages.sury.org/debsuryorg-archive-keyring.deb"
+install_deb "https://archive.raspberrypi.org/debian/pool/main/r/raspberrypi-archive-keyring/raspberrypi-archive-keyring_2025.1+rpt1_all.deb"
+
+add_apt_repository nginx "http://nginx.org/packages/debian/" stretch nginx "https://nginx.org/keys/nginx_signing.key"
+add_apt_repository raspi "http://archive.raspberrypi.com/debian/" trixie main /usr/share/keyrings/raspberrypi-archive-keyring.gpg
+add_apt_repository php "https://packages.sury.org/php/" trixie main /usr/share/keyrings/debsuryorg-archive-keyring.gpg
+
+apt-get -y update
+
+DEBIAN_FRONTEND=noninteractive apt-get -y install "${packages[@]}"
+
+#install_mikenopa_docker_utils
+/tmp/mikenopa-docker-utils --delete
+
+rm -rf /var/lib/apt/lists/*
+
+# install composer
+curl -fsLS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer --version=2.6.5
+
+rm -rf /etc/nginx/conf.d/*
+rm -f /etc/nginx/nginx.conf
+
+rm -f /etc/$PHPVER/fpm/php-fpm.conf
+
+ln -sf /usr/share/zoneinfo/UTC /etc/localtime
+
+mkdir -p /run/php /app /persistent /var/log/phpfpm
+
+setcap CAP_NET_BIND_SERVICE=+eip "`which nginx`"
+
+#last command - remove self
+rm -f "$0"
