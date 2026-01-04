@@ -1,7 +1,12 @@
 #!/bin/bash
 
+if [ ! -f "/tmp/envdump.json" ]; then
+    bootenv
+fi
+
 source envdump
 envdump --restore
+
 args=("$@")
 if [ "$#" = 0 ]; then
     args+=(bash)

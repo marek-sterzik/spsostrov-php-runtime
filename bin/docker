@@ -108,9 +108,9 @@ parse_operation() {
         operation="exec"
     fi
     if [ "$operation" = "run" ]; then
-	echo run
+        echo run
     else
-	echo exec
+        echo exec
     fi
 }
 
@@ -133,10 +133,19 @@ docker_exec() {
     tflag=""
     test -t 0 || tflag="-T"
 
+    cmd_prefix=""
+    if [ "$container" = "webserver" -a "$operation" = "exec" ]; then
+        if [ "$user" = "www-data" ]; then
+            cmd_prefix=x
+            user=root
+        fi
+        
+    fi
+
     if [ "$#" = 0 ]; then
-        docker_compose $operation $tflag --user "$user" "$container" bash
+        docker_compose $operation $tflag --user "$user" "$container" $cmd_prefix bash
     else
-        docker_compose $operation $tflag --user "$user" "$container" "$@"
+        docker_compose $operation $tflag --user "$user" "$container" $cmd_prefix "$@"
     fi
 }
 

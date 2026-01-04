@@ -81,7 +81,7 @@ DEBIAN_FRONTEND=noninteractive apt-get -y install "${packages[@]}"
 rm -rf /var/lib/apt/lists/*
 
 # install composer
-curl -fsLS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer --version=2.6.5
+curl -fsLS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer --version=2.9.3
 
 rm -rf /etc/nginx/conf.d/*
 rm -f /etc/nginx/nginx.conf
