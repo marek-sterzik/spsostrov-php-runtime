@@ -3,6 +3,9 @@
 set -e
 
 source envcheck
+source envdump
+
+envdump --start
 
 if [ "$WORKER_ENV_BOOTED" != "full" -a "$WORKER_ENV_BOOTED" != "cron" ]; then
     envcheck SYMFONY_ENV=default:prod .=enum:dev:test:prod
@@ -82,3 +85,5 @@ if [ "$WORKER_ENV_BOOTED" != "full" -a "$WORKER_ENV_BOOTED" != "cron" ]; then
     fi
     export WORKER_ENV_BOOTED=full
 fi
+
+envdump --dump

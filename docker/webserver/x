@@ -1,6 +1,7 @@
 #!/bin/bash
 
-source bootenv
+source envdump
+envdump --restore
 args=("$@")
 if [ "$#" = 0 ]; then
     args+=(bash)
