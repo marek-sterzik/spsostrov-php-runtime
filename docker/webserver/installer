@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -e
-packages=(ca-certificates gpg git nginx openssl openssh-client zip python3 python3-rpi-lgpio "php$PHPVER")
+packages=(ca-certificates gpg git nginx openssl openssh-client zip "php$PHPVER")
 packages_preinstall=(apt-transport-https gnupg2 iproute2 cron apt curl)
 php_packages=(fpm cli bcmath common curl dev dom intl mbstring mysql opcache readline redis sqlite xdebug xml zip gd snmp)
 
@@ -65,10 +65,8 @@ apt-get -y update
 apt-get -y install "${packages_preinstall[@]}"
 
 install_deb "https://packages.sury.org/debsuryorg-archive-keyring.deb"
-install_deb "https://archive.raspberrypi.org/debian/pool/main/r/raspberrypi-archive-keyring/raspberrypi-archive-keyring_2025.1+rpt1_all.deb"
 
 add_apt_repository nginx "http://nginx.org/packages/debian/" stretch nginx "https://nginx.org/keys/nginx_signing.key"
-add_apt_repository raspi "http://archive.raspberrypi.com/debian/" trixie main /usr/share/keyrings/raspberrypi-archive-keyring.gpg
 add_apt_repository php "https://packages.sury.org/php/" trixie main /usr/share/keyrings/debsuryorg-archive-keyring.gpg
 
 apt-get -y update
