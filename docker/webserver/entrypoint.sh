@@ -104,7 +104,7 @@ chown -R "$SERVER_UID:$SERVER_GID" /var/log/phpfpm /run/php /var/log/php-fpm.log
 
 if [ -x "/app/bin/docker-boot" ]; then
     echo "Booting application..." 1>&2
-    runas --user "$SERVER_UID" --group "$SERVER_GID" --home /tmp /app/bin/docker-boot
+    runas $RUNAS_ARGS --home /tmp /app/bin/docker-boot
     echo "Application booted" 1>&2
 fi
 
@@ -124,5 +124,5 @@ fi
 
 echo "Starting webserver" 1>&2
 
-runas --user "$SERVER_UID" --group "$SERVER_GID" --home /tmp "php-fpm$PHPVER"
-exec runas --user "$SERVER_UID" --group "$SERVER_GID" --home /tmp nginx -g 'daemon off;'
+runas $RUNAS_ARGS --home /tmp "php-fpm$PHPVER"
+exec runas $RUNAS_ARGS --home /tmp nginx -g 'daemon off;'

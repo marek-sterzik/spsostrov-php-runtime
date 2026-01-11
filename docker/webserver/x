@@ -12,7 +12,7 @@ if [ "$#" = 0 ]; then
     args+=(bash)
 fi
 if [ "$SERVER_UID" != "`id -u`" -o "$SERVER_GID" != "`id -g`" ]; then
-    runas --user "$SERVER_UID" --group "$SERVER_GID" --home /tmp -- "${args[@]}"
+    runas $RUNAS_ARGS --home /tmp -- "${args[@]}"
 else
     export HOME="/tmp"
     "$@"
