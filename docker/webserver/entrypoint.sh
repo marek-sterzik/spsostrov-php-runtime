@@ -46,7 +46,11 @@ for file in "${WRITABLE_FILES[@]}"; do
     real_file="`realpath "$file"`"
     if echo "$real_file" | grep -q '^/app/'; then
         if ! [ -f "$file" -o -d "$file" ]; then
-            touch "$file"
+            if echo "$file" | grep -q '/$'; then
+                mkdir "$file"
+            else
+                touch "$file"
+            fi
         fi
         if [ -d "$file" ]; then
             chown -R "$SERVER_UID:$SERVER_GID" "$file"

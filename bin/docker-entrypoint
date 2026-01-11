@@ -7,7 +7,7 @@
 WORKER_PHP_SCRIPT="index.php"
 WORKER_ROOT="public"
 WORKER_COMMANDS+=("console:bin/console")
-WRITABLE_FILES+=(".env.local" ".env.local.php" "var")
+WRITABLE_FILES+=(".env.local" ".env.local.php" "var/")
 PERSISTENT_DIR="worker"
 
 envcheck RUNTIME_UID=default:33 .=uint
