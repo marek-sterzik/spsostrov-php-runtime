@@ -1,4 +1,5 @@
 import $ from "jquery"
+import regeneratorRuntime from "regenerator-runtime"
 
 async function testSync(url, element)
 {
