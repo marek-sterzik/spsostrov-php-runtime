@@ -15,12 +15,10 @@ spsostrov-php-runtime nebo v souboru [README.windows.md](https://github.com/mare
 
 ## Rychlý start
 
-Pro rychlý start systému, spusťte tuto sekvenci příkazů:
+Pro rychlý start systému, spusťte příkaz:
 
 ```
-bin/docker configure
-bin/docker up
-bin/docker initialize
+bin/docker start
 ```
 
 **Aplikaci přitom vždy ze zásady spouštíme jako obyčejný uživatel, nikdy jako root!**

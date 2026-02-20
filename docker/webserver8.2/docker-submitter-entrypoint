@@ -1,9 +1,0 @@
-#!/bin/bash
-
-echo "Submitter!"
-
-if [ -x "/var/www/html/bin/cron" ]; then
-    su www-data -c /var/www/html/bin/cron -s /bin/bash &
-fi
-
-exec docker-php-entrypoint "$@"

@@ -35,6 +35,12 @@ docker_configure() {
     . scripts/configure
 }
 
+docker_configure_cond() {
+    if [ ! -f ".config.env" ]; then
+        docker_configure
+    fi
+}
+
 do_initialize_deploy() {
     lib/invoke node bash scripts/initialize-node "$@"
     lib/invoke deploy bash scripts/initialize-deploy "$@"
@@ -106,9 +112,9 @@ parse_operation() {
         operation="exec"
     fi
     if [ "$operation" = "run" ]; then
-	echo run
+        echo run
     else
-	echo exec
+        echo exec
     fi
 }
 
@@ -131,10 +137,19 @@ docker_exec() {
     tflag=""
     test -t 0 || tflag="-T"
 
+    cmd_prefix=""
+    if [ "$container" = "webserver" -a "$operation" = "exec" ]; then
+        if [ "$user" = "www-data" ]; then
+            cmd_prefix=x
+            user=root
+        fi
+        
+    fi
+
     if [ "$#" = 0 ]; then
-        docker_compose $operation $tflag --user "$user" "$container" bash
+        docker_compose $operation $tflag --user "$user" "$container" $cmd_prefix bash
     else
-        docker_compose $operation $tflag --user "$user" "$container" "$@"
+        docker_compose $operation $tflag --user "$user" "$container" $cmd_prefix "$@"
     fi
 }
 
@@ -154,6 +169,8 @@ show_help() {
     echo "        stop all docker containers" 1>&2
     echo "    initialize" 1>&2
     echo "        initialize the application" 1>&2
+    echo "    start" 1>&2
+    echo "        start the whole application (configure & up & initialize)" 1>&2
     echo "    prod-update" 1>&2
     echo "        make production update of the application" 1>&2
     echo "    prepare-deploy" 1>&2
@@ -183,12 +200,16 @@ shift
 case "$cmd" in
 config|configure)
     docker_configure "$@";;
-up|start)
+up)
     docker_up "$@";;
 down|stop)
     docker_down "$@";;
 init|initialize)
     docker_initialize "$@";;
+start)
+    docker_configure_cond
+    docker_up
+    docker_initialize;;
 prod-update|production-update|update-prod|update-production)
     docker_prod_update "$@";;
 prepare-deploy|deploy-prepare)

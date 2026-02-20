@@ -2,18 +2,16 @@ services:
     webserver:
         build:
             context: docker/webserver
-            args:
-                - WWW_DATA_UID=${WWW_DATA_UID:-orig}
-                - WWW_DATA_GID=${WWW_DATA_GID:-orig}
 
         expose:
             - 80
         ports:
             - ${APP_PORT:-80}:80
         volumes:
-            - .:/var/www/html
+            - .:/app
         environment:
-            APACHE_DOCUMENT_ROOT: /var/www/html/public
+            RUNTIME_UID: ${WWW_DATA_UID:-33}
+            RUNTIME_GID: ${WWW_DATA_GID:-33}
     db:
         image: mysql:8.0.40
         expose:
