@@ -1,0 +1,13 @@
+images:
+    - name: main
+      prepare-command:
+        - "rm -rf var/cache/dev var/cache/test var/logs/test.log"
+      build: "docker/webserver"
+      project-dir: "/app"
+      subdir: "."
+      exclude:
+        - docker
+        - js
+        - node_modules
+        - standards
+        - tests
