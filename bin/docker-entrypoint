@@ -15,3 +15,8 @@ envcheck RUNTIME_GID=default:33 .=uint
 
 SERVER_UID="$RUNTIME_UID"
 SERVER_GID="$RUNTIME_GID"
+
+envcheck APP_ENV=default:prod .=enum:prod:test:dev
+envcheck APP_SECRET=default:7e0e13ce8d72716678be47a2c9d3ad15 .=re:'^[a-zA-Z0-9]+$'
+
+export ADMINER_ENABLED=true
