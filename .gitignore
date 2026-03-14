@@ -17,6 +17,7 @@
 /docker-compose-extra.yml
 
 ###> symfony/framework-bundle ###
+/.env.my
 /.env.local
 /.env.local.php
 /.env.*.local
