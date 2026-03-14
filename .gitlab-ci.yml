@@ -14,4 +14,4 @@ build:
       when: never
     - when: always
   script:
-    - build-script --composer
+    - build-script
