@@ -20,5 +20,7 @@ envcheck APP_ENV=default:prod .=enum:prod:test:dev
 envcheck APP_SECRET=default:7e0e13ce8d72716678be47a2c9d3ad15 .=re:'^[a-zA-Z0-9]+$'
 envcheck APP_NAME=default:odevzdej
 envcheck DATABASE_URL=url:schemes=mysql
+envcheck SSH_KEY=default:"" .=any
+envcheck SSH_KEY_PASSPHRASE=default:"" .=any
 
 export ADMINER_ENABLED=true

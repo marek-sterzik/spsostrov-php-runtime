@@ -1,0 +1,28 @@
+#!/bin/bash
+
+set -e
+
+cd "`dirname "$0"`/.."
+
+mkdir -p var/ssh
+cd var/ssh
+
+keyfile="key"
+keyfile_pub="$keyfile.pub"
+
+if [ -e "$keyfile" -a ! -f "$keyfile" ]; then
+    rm -rf "$keyfile"
+fi
+
+if [ -n "$SSH_KEY" ]; then
+    echo "$SSH_KEY" > "$keyfile"
+    if [ -n "$SSH_KEY_PASSPHRASE" ]; then
+        ssh-keygen -p -P "$SSH_KEY_PASSPHRASE" -N "" -f "$keyfile"
+    fi
+else
+    if [ ! -f "$keyfile" ]; then
+        ssh-keygen -P "" -f "$keyfile"
+    fi
+fi
+
+ssh-keygen -f "$keyfile" -y > "$keyfile_pub"

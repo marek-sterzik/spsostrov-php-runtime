@@ -1,5 +1,0 @@
-#!/bin/bash
-
-cd "`dirname "$0"`/.."
-
-lib/invoke runtime lib/ensure-ssh-key-exists "$@"
