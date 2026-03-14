@@ -1,7 +1,5 @@
 #!/bin/bash
 
-lib/create-ssh-key
-
 if [ -n "$(find migrations/ -iname '*.php')" ]; then
     lib/console doctrine:migrations:migrate --no-interaction
 fi

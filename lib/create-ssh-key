@@ -26,3 +26,5 @@ else
 fi
 
 ssh-keygen -f "$keyfile" -y > "$keyfile_pub"
+
+chown "$SERVER_UID:$SERVER_GID" "$keyfile" "$keyfile_pub"
