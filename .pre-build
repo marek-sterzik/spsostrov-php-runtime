@@ -2,7 +2,7 @@
 
 set -e
 
-docker compose run webserver composer install --no-dev
+#docker compose run webserver composer install --no-dev
 
 # yarn install???
 # bin/jscompile --prod

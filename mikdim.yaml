@@ -1,7 +1,8 @@
 images:
     - name: main
       prepare-command:
-        - "rm -rf var/cache/dev var/cache/test var/logs/test.log"
+        - "bin/jscompile --production"
+        - "rm -rf var/cache var/logs"
       build: "docker/webserver"
       project-dir: "/app"
       subdir: "."
