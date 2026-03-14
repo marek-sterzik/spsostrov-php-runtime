@@ -8,7 +8,6 @@ source envdump
 envdump --start
 
 if [ "$WORKER_ENV_BOOTED" != "full" -a "$WORKER_ENV_BOOTED" != "cron" ]; then
-    envcheck SYMFONY_ENV=default:prod .=enum:dev:test:prod
     export XDEBUG=0
     if [ -z "$XDEBUG_PORT" -o "$XDEBUG_PORT" = "none" ]; then
         XDEBUG_PORT=""
@@ -38,12 +37,6 @@ if [ "$WORKER_ENV_BOOTED" != "full" -a "$WORKER_ENV_BOOTED" != "cron" ]; then
     WORKER_COMMANDS=()
     WRITABLE_FILES=()
 
-
-    if [ "$SYMFONY_ENV" = prod ]; then
-        export SYMFONY_DEBUG="0"
-    else
-        export SYMFONY_DEBUG="1"
-    fi
 
     if [ -f "/app/bin/docker-entrypoint" ]; then
         test "$ENTRYPOINT" != 1 || echo "Setting up application..." 1>&2

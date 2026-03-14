@@ -102,9 +102,14 @@ touch /var/log/php-fpm.log /var/run/nginx.pid
 chown -R "$SERVER_UID:$SERVER_GID" /var/log/phpfpm /run/php /var/log/php-fpm.log /var/log/nginx /var/lib/nginx /var/run/nginx.pid 
 
 
-if [ -x "/app/bin/docker-boot" ]; then
+if [ -x "/app/bin/docker-boot" -o "/app/bin/docker-boot-root" ]; then
     echo "Booting application..." 1>&2
-    runas $RUNAS_ARGS --home /tmp /app/bin/docker-boot
+    if [ -x "/app/bin/docker-boot-root" ]; then
+        /app/bin/docker-boot-root
+    fi
+    if [ -x "/app/bin/docker-boot" ]; then
+        runas $RUNAS_ARGS --home /tmp /app/bin/docker-boot
+    fi
     echo "Application booted" 1>&2
 fi
 
@@ -112,8 +117,6 @@ fi
 if [ -n "$CRON_JOBS" ]; then
     echo "Starting cron" 1>&2
     (
-        echo "SYMFONY_ENV='$SYMFONY_ENV'"
-        echo "SYMFONY_DEBUG='$SYMFONY_DEBUG'"
         echo "SERVER_UID='$SERVER_UID'"
         echo "SERVER_GID='$SERVER_GID'"
         echo "WORKER_ENV_BOOTED='cron'"
