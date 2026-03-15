@@ -57,4 +57,9 @@ ne="development"
 if [ -n "$production" ]; then
     ne="production"
 fi
+
+if [ ! -d "node_modules" ]; then
+    yarn install
+fi
+
 NODE_ENV="$ne" node_modules/.bin/webpack $watch
