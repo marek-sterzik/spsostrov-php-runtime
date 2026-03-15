@@ -24,3 +24,8 @@ if [ -n "$(find migrations/ -iname '*.php')" ]; then
         fi
     fi
 fi
+
+if [ "$APP_ENV" != "dev" ]; then
+    rm -rf var/storage
+    ln -s "$PERSISTENT_DIR" var/storage
+fi
