@@ -9,7 +9,7 @@ ini_set("display_errors", false);
 
 require dirname(__DIR__).'/vendor/autoload.php';
 
-(new Dotenv())->bootEnv(dirname(__DIR__).'/.env');
+(new Dotenv())->bootEnv(dirname(__DIR__).'/.env', overrideExistingVars: true);
 
 if (isset($_SERVER['APP_TIMEZONE'])) {
     date_default_timezone_set($_SERVER["APP_TIMEZONE"]);
