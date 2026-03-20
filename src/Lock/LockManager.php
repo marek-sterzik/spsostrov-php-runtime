@@ -27,17 +27,15 @@ class LockManager
         }
 
         if (self::$perThreadLocks[$lockId] == 0) {
-            /*
             $query = $this->entityManager->createNativeQuery('SELECT GET_LOCK(?, ?) AS x', $this->rsm);
             $query->setParameter(1, $this->getLockName($lockId));
-            $query->setParameter(2, -1);
+            $query->setParameter(2, 0xffffff);
 
             $result = (int)$query->getSingleScalarResult();
 
             if (!$result) {
                 throw new Exception(sprintf('Cannot acquire lock %s', $this->getLockName($lockId)));
             }
-            */
         }
 
         self::$perThreadLocks[$lockId]++;
@@ -53,11 +51,9 @@ class LockManager
         self::$perThreadLocks[$lockId]--;
         if (self::$perThreadLocks[$lockId] <= 0) {
             unset(self::$perThreadLocks[$lockId]);
-            /*
             $query = $this->entityManager->createNativeQuery('SELECT RELEASE_LOCK(?) AS x', $this->rsm);
             $query->setParameter(1, $this->getLockName($lockId));
             $query->getSingleScalarResult();
-            */
         }
     }
 
