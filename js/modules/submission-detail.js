@@ -1,5 +1,6 @@
 import $ from "jquery"
 import updateHscroll from "../scroll"
+import regeneratorRuntime from "regenerator-runtime"
 
 const doUpdate = async (updateUrl) => {
     var result
