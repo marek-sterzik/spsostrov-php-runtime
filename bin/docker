@@ -215,7 +215,7 @@ start)
     docker_up
     docker_initialize;;
 build)
-    dokcer_build "$@";;
+    docker_build "$@";;
 logs)
     docker_logs "$@";;
 prod-update|production-update|update-prod|update-production)
