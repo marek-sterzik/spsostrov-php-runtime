@@ -67,6 +67,14 @@ docker_runtime_update() {
     do_initialize_runtime prod
 }
 
+docker_build() {
+    docker_compose build "$@"
+}
+
+docker_logs() {
+    docker_compose logs "$@"
+}
+
 docker_up() {
     docker_compose up --build -d
     echo "Running at port: ${APP_PORT:-80}"
@@ -206,6 +214,10 @@ start)
     docker_configure_cond
     docker_up
     docker_initialize;;
+build)
+    dokcer_build "$@";;
+logs)
+    docker_logs "$@";;
 prod-update|production-update|update-prod|update-production)
     docker_prod_update "$@";;
 prepare-deploy|deploy-prepare)
